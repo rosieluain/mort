@@ -1,11 +1,15 @@
 Package: mort
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
+Title: mort: Identifying potential mortalities and expelled tags in aquatic acoustic telemetry arrays
+Version: 0.0.1
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    person("Rosie", "Smith", , "rosieluain@gmail.com", role = c("aut", "cre"),
+           comment = c(ORCID = "0000-0003-2675-4452"))
+Description: WA toolkit for identifying potential mortalities and expelled tags in aquatic acoustic telemetry arrays. 
+    Designed for arrays with non-overlapping receivers. 
 License: GPL (>= 3)
 Encoding: UTF-8
+URL: https://github.com/rosieluain/mort
+BugReports: https://github.com/rosieluain/mort/issues
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
+LazyData: true
