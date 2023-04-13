@@ -1,2 +1,3 @@
-^.*\.Rproj$
+^mort\.Rproj$
 ^\.Rproj\.user$
+^LICENSE\.md$
