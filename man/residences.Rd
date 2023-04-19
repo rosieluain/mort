@@ -2,26 +2,41 @@
 % Please edit documentation in R/residences.R
 \name{residences}
 \alias{residences}
-\title{Generate residences}
+\title{Generate residence events}
 \usage{
-residences(data, ID, cutoff, units)
+residences(data, ID, station, datetime, cutoff, units)
 }
 \arguments{
 \item{data}{a data frame of detection data.}
 
-\item{ID}{a string of the column name in data frame \code{data} that includes the tag or sample ID}
+\item{ID}{a string of the name of the column in \code{data} that holds the tag or sample IDs.}
+
+\item{station}{a string of the name of the column in \code{data} that holds the station name or receiver location.}
+
+\item{datetime}{a string of the name of the column in \code{data} that holds the date and time.}
 
 \item{cutoff}{the maximum allowable time difference between detections to
 be considered a single residence event.}
 
-\item{units}{the units of the cutoff. Options are "secs", "mins", "hrs", or "days".}
+\item{units}{the units of the cutoff. These will also be the units used to calculate the duration of the residence events.
+Options are "secs", "mins", "hours", "days", and "weeks".}
 }
 \value{
-A data frame
+A data frame with one row for each residence event, including date/time of
+residence start, date/time of residence end, and duration of residence event. All
+input data fields (e.g., any name, location, or species information that was
+included with detection data) will be retained.
 }
 \description{
-Generate residences
+Generate residence events from passive acoustic telemetry data.
+}
+\details{
+Note that a progress bar appears, based on how many of the unique tag
+IDs have been processed. There will be a delay both before the progress bar
+appears and after the progress bar has reached 100\%, which may be substantial
+depending on the size of the telemetry dataset.
 }
 \examples{
-residences(data=dat,cutoff=1,units="days")
+\dontrun{residences(data=data,ID="TagID",station="Receiver",
+# datetime="DateTimeUTC",cutoff=1,units="days")}
 }
