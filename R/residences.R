@@ -39,6 +39,12 @@ residences<-function(data,ID,station,datetime,cutoff,units){
       stop(paste(datetime,"is not of class POSIXt and is not in the format YYYY-mm-dd HH:MM:SS"))
     }
   }
+  else {
+    # If datetime already in POSIXt, but no time zone specified, assume UTC
+    if (is.null(attributes(data[[datetime]])$tzone)){
+      attributes(data[[datetime]])$tzone<-"UTC"
+    }
+  }
 
   # Get number of columns of data - to help fill in res later
   ncdata<-ncol(data)
