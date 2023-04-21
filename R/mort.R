@@ -29,7 +29,7 @@
 #' @param residences a character string with the name of the column in `data`
 #' that holds the duration of the residence events. Must be specified if `format="manual"`.
 #' @param method the method to be used in flagging mortalities. Options are
-#' "", "", or "all"
+#' "last", "any", "cumulative", or "all"
 #' @param season a dataframe with start and end dates of the season(s) of interest
 #' @param ID a string of the name of the column in `data` that holds the tag or
 #' sample IDs.
@@ -39,6 +39,9 @@
 #' start date and time. Must be specified and in POSIXt if `format="manual"`.
 #' @param res.end a string of the name of the column in `data` that holds the
 #' end date and time. Must be specified and in POSIXt if `format="manual"`.
+#' @param singles specifies if single detections (length of residence event = 0)
+#' should be removed. Removing single detections is the most conservative method,
+#' so chance or potentially invalid detections do not affect mortality estimates.
 #'
 #' @return a dataframe with...
 #' @export
@@ -46,7 +49,8 @@
 #' @examples
 #' \dontrun{mort(data=res.events,format="manual",units="days",residences="ResidenceLength")}
 mort<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
-               method="all",units="auto",residences="auto",season=NULL){
+               method="all",units="auto",residences="auto",season=NULL,
+               singles=FALSE){
   if (type=="mort"){
     units=sub("ResidenceLength.","",colnames(data)[grep("ResidenceLength",colnames(data))])
   }
@@ -71,6 +75,24 @@ mort<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
 
   # Get list of unique tag IDs
   tag<-unique(data[[ID]])
+
+  # Most recent residence longer than max residence before station change
+  if (method %in% c("last","all")){
+
+
+    max(res.max.summer$ResTime)
+    # 37.4 in 2021 and spring 2022 - same after changing residences/Station.B
+    # Before 2021 data, was 34.2
+
+
+
+  }
+
+
+
+
+
+
 
 }
 
@@ -151,11 +173,7 @@ if ("resmorts.csv" %in% list.files(path="Data")){
 }
 
 #### Longest residence time followed by station change ####
-# Set up empty data frame that will hold maximum residence periods
-# for each char
-res.max<-residences[0,]
 
-pb<-txtProgressBar(1,length(char),style=3)
 for (i in 1:length(char)){
   # Subset residences from char ID i
   res.temp<-residences[residences$ID==char[i],]
@@ -310,6 +328,7 @@ for (i in 1:nrow(river.summer)){
                                              residences$EndUTC<=river.summer$Freeze[i],])
 }
 
+#### Turned into stationchange.R stationchange function (but not for summer) ####
 stn.change.summer<-residences[0,]
 pb<-txtProgressBar(1,length(char),style=3)
 for (i in 1:length(char)){
@@ -397,6 +416,7 @@ for (i in 1:length(char)){
 }
 
 #### Longest ice-free residence time followed by a station change ####
+#### Incorporated into stationchange.R resmax function (but not for summer) ####
 res.max.summer<-residences.char.summer[0,]
 
 for (i in 1:nrow(stn.change.summer)){
