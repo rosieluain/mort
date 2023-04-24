@@ -20,8 +20,8 @@
 #' @export
 #'
 #' @examples
-stationchange<-function(data=data,ID=ID,station=station,residences=residences,
-                        singles=singles){
+stationchange<-function(data,ID,station,residences,
+                        singles){
   # Get list of unique tag IDs
   tag<-unique(data[[ID]])
 
@@ -97,8 +97,8 @@ stationchange<-function(data=data,ID=ID,station=station,residences=residences,
 #' @export
 #'
 #' @examples
-resmax<-function(data=data,ID=ID,station=station,res.start=res.start,
-                 residences=residences,stnchange){
+resmax<-function(data,ID,station,res.start,
+                 residences,stnchange){
   res.max<-data[0,]
 
   for (i in 1:nrow(stnchange)){
