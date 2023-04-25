@@ -18,23 +18,27 @@
 
 
 
-#' MortTemp
+#' Identify potential mortalities or expelled tags
+#' @description Identifies potential mortalities or expelled tags from passive
+#' acoustic telemetry data. Mortalities are identified based on thresholds
+#' derived from the dataset itself.
 #'
-#' @param data a dataframe with residence events.
+#' @param data a dataframe of residence events. Residence events must include
+#' tag ID, location name, start time, and duration. Residence events must also
+#' include end time if `season` is provided.
 #' @param format the format used to generate the residence events. Options are
 #' "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
-#' must specify the `units` and `residences`.
-#' @param units units of the duration of the residence events in `data`. Must be
-#' specified if `format="manual"`.
+#' must specify `ID`, `station`, `res.start`, `res.end`, `residences`, and `units`.
+#' @param units units of the duration of the residence events in `data`.
 #' @param residences a character string with the name of the column in `data`
-#' that holds the duration of the residence events. Must be specified if `format="manual"`.
+#' that holds the duration of the residence events.
 #' @param method the method to be used in flagging mortalities. Options are
 #' "last", "any", "cumulative", or "all"
 #' @param season a dataframe with start and end dates of the season(s) of interest
 #' @param ID a string of the name of the column in `data` that holds the tag or
 #' sample IDs.
 #' @param station a string of the name of the column in `data` that holds the
-#' station name or receiver location
+#' station name or receiver location.
 #' @param res.start a string of the name of the column in `data` that holds the
 #' start date and time. Must be specified and in POSIXt if `format="manual"`.
 #' @param res.end a string of the name of the column in `data` that holds the
@@ -43,12 +47,16 @@
 #' should be removed. Removing single detections is the most conservative method,
 #' so chance or potentially invalid detections do not affect mortality estimates.
 #'
-#' @return a dataframe with...
+#' @return a dataframe with one row for each tag ID, including the date/time of
+#' the residence start when the potentia mortality or expelled tag was identified.
+#' All input data fields
+#' (e.g., any name, location, or species information that was included with the
+#' input data) will be retained.
 #' @export
 #'
 #' @examples
 #' \dontrun{mort(data=res.events,format="manual",units="days",residences="ResidenceLength")}
-mort<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
+morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
                method="all",units="auto",residences="auto",season=NULL,
                singles=FALSE){
   # if (format=="mort"){
@@ -73,20 +81,58 @@ mort<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
   # #
   # # }
   #
-  # # Get list of unique tag IDs
-  # tag<-unique(data[[ID]])
 
+  ### Add in a check that if any parameters are missing for manual method,
+  # then give an error
+
+  # Get list of unique tag IDs
+  tag<-unique(data[[ID]])
+
+  ### This is where ddd should be incorporated
   stn.change=stationchange(data=data,ID=ID,station=station,
                            residences=residences,singles=singles)
 
+  morts<-data[0,]
+
   # Most recent residence longer than max residence before station change
-  if (method %in% c("last","all")){
+  if (method %in% c("last","any","all")){
+    # Identify the longest residence followed by a station change
     max.res<-max(resmax(data=data,ID=ID,station=station,res.start=res.start,
                         residences=residences,stnchange=stn.change)[[residences]])
+    if (method=="last"){
+      # Note that not run for "all", because "last" is also captured with "any"
+      for (i in 1:length(tag)){
+        if (data[[residences]][data[[ID]]==tag[i]&
+                               data[[res.start]]==max(data[[res.start]][data[[ID]]==tag[i]])]>max.res){
+          morts[nrow(morts)+1,]<-data[data[[ID]]==tag[i]&
+                                        data[[res.start]]==max(data[[res.start]][data[[ID]]==tag[i]]),]
+        }
+      }
+    }
+    if (method %in% c("any","all")){
+      # Identify all the residences longer than max.res
+      # If they are after the last station change, then add them to morts
+
+      for (i in 1:length(tag)){
+        res.temp<-data[data[[ID]]==tag[i],]
+        j<-which(res.temp[[residences]]>max.res&
+                   res.temp[[res.start]]>1)
+        # If there are any long residences after the station change
+        if (length(j)>0){
+          # Find which one is the earliest
+          k<-which(res.temp[[res.start]][j]==min(res.temp[[res.start]][j]))
+          # Add to morts
+          morts[nrow(morts)+1,]<-res.temp[j[k],]
+        }
+      }
+    }
+  }
+
+  if (method %in% c("cumulative","all")){
 
   }
 
-  max.res
+  morts
 
 }
 

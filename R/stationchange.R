@@ -3,25 +3,37 @@
 
 
 
-#' Title
+#' Identify most recent station change
+#' @description Identify the most recent station or location change from passive
+#' acoustic telemetry data.
 #'
-#' @param data
-#' @param format
-#' @param ID
-#' @param station
-#' @param res.start
-#' @param res.end
-#' @param method
-#' @param units
-#' @param residences
-#' @param season
+#' @param data a dataframe of residence events. Residence events must include
+#' tag ID, location name, start time, and duration.
+#' @param format the format used to generate the residence events. Options are
+#' "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
+#' must specify `ID`, `station`, `res.start`, and `residences`.
+#' @param ID a string of the name of the column in `data` that holds the tag or
+#' sample IDs.
+#' @param station a string of the name of the column in `data` that holds the
+#' station name or receiver location.
+#' @param singles specifies if single detections (length of residence event = 0)
+#' should be removed. Removing single detections is the most conservative method,
+#' so chance or potentially invalid detections do not affect mortality estimates.
+#' @param residences a character string with the name of the column in `data`
+#' that holds the duration of the residence events.
+#' @param res.start a string of the name of the column in `data` that holds the
+#' start date and time. Must be specified and in POSIXt if `format="manual"`.
 #'
-#' @return
+#' @return a dataframe with one row for each tag ID, including the date/time of
+#' the residence start at the most recent station or location, the date/time of
+#' the residence end, and duration of the residence event. All input data fields
+#' (e.g., any name, location, or species information that was included with the
+#' input data) will be retained.
 #' @export
 #'
 #' @examples
-stationchange<-function(data,ID,station,residences,
-                        singles){
+stationchange<-function(data,format="mort",ID,station,res.start,residences,
+                        singles=FALSE){
   # Get list of unique tag IDs
   tag<-unique(data[[ID]])
 
@@ -29,6 +41,8 @@ stationchange<-function(data,ID,station,residences,
 
   for (i in 1:length(tag)){
     res.temp<-data[data[[ID]]==tag[i],]
+    # Order by time
+    res.temp<-res.temp[order(res.temp[[res.start]]),]
     if (singles==FALSE){
       # Remove single detections
       res.temp<-res.temp[res.temp[[residences]]!=0,]
@@ -67,13 +81,14 @@ stationchange<-function(data,ID,station,residences,
       if (j>0){
         stn.change[nrow(stn.change)+1,]<-res.temp[(j+1),]
       }
+      # If the fish has not changed locations for the whole detection history
+      else {
+        stn.change[nrow(stn.change)+1,]<-res.temp[1,]
+      }
     }
-
-    # # Don't want this (code below), but is there value in adding the tag ID and then an NA
-    # # if there are no station changes?
-    # else if (nrow(res.temp==1)){
-    #   stn.change.summer[nrow(stn.change.summer)+1,]<-res.temp[1,]
-    # }
+    else if (nrow(res.temp)==1){
+      stn.change[nrow(stn.change)+1,]<-res.temp[1,]
+    }
   }
 
   stn.change
@@ -84,16 +99,24 @@ stationchange<-function(data,ID,station,residences,
 
 #### Need to add season option
 
-#' Title
+#' Maximum residence duration
+#' @description
 #'
-#' @param data
-#' @param ID
-#' @param station
-#' @param res.start
-#' @param residences
-#' @param stnchange
+#' @param data a dataframe of residence events. Residence events must include
+#' tag ID, location name, start time, and duration. Residence events must also
+#' include end time if `season` is provided.
+#' @param ID a string of the name of the column in `data` that holds the tag or
+#' sample IDs.
+#' @param station a string of the name of the column in `data` that holds the
+#' station name or receiver location.
+#' @param res.start a string of the name of the column in `data` that holds the
+#' start date and time. Must be specified and in POSIXt if `format="manual"`.
+#' @param residences a character string with the name of the column in `data`
+#' that holds the duration of the residence events.
+#' @param stnchange a dataframe with the start time and location of the most
+#' recent station or location change. Must use the same column names as `data`.
 #'
-#' @return
+#' @return a dataframe with...
 #' @export
 #'
 #' @examples
@@ -105,19 +128,16 @@ resmax<-function(data,ID,station,res.start,
     # Subset residences for ID i, where res.start < res.start of stnchange
     res.temp<-data[data[[ID]]==stnchange[[ID]][i]&
                      data[[res.start]]<stnchange[[res.start]][i],]
-    j<-which(res.temp[[residences]]==max(res.temp[[residences]]))
-    for (k in 1:length(j)){
-      res.max[nrow(res.max)+1,]<-res.temp[j[k],]
+    if (nrow(res.temp)>0){
+      j<-which(res.temp[[residences]]==max(res.temp[[residences]]))
+      for (k in 1:length(j)){
+        res.max[nrow(res.max)+1,]<-res.temp[j[k],]
+      }
     }
   }
 
   res.max
 }
-
-
-# max(res.max.summer$ResTime)
-# # 37.4 in 2021 and spring 2022 - same after changing residences/Station.B
-# # Before 2021 data, was 34.2
 
 
 
