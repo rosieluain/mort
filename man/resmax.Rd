@@ -2,13 +2,39 @@
 % Please edit documentation in R/stationchange.R
 \name{resmax}
 \alias{resmax}
-\title{Title}
+\title{Maximum residence duration}
 \usage{
 resmax(data, ID, station, res.start, residences, stnchange)
 }
 \arguments{
-\item{stnchange}{}
+\item{data}{a dataframe of residence events. Residence events must include
+tag ID, location name, start time, and duration. Residence events must also
+include end time if \code{season} is provided.}
+
+\item{ID}{a string of the name of the column in \code{data} that holds the tag or
+sample IDs.}
+
+\item{station}{a string of the name of the column in \code{data} that holds the
+station name or receiver location.}
+
+\item{res.start}{a string of the name of the column in \code{data} that holds the
+start date and time. Must be specified and in POSIXt if \code{format="manual"}.}
+
+\item{residences}{a character string with the name of the column in \code{data}
+that holds the duration of the residence events.}
+
+\item{stnchange}{a dataframe with the start time and location of the most
+recent station or location change. Must use the same column names as \code{data}.}
+}
+\value{
+a dataframe with the residence information for the longest residence
+for each tag ID that occurred before the most recent station/location change.
 }
 \description{
-Title
+Find the maximum duration of a single residence in the dataset that occurred
+before a station change (i.e., the animal can be assumed to be alive)
+}
+\examples{
+\dontrun{resmax(data=res.events,ID="TagID",station="Receiver",
+res.start="StartUTC",residences="ResidencesLength.days",stnchange=station.change)}
 }

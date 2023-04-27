@@ -3,6 +3,7 @@
 export(morts)
 export(residences)
 export(resmax)
+export(resmaxcml)
 export(stationchange)
 importFrom(stats,na.omit)
 importFrom(utils,setTxtProgressBar)

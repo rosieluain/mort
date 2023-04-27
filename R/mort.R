@@ -89,7 +89,7 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
   tag<-unique(data[[ID]])
 
   ### This is where ddd should be incorporated
-  stn.change=stationchange(data=data,ID=ID,station=station,
+  stn.change=stationchange(data=data,ID=ID,station=station,res.start=res.start,
                            residences=residences,singles=singles)
 
   morts<-data[0,]
@@ -100,7 +100,7 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
     max.res<-max(resmax(data=data,ID=ID,station=station,res.start=res.start,
                         residences=residences,stnchange=stn.change)[[residences]])
     if (method=="last"){
-      # Note that not run for "all", because "last" is also captured with "any"
+      # Note that not run for "all" or "any", because "last" is also captured with "any"
       for (i in 1:length(tag)){
         if (data[[residences]][data[[ID]]==tag[i]&
                                data[[res.start]]==max(data[[res.start]][data[[ID]]==tag[i]])]>max.res){
@@ -112,7 +112,6 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
     if (method %in% c("any","all")){
       # Identify all the residences longer than max.res
       # If they are after the last station change, then add them to morts
-
       for (i in 1:length(tag)){
         res.temp<-data[data[[ID]]==tag[i],]
         j<-which(res.temp[[residences]]>max.res&
@@ -129,7 +128,33 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
   }
 
   if (method %in% c("cumulative","all")){
-
+    # Identify the longest cumulative residence followed by a station change
+    max.rescml<-max(resmaxcml(data=data,ID=ID,station=station,res.start=res.start,
+                              res.end=res.end,residences=residences,units=units,
+                              stnchange=stn.change)[[residences]])
+    for (i in 1:nrow(stn.change)){
+      res.temp<-data[data[[ID]]==stn.change[[ID]][i],]
+      # If the cumulative residence at the most recent station is longer than the
+      # threshold of max.rescml
+      if (difftime(res.temp[[res.end]][res.temp[[res.end]]==max(res.temp[[res.end]])],
+                   stn.change[[res.start]][i],units=units)>max.rescml){
+        # If the ID is already in morts
+        if (stn.change[[ID]][i] %in% morts[[ID]]){
+          # Identify which row
+          j<-which(morts[[ID]]==stn.change[[ID]][i])
+          # If the residence currently in res.morts ocurred later
+          # than the cumulative residence period
+          if (morts[[res.start]][j]>stn.change[[res.start]][i]){
+            # Adjust the start time to the earlier date
+            morts[j,]<-stn.change[i,]
+          }
+        }
+        # If the ID is not yet in morts
+        else {
+          morts[nrow(morts)+1,]<-stn.change[i,]
+        }
+      }
+    }
   }
 
   morts

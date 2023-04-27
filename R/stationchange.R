@@ -32,6 +32,8 @@
 #' @export
 #'
 #' @examples
+#' \dontrun{stationchange(data=res.events,format="manual",ID="TagID",
+#' station="Receiver",res.start="StartUTC",residences="ResidencesLength.days")}
 stationchange<-function(data,format="mort",ID,station,res.start,residences,
                         singles=FALSE){
   # Get list of unique tag IDs
@@ -100,7 +102,8 @@ stationchange<-function(data,format="mort",ID,station,res.start,residences,
 #### Need to add season option
 
 #' Maximum residence duration
-#' @description
+#' @description Find the maximum duration of a single residence in the dataset that occurred
+#' before a station change (i.e., the animal can be assumed to be alive)
 #'
 #' @param data a dataframe of residence events. Residence events must include
 #' tag ID, location name, start time, and duration. Residence events must also
@@ -116,10 +119,13 @@ stationchange<-function(data,format="mort",ID,station,res.start,residences,
 #' @param stnchange a dataframe with the start time and location of the most
 #' recent station or location change. Must use the same column names as `data`.
 #'
-#' @return a dataframe with...
+#' @return a dataframe with the residence information for the longest residence
+#' for each tag ID that occurred before the most recent station/location change.
 #' @export
 #'
 #' @examples
+#' \dontrun{resmax(data=res.events,ID="TagID",station="Receiver",
+#' res.start="StartUTC",residences="ResidencesLength.days",stnchange=station.change)}
 resmax<-function(data,ID,station,res.start,
                  residences,stnchange){
   res.max<-data[0,]
@@ -140,9 +146,86 @@ resmax<-function(data,ID,station,res.start,
 }
 
 
+#' Maximum cumulative residence duration
+#' @description Find the maximum duration that an animal spent at a single
+#' station/location before a station change (i.e., the animal can be assumed
+#' to be alive). Differs from `resmax` in that the duration is cumulative -
+#' the time of residence events and intervals between residence events are all
+#' included, provided there are no intervening residence events at other
+#' stations/locations.
+#'
+#' @param data a dataframe of residence events. Residence events must include
+#' tag ID, location name, start time, and duration. Residence events must also
+#' include end time if `season` is provided.
+#' @param ID a string of the name of the column in `data` that holds the tag or
+#' sample IDs.
+#' @param station a string of the name of the column in `data` that holds the
+#' station name or receiver location.
+#' @param res.start a string of the name of the column in `data` that holds the
+#' start date and time. Must be specified and in POSIXt if `format="manual"`.
+#' @param res.end a string of the name of the column in `data` that holds the
+#' end date and time. Must be specified and in POSIXt if `format="manual"`.
+#' @param residences a character string with the name of the column in `data`
+#' that holds the duration of the residence events.
+#' @param units units of the duration of the residence events in `data`.
+#' @param stnchange a dataframe with the start time and location of the most
+#' recent station or location change. Must use the same column names as `data`.
+#'
+#' @return a dataframe with the cumulative residence information for each
+#' period where an animal was consecutively detected at a single station/location.
+#' Records are only given for cumulative residences that occurred before the most
+#' recent station/location change (i.e., the animal can be assumed to be alive).
+#' @export
+#'
+#' @examples
+#' \dontrun{resmaxcml(data=res.events,ID="TagID",station="Receiver",
+#' res.start="StartUTC",res.end="EndUTC",residences="ResidencesLength.days",
+#' units="days",stnchange=station.change)}
+resmaxcml<-function(data,ID,station,res.start,res.end,
+                    residences,units,stnchange){
+  res.maxcml<-data[0,]
 
+  for (i in 1:nrow(stnchange)){
+    # Subset residences for ID i, where res.start < res.start of stnchange
+    res.temp<-data[data[[ID]]==stnchange[[ID]][i]&
+                     data[[res.start]]<stnchange[[res.start]][i],]
+    j<-1
+    repeat {
+      # If there are more than or equal (single residence) to j rows
+      if (nrow(res.temp)>=j){
+        # Set k = j to mark beginning
+        k<-j
+        repeat{
+          # If there are multiple residences and the first station
+          # name is the same as the next record
+          if (nrow(res.temp)>j&
+              (res.temp[[station]][j]==res.temp[[station]][j+1])){
+            # Go to next row
+            j<-j+1
+          }
+          # Otherwise, there is a station change after j
+          else {
+            # Add record j (before station change)
+            res.maxcml[nrow(res.maxcml)+1,]<-res.temp[j,]
+            # If the previous station change was before j (as marked by k)
+            if (k!=j){
+              # Adust StartUTC so it is the start of the cumulative residence
+              res.maxcml[[res.start]][nrow(res.maxcml)]<-res.temp[[res.start]][k]
+            }
+            # Go to next row
+            j<-j+1
+            break
+          }
+        }
+      }
+      else {break}
+    }
+  }
 
+  res.maxcml[[residences]]<-difftime(res.maxcml[[res.end]],
+                                     res.maxcml[[res.start]],
+                                     units=units)
 
-
-
+  res.maxcml
+}
 

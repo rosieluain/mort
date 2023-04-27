@@ -2,13 +2,54 @@
 % Please edit documentation in R/stationchange.R
 \name{stationchange}
 \alias{stationchange}
-\title{Title}
+\title{Identify most recent station change}
 \usage{
-stationchange(data, ID, station, residences, singles)
+stationchange(
+  data,
+  format = "mort",
+  ID,
+  station,
+  res.start,
+  residences,
+  singles = FALSE
+)
 }
 \arguments{
-\item{season}{}
+\item{data}{a dataframe of residence events. Residence events must include
+tag ID, location name, start time, and duration.}
+
+\item{format}{the format used to generate the residence events. Options are
+"mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
+must specify \code{ID}, \code{station}, \code{res.start}, and \code{residences}.}
+
+\item{ID}{a string of the name of the column in \code{data} that holds the tag or
+sample IDs.}
+
+\item{station}{a string of the name of the column in \code{data} that holds the
+station name or receiver location.}
+
+\item{res.start}{a string of the name of the column in \code{data} that holds the
+start date and time. Must be specified and in POSIXt if \code{format="manual"}.}
+
+\item{residences}{a character string with the name of the column in \code{data}
+that holds the duration of the residence events.}
+
+\item{singles}{specifies if single detections (length of residence event = 0)
+should be removed. Removing single detections is the most conservative method,
+so chance or potentially invalid detections do not affect mortality estimates.}
+}
+\value{
+a dataframe with one row for each tag ID, including the date/time of
+the residence start at the most recent station or location, the date/time of
+the residence end, and duration of the residence event. All input data fields
+(e.g., any name, location, or species information that was included with the
+input data) will be retained.
 }
 \description{
-Title
+Identify the most recent station or location change from passive
+acoustic telemetry data.
+}
+\examples{
+\dontrun{stationchange(data=res.events,format="manual",ID="TagID",
+station="Receiver",res.start="StartUTC",residences="ResidencesLength.days")}
 }

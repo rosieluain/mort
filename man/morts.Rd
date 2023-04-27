@@ -19,7 +19,9 @@ morts(
 )
 }
 \arguments{
-\item{data}{a dataframe with residence events.}
+\item{data}{a dataframe of residence events. Residence events must include
+tag ID, location name, start time, and duration. Residence events must also
+include end time if \code{season} is provided.}
 
 \item{format}{the format used to generate the residence events. Options are
 "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
@@ -29,7 +31,7 @@ must specify \code{ID}, \code{station}, \code{res.start}, \code{res.end}, \code{
 sample IDs.}
 
 \item{station}{a string of the name of the column in \code{data} that holds the
-station name or receiver location}
+station name or receiver location.}
 
 \item{res.start}{a string of the name of the column in \code{data} that holds the
 start date and time. Must be specified and in POSIXt if \code{format="manual"}.}
@@ -40,11 +42,10 @@ end date and time. Must be specified and in POSIXt if \code{format="manual"}.}
 \item{method}{the method to be used in flagging mortalities. Options are
 "last", "any", "cumulative", or "all"}
 
-\item{units}{units of the duration of the residence events in \code{data}. Must be
-specified if \code{format="manual"}.}
+\item{units}{units of the duration of the residence events in \code{data}.}
 
 \item{residences}{a character string with the name of the column in \code{data}
-that holds the duration of the residence events. Must be specified if \code{format="manual"}.}
+that holds the duration of the residence events.}
 
 \item{season}{a dataframe with start and end dates of the season(s) of interest}
 
@@ -53,10 +54,16 @@ should be removed. Removing single detections is the most conservative method,
 so chance or potentially invalid detections do not affect mortality estimates.}
 }
 \value{
-a dataframe with...
+a dataframe with one row for each tag ID, including the date/time of
+the residence start when the potentia mortality or expelled tag was identified.
+All input data fields
+(e.g., any name, location, or species information that was included with the
+input data) will be retained.
 }
 \description{
-Identify potential mortalities or expelled tags
+Identifies potential mortalities or expelled tags from passive
+acoustic telemetry data. Mortalities are identified based on thresholds
+derived from the dataset itself.
 }
 \examples{
 \dontrun{mort(data=res.events,format="manual",units="days",residences="ResidenceLength")}
