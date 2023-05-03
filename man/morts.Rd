@@ -34,10 +34,12 @@ sample IDs.}
 station name or receiver location.}
 
 \item{res.start}{a string of the name of the column in \code{data} that holds the
-start date and time. Must be specified and in POSIXt if \code{format="manual"}.}
+start date and time. Must be specified and in POSIXt or character in the format
+YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
 
 \item{res.end}{a string of the name of the column in \code{data} that holds the
-end date and time. Must be specified and in POSIXt if \code{format="manual"}.}
+end date and time. Must be specified and in POSIXt or character in the format
+YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
 
 \item{method}{the method to be used in flagging mortalities. Options are
 "last", "any", "cumulative", or "all"}
@@ -55,7 +57,7 @@ so chance or potentially invalid detections do not affect mortality estimates.}
 }
 \value{
 a dataframe with one row for each tag ID, including the date/time of
-the residence start when the potentia mortality or expelled tag was identified.
+the residence start when the potential mortality or expelled tag was identified.
 All input data fields
 (e.g., any name, location, or species information that was included with the
 input data) will be retained.
