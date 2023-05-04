@@ -12,14 +12,17 @@ infrequent(
   res.start,
   res.end,
   residences,
+  units,
   method,
   threshold,
+  threshold.units = NULL,
   recent.period = NULL,
   recent.units = NULL,
   start = NULL,
   end = NULL,
-  morts = NULL,
-  replace = FALSE
+  morts.prev = NULL,
+  replace = FALSE,
+  backwards = FALSE
 )
 }
 \arguments{
@@ -48,12 +51,19 @@ YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
 \item{residences}{residences a character string with the name of the column in \code{data}
 that holds the duration of the residence events.}
 
+\item{units}{Units of the duration of the residence events in \code{data}. Options are "secs",
+"mins", "hours", "days", and "weeks".}
+
 \item{method}{a character string of the threshold method. Options are "recent"
 and "defined". If "recent", must specify \code{recent.period} and \code{recent.units}.
 If "defined", must specify \code{start} and \code{end}.}
 
 \item{threshold}{the minimum summed duration of residence events for an animal
 to be considered alive. Units must be the same as the units of \code{residences}.}
+
+\item{threshold.units}{the units of \code{threshold}. Options are "secs",
+"mins", "hours", "days", and "weeks". If \code{NULL}, assumed to be the same as
+\code{units}.}
 
 \item{recent.period}{the length of the period of time in which an animal must
 be detected longer than the \code{threshold} to be considered alive. The period
@@ -72,12 +82,17 @@ detections if \code{method="defined"}. Must be in the format
 YYYY-mm-dd HH:MM:SS. The time zone is the same as \code{res.start} or
 assumed to be UTC if no time zone is defined for \code{res.start}.}
 
-\item{morts}{a dataframe containing potential mortalities. The dataframe must
+\item{morts.prev}{a dataframe containing potential mortalities. The dataframe must
 have the same columns and in the same order as \code{data}.}
 
 \item{replace}{if \code{morts} specified and an animal with infrequent detections
 is already in \code{morts}, the record in \code{morts} will be replaced if \code{TRUE}.
 Default is \code{FALSE}.}
+
+\item{backwards}{option to examine residence events prior to the one that was
+flagged as a potential mortality. If prior residence events are at the same
+station/location as the flagged event, the time of the potential mortality is shifted
+earlier.}
 }
 \value{
 if \code{morts=NULL}, a dataframe with one row for each tag ID, including the date/time of

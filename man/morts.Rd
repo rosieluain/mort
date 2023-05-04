@@ -15,7 +15,9 @@ morts(
   units = "auto",
   residences = "auto",
   season = NULL,
-  singles = FALSE
+  singles = FALSE,
+  backwards = FALSE,
+  morts.prev = NULL
 )
 }
 \arguments{
@@ -54,6 +56,15 @@ that holds the duration of the residence events.}
 \item{singles}{specifies if single detections (length of residence event = 0)
 should be removed. Removing single detections is the most conservative method,
 so chance or potentially invalid detections do not affect mortality estimates.}
+
+\item{backwards}{option to examine residence events prior to the one that was
+flagged as a potential mortality. If prior residence events are at the same
+station/location as the flagged event, the time of the potential mortality is shifted
+earlier. Note that if \code{backwards=TRUE}, then the output of \code{method="last"} is
+the same as \code{method="any"}.}
+
+\item{morts.prev}{a dataframe containing potential mortalities. The dataframe must
+have the same columns and in the same order as \code{data}.}
 }
 \value{
 a dataframe with one row for each tag ID, including the date/time of

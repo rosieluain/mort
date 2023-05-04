@@ -48,6 +48,13 @@
 #' @param singles specifies if single detections (length of residence event = 0)
 #' should be removed. Removing single detections is the most conservative method,
 #' so chance or potentially invalid detections do not affect mortality estimates.
+#' @param morts.prev a dataframe containing potential mortalities. The dataframe must
+#' have the same columns and in the same order as `data`.
+#' @param backwards option to examine residence events prior to the one that was
+#' flagged as a potential mortality. If prior residence events are at the same
+#' station/location as the flagged event, the time of the potential mortality is shifted
+#' earlier. Note that if `backwards=TRUE`, then the output of `method="last"` is
+#' the same as `method="any"`.
 #'
 #' @return a dataframe with one row for each tag ID, including the date/time of
 #' the residence start when the potential mortality or expelled tag was identified.
@@ -60,7 +67,7 @@
 #' \dontrun{mort(data=res.events,format="manual",units="days",residences="ResidenceLength")}
 morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
                method="all",units="auto",residences="auto",season=NULL,
-               singles=FALSE){
+               singles=FALSE,backwards=FALSE,morts.prev=NULL){
   # if (format=="mort"){
   #   units=sub("ResidenceLength.","",colnames(data)[grep("ResidenceLength",colnames(data))])
   # }
@@ -103,11 +110,18 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
   # Get list of unique tag IDs
   tag<-unique(data[[ID]])
 
+  if (!is.null(morts.prev)){
+    morts<-morts.prev
+    if (backwards==TRUE){
+      nm<-nrow(morts)
+      new.morts<-as.numeric()
+    }
+  }
+  else {morts<-data[0,]}
+
   ### This is where ddd should be incorporated
   stn.change=stationchange(data=data,ID=ID,station=station,res.start=res.start,
                            residences=residences,singles=singles)
-
-  morts<-data[0,]
 
   # Most recent residence longer than max residence before station change
   if (method %in% c("last","any","all")){
@@ -117,10 +131,15 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
     if (method=="last"){
       # Note that not run for "all" or "any", because "last" is also captured with "any"
       for (i in 1:length(tag)){
-        if (data[[residences]][data[[ID]]==tag[i]&
-                               data[[res.start]]==max(data[[res.start]][data[[ID]]==tag[i]])]>max.res){
-          morts[nrow(morts)+1,]<-data[data[[ID]]==tag[i]&
+        # Only run if ID not already in morts
+        # If it is already in morts, it would be from infrequent function, which
+        # would identify a time earlier or equal to the most recent detection
+        if (!(tag[i] %in% morts[[ID]])){
+          if (data[[residences]][data[[ID]]==tag[i]&
+                                 data[[res.start]]==max(data[[res.start]][data[[ID]]==tag[i]])]>max.res){
+            morts[nrow(morts)+1,]<-data[data[[ID]]==tag[i]&
                                         data[[res.start]]==max(data[[res.start]][data[[ID]]==tag[i]]),]
+          }
         }
       }
     }
@@ -135,8 +154,19 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
         if (length(j)>0){
           # Find which one is the earliest
           k<-which(res.temp[[res.start]][j]==min(res.temp[[res.start]][j]))
-          # Add to morts
-          morts[nrow(morts)+1,]<-res.temp[j[k],]
+          if (tag[i] %in% morts[[ID]]){
+            m<-which(morts[[ID]]==tag[i])
+            if (res.temp[[res.start]][j[k]]<morts[[res.start]][m]){
+              morts[m,]<-res.temp[j[k],]
+            }
+            if (backwards==TRUE){
+              new.morts<-c(new.morts,m)
+            }
+          }
+          else {
+            # Add to morts
+            morts[nrow(morts)+1,]<-res.temp[j[k],]
+          }
         }
       }
     }
@@ -162,6 +192,9 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
           if (morts[[res.start]][j]>stn.change[[res.start]][i]){
             # Adjust the start time to the earlier date
             morts[j,]<-stn.change[i,]
+            if (backwards==TRUE){
+              new.morts<-c(new.morts,j)
+            }
           }
         }
         # If the ID is not yet in morts
@@ -172,11 +205,25 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
     }
   }
 
+  if (backwards==TRUE){
+    if (!is.null(morts.prev)){
+      if (nrow(morts)>nm){
+        new.morts<-unique(c(new.morts,seq((nm+1),nrow(morts),1)))
+        for (i in 1:length(new.morts)){
+          morts[i,]<-backwards(data=data,morts=morts[i,],ID=ID,station=station,
+                               res.start=res.start,season=FALSE,stnchange=stn.change)
+        }
+      }
+    }
+    else {
+      morts<-backwards(data=data,morts=morts,ID=ID,station=station,
+                       res.start=res.start,season=FALSE,stnchange=stn.change)
+    }
+  }
+
   morts
 
 }
-
-
 
 
 #' Identify potential mortalities from infrequent detections
@@ -225,11 +272,15 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
 #' detections if `method="defined"`. Must be in the format
 #' YYYY-mm-dd HH:MM:SS. The time zone is the same as `res.start` or
 #' assumed to be UTC if no time zone is defined for `res.start`.
-#' @param morts a dataframe containing potential mortalities. The dataframe must
+#' @param morts.prev a dataframe containing potential mortalities. The dataframe must
 #' have the same columns and in the same order as `data`.
 #' @param replace if `morts` specified and an animal with infrequent detections
 #' is already in `morts`, the record in `morts` will be replaced if `TRUE`.
 #' Default is `FALSE`.
+#' @param backwards option to examine residence events prior to the one that was
+#' flagged as a potential mortality. If prior residence events are at the same
+#' station/location as the flagged event, the time of the potential mortality is shifted
+#' earlier.
 #'
 #' @details Example of `method="recent"`: if `threshold=10` and `recent.period=1` and
 #' `recent.units="years"`, an animal will be flagged as a potential mortality if
@@ -264,8 +315,8 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
 
 infrequent<-function(data,format,ID,station,res.start,res.end,residences,units,
                      method,threshold,threshold.units=NULL,recent.period=NULL,recent.units=NULL,
-                     start=NULL,end=NULL,morts=NULL,replace=FALSE){
-  #### Need to add in if want to move backwards
+                     start=NULL,end=NULL,morts.prev=NULL,replace=FALSE,backwards=FALSE){
+
   if (all(class(data[[res.start]])!="POSIXt")){
     try(data[[res.start]]<-as.POSIXct(data[[res.start]],tz="UTC",silent=TRUE))
     if (all(class(data[[res.start]])!="POSIXt")){
@@ -288,10 +339,15 @@ infrequent<-function(data,format,ID,station,res.start,res.end,residences,units,
 
   tag<-unique(data[[ID]])
 
-  # If there is already a morts dataframe, remove those IDs from tag
-  if (!is.null(morts)){
-    tag<-tag[!(tag %in% morts[[ID]])]
-    inf.morts<-morts
+  # If there is already a morts dataframe and replace=FALSE, remove those IDs from tag
+  if (!is.null(morts.prev)){
+    if (replace==FALSE){
+      tag<-tag[!(tag %in% morts.prev[[ID]])]
+    }
+    inf.morts<-morts.prev
+    if (backwards==TRUE){
+      new.morts<-as.numeric()
+    }
   }
   else {inf.morts<-data[0,]}
 
@@ -304,17 +360,31 @@ infrequent<-function(data,format,ID,station,res.start,res.end,residences,units,
       stop("recent.units is not specified")
     }
     for (i in 1:length(tag)){
-      if (is.null(morts)|
-          (!is.null(morts)&
+      if (is.null(morts.prev)|
+          (!is.null(morts.prev)&
            (replace==TRUE|
-            !(tag[i] %in% morts)))){
+            !(tag[i] %in% morts.prev[[ID]])))){
         res.temp<-data[data[[ID]]==tag[i]&
                          difftime(data[[res.end]][data[[res.end]]==max(data[[res.end]])],
                                   data[[res.end]],units=recent.units)<recent.period,]
         if (nrow(res.temp)>=1&
             length(unique(res.temp[[station]]))==1&
             sum(res.temp[[residences]])<threshold){
-          inf.morts[nrow(inf.morts)+1,]<-res.temp[1,]
+          if (tag[i] %in% inf.morts[[ID]]){
+            j<-which(inf.morts[[ID]]==tag[i])
+            if (res.temp[[res.start]][1]<inf.morts[[res.start]][j]){
+              inf.morts[j,]<-res.temp[1,]
+              if (!is.null(morts.prev)&backwards==TRUE){
+                new.morts<-c(new.morts,j)
+              }
+            }
+          }
+          else {
+            inf.morts[nrow(inf.morts)+1,]<-res.temp[1,]
+            # if (!is.null(morts.prev)&backwards==TRUE){
+            #   new.morts<-c(new.morts,nrow(inf.morts))
+            # }
+          }
         }
       }
     }
@@ -338,10 +408,10 @@ infrequent<-function(data,format,ID,station,res.start,res.end,residences,units,
       stop("end is not in the format YYYY-mm-dd HH:MM:SS")
     }
     for (i in 1:length(tag)){
-      if (is.null(morts)|
-          (!is.null(morts)&
+      if (is.null(morts.prev)|
+          (!is.null(morts.prev)&
            (replace==TRUE|
-            !(tag[i] %in% morts)))){
+            !(tag[i] %in% morts.prev)))){
         res.temp<-data[data[[ID]]==tag[i]&
                          data[[res.end]]>=start&
                          data[[res.start]]<=end,]
@@ -349,6 +419,27 @@ infrequent<-function(data,format,ID,station,res.start,res.end,residences,units,
             length(unique(res.temp[[station]]))==1&
             sum(res.temp[[residences]])<threshold){
           inf.morts[nrow(inf.morts)+1,]<-res.temp[1,]
+          # if (!is.null(morts.prev)&backwards==TRUE){
+          #   new.morts<-c(new.morts,nrow(inf.morts))
+          # }
+        }
+      }
+    }
+  }
+
+  if (backwards==TRUE){
+    if (is.null(morts.prev)){
+    inf.morts<-backwards(data=data,morts=inf.morts,ID=ID,station=station,
+                         res.start=res.start,season=FALSE)
+    }
+    else {
+      if (nrow(inf.morts)>nrow(morts.prev)){
+        new.morts<-c(new.morts,seq(nrow(morts.prev)+1,nrow(inf.morts),1))
+      }
+      if (length(new.morts)>0){
+        for (i in 1:length(new.morts)){
+          inf.morts[new.morts[i],]<-backwards(data=data,morts=inf.morts[new.morts[i],],ID=ID,station=station,
+                                           res.start=res.start,season=NULL)
         }
       }
     }
