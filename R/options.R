@@ -72,11 +72,42 @@ backwards<-function(data,morts,ID,station,res.start,season=NULL,
   morts
 }
 
+#### ddd (dead drift direction) ####
+drift<-function(data,ID,station,res.start,res.end,ddd,from.station,to.station,
+                cutoff,units){
+  # Get list of unique tag IDs
+  tag<-unique(data[[ID]])
+
+  res.drift<-data[0,]
+
+  for (i in 1:length(tag)){
+    res.temp<-data[data[[ID]]==tag[i],]
+    if (nrow(res.temp)>1&
+        any(res.temp[[station]][1:(nrow(res.temp)-1),] %in% ddd[[from.station]])){
+      j<-which(res.temp[[station]] %in% ddd[[from.station]])
+      # Exclude any where j is the last record
+      if (nrow(res.temp) %in% j){
+        j<-j[-which(j==nrow(res.temp))]
+      }
+      del<-as.numeric()
+      for (k in 1:length(j)){
+        if ((res.temp[[station]][j[k]+1] %in%
+             ddd[[to.station]][ddd[[from.station]]==res.temp[[station]][j[k]]])&
+            difftime(res.temp[[res.start]][j[k]+1],
+                     res.temp[[res.end]][j[k]],
+                     units=units)<cutoff){
+          res.temp[[res.start]][j[k+1]]<-res.temp[[res.start]][j[k]]
+          res.temp[[station]][j[k+1]]<-res.temp[[station]][j[k]]
+          del<-c(del,j[k])
+        }
+      }
+      res.temp<-res.temp[-del,]
+    }
+    res.drift[(nrow(res.drift)+1):(nrow(res.drift)+nrow(res.temp)),]<-res.temp[,]
+  }
+}
 
 
 
-
-
-#### DDD ####
 
 #### Seasonal ####

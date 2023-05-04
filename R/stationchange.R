@@ -35,7 +35,7 @@
 #' \dontrun{stationchange(data=res.events,format="manual",ID="TagID",
 #' station="Receiver",res.start="StartUTC",residences="ResidencesLength.days")}
 stationchange<-function(data,format="mort",ID,station,res.start,residences,
-                        singles=FALSE){
+                        singles=FALSE,ddd=NULL){
   # Get list of unique tag IDs
   tag<-unique(data[[ID]])
 
