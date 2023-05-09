@@ -55,6 +55,23 @@
 #' station/location as the flagged event, the time of the potential mortality is shifted
 #' earlier. Note that if `backwards=TRUE`, then the output of `method="last"` is
 #' the same as `method="any"`.
+#' @param drift option to account for potential drifting in identifying
+#' thresholds and/or mortalities. Options are "none", "threshold",
+#' "morts", "both". Default is "none".
+#' @param ddd a dataframe of stations/locations where detected movement between
+#' stations may be due to drifting of an expelled tag or dead animal.
+#' @param from.station a string of the name of the column in `ddd` that contains
+#' the station/location names where drifting detections may start from. Must
+#' be identical to the station/location names in `data`.
+#' @param to.station a string of the name of the column in `ddd` that contains
+#' the station/location names where drifting detections may move to. Must
+#' be identical to the station/location names in `data`.
+#' @param drift.cutoff the maximum allowable time difference between detections to be
+#' considered a single residence event. Recommended to be the same as used
+#' to generate residence events in `data`.
+#' @param drift.units the units of the cutoff. Options are "secs", "mins", "hours",
+#' "days", and "weeks". Recommended to be the same as used to generate
+#' residence events in `data`.
 #'
 #' @return a dataframe with one row for each tag ID, including the date/time of
 #' the residence start when the potential mortality or expelled tag was identified.
@@ -67,7 +84,9 @@
 #' \dontrun{mort(data=res.events,format="manual",units="days",residences="ResidenceLength")}
 morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
                method="all",units="auto",residences="auto",season=NULL,
-               singles=FALSE,backwards=FALSE,morts.prev=NULL){
+               singles=FALSE,backwards=FALSE,drift="none",ddd=NULL,
+               from.station=NULL, to.station=NULL,drift.cutoff=NULL,
+               drift.units=NULL,morts.prev=NULL){
   # if (format=="mort"){
   #   units=sub("ResidenceLength.","",colnames(data)[grep("ResidenceLength",colnames(data))])
   # }
@@ -119,13 +138,36 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
   }
   else {morts<-data[0,]}
 
-  ### This is where ddd should be incorporated
-  stn.change=stationchange(data=data,ID=ID,station=station,res.start=res.start,
-                           residences=residences,singles=singles)
+  if (drift %in% c("none","morts")){
+    stn.change=stationchange(data=data,ID=ID,station=station,res.start=res.start,
+                             residences=residences,singles=singles)
+  }
+  else { # "both" or "threshold"
+    stn.change=stationchange(data=data,ID=ID,station=station,res.start=res.start,
+                             res.end=res.end,residences=residences,singles=singles,
+                             drift=TRUE,ddd=ddd,from.station=from.station,
+                             to.station=to.station,drift.units=drift.units,
+                             if(!is.null(drift.cutoff)){drift.cutoff=drift.cutoff})
+  }
+  if (drift=="morts"){
+    stn.change.morts=stationchange(data=data,ID=ID,station=station,res.start=res.start,
+                                   res.end=res.end,residences=residences,singles=singles,
+                                   drift=TRUE,ddd=ddd,from.station=from.station,
+                                   to.station=to.station,drift.units=drift.units,
+                                   if(!is.null(drift.cutoff)){drift.cutoff=drift.cutoff})
+  }
+  if (drift=="threshold"){
+    stn.change.morts=stationchange(data=data,ID=ID,station=station,res.start=res.start,
+                                   residences=residences,singles=singles)
+  }
+  if (drift %in% c("none","both")){
+    stn.change.morts<-stn.change
+  }
 
   # Most recent residence longer than max residence before station change
   if (method %in% c("last","any","all")){
     # Identify the longest residence followed by a station change
+    # stnchange here is for threshold, so use stn.change
     max.res<-max(resmax(data=data,ID=ID,station=station,res.start=res.start,
                         residences=residences,stnchange=stn.change)[[residences]])
     if (method=="last"){
@@ -145,11 +187,11 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
     }
     if (method %in% c("any","all")){
       # Identify all the residences longer than max.res
-      # If they are after the last station change, then add them to morts
+      # If they are during or after the last station change, then add them to morts
       for (i in 1:length(tag)){
         res.temp<-data[data[[ID]]==tag[i],]
         j<-which(res.temp[[residences]]>max.res&
-                   res.temp[[res.start]]>1)
+                   res.temp[[res.start]]>=stn.change.morts[[res.start]][stn.change.morts[[ID]]==tag[i]])
         # If there are any long residences after the station change
         if (length(j)>0){
           # Find which one is the earliest
@@ -159,7 +201,8 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
             if (res.temp[[res.start]][j[k]]<morts[[res.start]][m]){
               morts[m,]<-res.temp[j[k],]
             }
-            if (backwards==TRUE){
+            if (backwards==TRUE&
+                !is.null(morts.prev)){
               new.morts<-c(new.morts,m)
             }
           }
@@ -177,29 +220,30 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
     max.rescml<-max(resmaxcml(data=data,ID=ID,station=station,res.start=res.start,
                               res.end=res.end,residences=residences,units=units,
                               stnchange=stn.change)[[residences]])
-    for (i in 1:nrow(stn.change)){
-      res.temp<-data[data[[ID]]==stn.change[[ID]][i],]
+    for (i in 1:nrow(stn.change.morts)){
+      res.temp<-data[data[[ID]]==stn.change.morts[[ID]][i],]
       # If the cumulative residence at the most recent station is longer than the
       # threshold of max.rescml
       if (difftime(res.temp[[res.end]][res.temp[[res.end]]==max(res.temp[[res.end]])],
-                   stn.change[[res.start]][i],units=units)>max.rescml){
+                   stn.change.morts[[res.start]][i],units=units)>max.rescml){
         # If the ID is already in morts
-        if (stn.change[[ID]][i] %in% morts[[ID]]){
+        if (stn.change.morts[[ID]][i] %in% morts[[ID]]){
           # Identify which row
-          j<-which(morts[[ID]]==stn.change[[ID]][i])
+          j<-which(morts[[ID]]==stn.change.morts[[ID]][i])
           # If the residence currently in res.morts ocurred later
           # than the cumulative residence period
-          if (morts[[res.start]][j]>stn.change[[res.start]][i]){
+          if (morts[[res.start]][j]>stn.change.morts[[res.start]][i]){
             # Adjust the start time to the earlier date
-            morts[j,]<-stn.change[i,]
-            if (backwards==TRUE){
+            morts[j,]<-stn.change.morts[i,]
+            if (backwards==TRUE&
+                !is.null(morts.prev)){
               new.morts<-c(new.morts,j)
             }
           }
         }
         # If the ID is not yet in morts
         else {
-          morts[nrow(morts)+1,]<-stn.change[i,]
+          morts[nrow(morts)+1,]<-stn.change.morts[i,]
         }
       }
     }
@@ -211,13 +255,13 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
         new.morts<-unique(c(new.morts,seq((nm+1),nrow(morts),1)))
         for (i in 1:length(new.morts)){
           morts[i,]<-backwards(data=data,morts=morts[i,],ID=ID,station=station,
-                               res.start=res.start,season=FALSE,stnchange=stn.change)
+                               res.start=res.start,season=FALSE,stnchange=stn.change.morts)
         }
       }
     }
     else {
       morts<-backwards(data=data,morts=morts,ID=ID,station=station,
-                       res.start=res.start,season=FALSE,stnchange=stn.change)
+                       res.start=res.start,season=FALSE,stnchange=stn.change.morts)
     }
   }
 

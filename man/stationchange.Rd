@@ -11,7 +11,8 @@ stationchange(
   station,
   res.start,
   residences,
-  singles = FALSE
+  singles = FALSE,
+  ddd = NULL
 )
 }
 \arguments{

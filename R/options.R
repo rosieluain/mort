@@ -73,8 +73,66 @@ backwards<-function(data,morts,ID,station,res.start,season=NULL,
 }
 
 #### ddd (dead drift direction) ####
-drift<-function(data,ID,station,res.start,res.end,ddd,from.station,to.station,
-                cutoff,units){
+#' Dead drift
+#' @description Identifies sequential residence events where detected movement
+#' between stations may be due to drifting of an expelled tag or dead animal.
+#'
+#' @param data a data frame of residence events. Residence events must include
+#' tag ID, location name, start time, and end time.
+#' @param format the format used to generate the residence events in `data`.
+#' Options are "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then
+#' user must specify `ID`, `station`, `res.start`, and `res.end`.
+#' @param ID a string of the name of the column in `data` that holds the tag or
+#' sample IDs.
+#' @param station a string of the name of the column in `data` that holds the
+#' station name or receiver location.
+#' @param res.start a string of the name of the column in `data` that holds the
+#' start date and time. Must be specified and in POSIXt or character in the format
+#' YYYY-mm-dd HH:MM:SS if `format="manual"`.
+#' @param res.end a string of the name of the column in `data` that holds the
+#' end date and time. Must be specified and in POSIXt or character in the format
+#' YYYY-mm-dd HH:MM:SS if `format="manual"`.
+#' @param ddd a dataframe of stations/locations where detected movement between
+#' stations may be due to drifting of an expelled tag or dead animal.
+#' @param from.station a string of the name of the column in `data` that contains
+#' the station/location names where drifting detections may start from.
+#' @param to.station a string of the name of the column in `data` that contains
+#' the station/location names where drifting detections may move to.
+#' @param cutoff the maximum allowable time difference between detections to be
+#' considered a single residence event. Default is `NULL`.
+#' @param units the units of the cutoff. Options are "secs", "mins", "hours",
+#' "days", and "weeks".
+#'
+#' @return A data frame with one row for each residence event. Format is the
+#' same as the input residence events, but events that may be due to dead drift
+#' are combined into single residence events.
+#' @export
+#'
+#' @examples
+#' \dontrun{drift(data=data,format="manual",ID="TagID",station="Receiver",
+#' res.start="ResidenceStart",res.end="ResidenceEnd",ddd=driftstations,
+#' from.station="FrStation",to.station="ToStation")}
+drift<-function(data,format,ID,station,res.start,res.end,
+                residences,ddd,from.station,to.station,
+                cutoff=NULL,units=NULL){
+
+  # Could make this check be a function
+  if (all(class(data[[res.start]])!="POSIXt")){
+    try(data[[res.start]]<-as.POSIXct(data[[res.start]],tz="UTC",silent=TRUE))
+    if (all(class(data[[res.start]])!="POSIXt")){
+      stop("res.start is not in the format YYYY-mm-dd HH:MM:SS")
+    }
+  }
+  if (all(class(data[[res.end]])!="POSIXt")){
+    try(data[[res.end]]<-as.POSIXct(data[[res.end]],tz="UTC",silent=TRUE))
+    if (all(class(data[[res.end]])!="POSIXt")){
+      stop("res.end is not in the format YYYY-mm-dd HH:MM:SS")
+    }
+  }
+
+  # Convert station to list (to hold all stations, in order)
+  data[[station]]<-as.list(data[[station]])
+
   # Get list of unique tag IDs
   tag<-unique(data[[ID]])
 
@@ -83,28 +141,49 @@ drift<-function(data,ID,station,res.start,res.end,ddd,from.station,to.station,
   for (i in 1:length(tag)){
     res.temp<-data[data[[ID]]==tag[i],]
     if (nrow(res.temp)>1&
-        any(res.temp[[station]][1:(nrow(res.temp)-1),] %in% ddd[[from.station]])){
+        any(res.temp[[station]][1:(nrow(res.temp)-1)] %in% ddd[[from.station]])){
       j<-which(res.temp[[station]] %in% ddd[[from.station]])
       # Exclude any where j is the last record
       if (nrow(res.temp) %in% j){
         j<-j[-which(j==nrow(res.temp))]
       }
       del<-as.numeric()
-      for (k in 1:length(j)){
-        if ((res.temp[[station]][j[k]+1] %in%
-             ddd[[to.station]][ddd[[from.station]]==res.temp[[station]][j[k]]])&
-            difftime(res.temp[[res.start]][j[k]+1],
-                     res.temp[[res.end]][j[k]],
-                     units=units)<cutoff){
-          res.temp[[res.start]][j[k+1]]<-res.temp[[res.start]][j[k]]
-          res.temp[[station]][j[k+1]]<-res.temp[[station]][j[k]]
-          del<-c(del,j[k])
+      if (is.null(cutoff)){
+        for (k in 1:length(j)){
+          if (res.temp[[station]][j[k]+1] %in%
+              ddd[[to.station]][ddd[[from.station]]==res.temp[[station]][[j[k]]][length(res.temp[[station]][[j[k]]])]]){
+            res.temp[[res.start]][j[k+1]]<-res.temp[[res.start]][j[k]]
+            res.temp[[station]][[j[k+1]]]<-append(res.temp[[station]][[j[k]]],res.temp[[station]][[j[k+1]]])
+            # res.temp[[station]][j[k+1]]<-res.temp[[station]][j[k]]
+            del<-c(del,j[k])
+          }
         }
       }
-      res.temp<-res.temp[-del,]
+      else {
+        for (k in 1:length(j)){
+          if ((res.temp[[station]][j[k]+1] %in%
+               ddd[[to.station]][ddd[[from.station]]==res.temp[[station]][j[k]]])&
+              difftime(res.temp[[res.start]][j[k]+1],
+                       res.temp[[res.end]][j[k]],
+                       units=units)<cutoff){
+            res.temp[[res.start]][j[k+1]]<-res.temp[[res.start]][j[k]]
+            res.temp[[station]][j[k+1]]<-res.temp[[station]][j[k]]
+            del<-c(del,j[k])
+          }
+        }
+      }
+      if (length(del)>0){
+        res.temp<-res.temp[-del,]
+      }
     }
     res.drift[(nrow(res.drift)+1):(nrow(res.drift)+nrow(res.temp)),]<-res.temp[,]
   }
+
+  res.drift[[residences]]<-difftime(res.drift[[res.end]],
+                                    res.drift[[res.start]],
+                                    units=units)
+
+  res.drift
 }
 
 

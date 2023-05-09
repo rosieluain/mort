@@ -23,6 +23,22 @@
 #' that holds the duration of the residence events.
 #' @param res.start a string of the name of the column in `data` that holds the
 #' start date and time. Must be specified and in POSIXt if `format="manual"`.
+#' @param drift option to account for potential drifting in identifying
+#' station changes.
+#' @param ddd a dataframe of stations/locations where detected movement between
+#' stations may be due to drifting of an expelled tag or dead animal.
+#' @param from.station a string of the name of the column in `ddd` that contains
+#' the station/location names where drifting detections may start from. Must
+#' be identical to the station/location names in `data`.
+#' @param to.station a string of the name of the column in `ddd` that contains
+#' the station/location names where drifting detections may move to. Must
+#' be identical to the station/location names in `data`.
+#' @param drift.cutoff the maximum allowable time difference between detections to be
+#' considered a single residence event. Recommended to be the same as used
+#' to generate residence events in `data`.
+#' @param drift.units the units of the cutoff. Options are "secs", "mins", "hours",
+#' "days", and "weeks". Recommended to be the same as used to generate
+#' residence events in `data`.
 #'
 #' @return a dataframe with one row for each tag ID, including the date/time of
 #' the residence start at the most recent station or location, the date/time of
@@ -34,62 +50,109 @@
 #' @examples
 #' \dontrun{stationchange(data=res.events,format="manual",ID="TagID",
 #' station="Receiver",res.start="StartUTC",residences="ResidencesLength.days")}
-stationchange<-function(data,format="mort",ID,station,res.start,residences,
-                        singles=FALSE,ddd=NULL){
+stationchange<-function(data,format="mort",ID,station,res.start,res.end,residences,
+                        singles=FALSE,drift=FALSE,ddd=NULL,from.station=NULL,
+                        to.station=NULL,drift.cutoff=NULL,drift.units=NULL){
+
+  # Check that if drift==TRUE, then drift.units are given
+
   # Get list of unique tag IDs
   tag<-unique(data[[ID]])
 
   stn.change<-data[0,]
 
-  for (i in 1:length(tag)){
-    res.temp<-data[data[[ID]]==tag[i],]
-    # Order by time
-    res.temp<-res.temp[order(res.temp[[res.start]]),]
-    if (singles==FALSE){
-      # Remove single detections
-      res.temp<-res.temp[res.temp[[residences]]!=0,]
-    }
+  if (drift==FALSE){
+    for (i in 1:length(tag)){
+      res.temp<-data[data[[ID]]==tag[i],]
+      # Order by time
+      res.temp<-res.temp[order(res.temp[[res.start]]),]
+      if (singles==FALSE){
+        # Remove single detections
+        res.temp<-res.temp[res.temp[[residences]]!=0,]
+      }
 
-    # If there are at least two records
-    if (nrow(res.temp)>=2){
-      # Set j to second last record
-      j<-nrow(res.temp)-1
-      repeat {
-        if (j>0){
-          # If residences at j and j+1 are at the same station
-          if (res.temp[[station]][j]==res.temp[[station]][j+1]){
-            j<-j-1
+      # If there are at least two records
+      if (nrow(res.temp)>=2){
+        # Set j to second last record
+        j<-nrow(res.temp)-1
+        repeat {
+          if (j>0){
+            # If residences at j and j+1 are at the same station
+            if (res.temp[[station]][j]==res.temp[[station]][j+1]){
+              j<-j-1
+            }
+            # This means that there is a station change between row j and j+1
+            else {break}
           }
-          # # Dead drift direction or overlapping station
-          # else if (res.temp$Station.Name[j] %in% unique(ddd$FrStation)){
-          #   # Find which dead drifting station
-          #   k<-which(ddd$FrStation==res.temp$Station.Name[j])
-          #   # If the next station is one of the matching ToStations
-          #   if (res.temp$Station.Name[j+1] %in% ddd$ToStation[k]){
-          #     # Move to the previous row
-          #     j<-j-1
-          #   }
-          #   else {
-          #     # Otherwise, there is a station change between j and j+1
-          #     break
-          #   }
-          # }
-          # This means that there is a station change between row j and j+1
           else {break}
         }
-        else {break}
-      }
 
-      if (j>0){
-        stn.change[nrow(stn.change)+1,]<-res.temp[(j+1),]
+        if (j>0){
+          stn.change[nrow(stn.change)+1,]<-res.temp[(j+1),]
+        }
+        # If the fish has not changed locations for the whole detection history
+        else {
+          stn.change[nrow(stn.change)+1,]<-res.temp[1,]
+        }
       }
-      # If the fish has not changed locations for the whole detection history
-      else {
+      else if (nrow(res.temp)==1){
         stn.change[nrow(stn.change)+1,]<-res.temp[1,]
       }
     }
-    else if (nrow(res.temp)==1){
-      stn.change[nrow(stn.change)+1,]<-res.temp[1,]
+  }
+
+  else {
+    data.drift<-drift(data=data,ID=ID,station=station,
+             res.start=res.start,res.end=res.end,residences=residences,
+             ddd=ddd,from.station=from.station,to.station=to.station,
+             units=drift.units,
+             if(!is.null(drift.cutoff)){cutoff=drift.cutoff})
+
+    for (i in 1:length(tag)){
+      res.temp<-data.drift[data.drift[[ID]]==tag[i],]
+      # Order by time
+      res.temp<-res.temp[order(res.temp[[res.start]]),]
+      if (singles==FALSE){
+        # Remove single detections
+        res.temp<-res.temp[res.temp[[residences]]!=0,]
+      }
+
+      # If there are at least two records
+      if (nrow(res.temp)>=2){
+        # Set j to second last record
+        j<-nrow(res.temp)-1
+
+        # If there is a cutoff
+        # a - b
+        # b - c - would show up as the same (no station change)
+        # a - b
+        # a - b - would show up as different (station change)
+        # could get around this by using any:
+        # if any match, then it is not a station change
+
+        repeat {
+          if (j>0){
+            # If residences at j and j+1 are at the same station
+            if (any(res.temp[[station]][[j]] %in% res.temp[[station]][[j+1]])){
+              j<-j-1
+            }
+            # This means that there is a station change between row j and j+1
+            else {break}
+          }
+          else {break}
+        }
+
+        if (j>0){
+          stn.change[nrow(stn.change)+1,]<-res.temp[(j+1),]
+        }
+        # If the fish has not changed locations for the whole detection history
+        else {
+          stn.change[nrow(stn.change)+1,]<-res.temp[1,]
+        }
+      }
+      else if (nrow(res.temp)==1){
+        stn.change[nrow(stn.change)+1,]<-res.temp[1,]
+      }
     }
   }
 
