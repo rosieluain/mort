@@ -1,7 +1,4 @@
 #### Need to add season option
-# Also need to add ddd or detection overlap
-
-
 
 #' Identify most recent station change
 #' @description Identify the most recent station or location change from passive
@@ -17,8 +14,7 @@
 #' @param station a string of the name of the column in `data` that holds the
 #' station name or receiver location.
 #' @param singles specifies if single detections (length of residence event = 0)
-#' should be removed. Removing single detections is the most conservative method,
-#' so chance or potentially invalid detections do not affect mortality estimates.
+#' should be retained. Default is `TRUE`.
 #' @param residences a character string with the name of the column in `data`
 #' that holds the duration of the residence events.
 #' @param res.start a string of the name of the column in `data` that holds the
@@ -51,7 +47,7 @@
 #' \dontrun{stationchange(data=res.events,format="manual",ID="TagID",
 #' station="Receiver",res.start="StartUTC",residences="ResidencesLength.days")}
 stationchange<-function(data,format="mort",ID,station,res.start,res.end,residences,
-                        singles=FALSE,drift=FALSE,ddd=NULL,from.station=NULL,
+                        singles=TRUE,drift=FALSE,ddd=NULL,from.station=NULL,
                         to.station=NULL,drift.cutoff=NULL,drift.units=NULL){
 
   # Check that if drift==TRUE, then drift.units are given
@@ -78,11 +74,20 @@ stationchange<-function(data,format="mort",ID,station,res.start,res.end,residenc
         repeat {
           if (j>0){
             # If residences at j and j+1 are at the same station
-            if (res.temp[[station]][j]==res.temp[[station]][j+1]){
-              j<-j-1
+            if (class(res.temp[[station]])=="list"){
+              if (any(res.temp[[station]][[j]] %in% res.temp[[station]][[j+1]])){
+                j<-j-1
+              }
+              # This means that there is a station change between row j and j+1
+              else {break}
             }
-            # This means that there is a station change between row j and j+1
-            else {break}
+            else {
+              if (res.temp[[station]][j]==res.temp[[station]][j+1]){
+                j<-j-1
+              }
+              # This means that there is a station change between row j and j+1
+              else {break}
+            }
           }
           else {break}
         }
@@ -101,6 +106,7 @@ stationchange<-function(data,format="mort",ID,station,res.start,res.end,residenc
     }
   }
 
+  #### Delete if get data=drift.data to work
   else {
     data.drift<-drift(data=data,ID=ID,station=station,
              res.start=res.start,res.end=res.end,residences=residences,
@@ -252,37 +258,85 @@ resmaxcml<-function(data,ID,station,res.start,res.end,
     # Subset residences for ID i, where res.start < res.start of stnchange
     res.temp<-data[data[[ID]]==stnchange[[ID]][i]&
                      data[[res.start]]<stnchange[[res.start]][i],]
-    j<-1
-    repeat {
-      # If there are more than or equal (single residence) to j rows
-      if (nrow(res.temp)>=j){
-        # Set k = j to mark beginning
-        k<-j
-        repeat{
-          # If there are multiple residences and the first station
-          # name is the same as the next record
-          if (nrow(res.temp)>j&
-              (res.temp[[station]][j]==res.temp[[station]][j+1])){
-            # Go to next row
-            j<-j+1
-          }
-          # Otherwise, there is a station change after j
-          else {
-            # Add record j (before station change)
-            res.maxcml[nrow(res.maxcml)+1,]<-res.temp[j,]
-            # If the previous station change was before j (as marked by k)
-            if (k!=j){
-              # Adust StartUTC so it is the start of the cumulative residence
-              res.maxcml[[res.start]][nrow(res.maxcml)]<-res.temp[[res.start]][k]
+    if (class(res.temp[[station]])=="list"){
+      j<-1
+      repeat {
+        # If there are more than or equal (single residence) to j rows
+        if (nrow(res.temp)>=j){
+          # Set k = j to mark beginning
+          k<-j
+          repeat{
+            # If there are multiple residences
+            if (nrow(res.temp)>j){
+              # If any of the first station
+              # name(s) matches any of the second station name(s)
+              if (any(res.temp[[station]][[j]] %in% res.temp[[station]][[j+1]])){
+                # Go to next row
+                j<-j+1
+              }
+              # Otherwise, there is a station change after j
+              else {
+                # Add record j (before station change)
+                res.maxcml[nrow(res.maxcml)+1,]<-res.temp[j,]
+                # If the previous station change was before j (as marked by k)
+                if (k!=j){
+                  # Adust StartUTC so it is the start of the cumulative residence
+                  res.maxcml[[res.start]][nrow(res.maxcml)]<-res.temp[[res.start]][k]
+                  # Add list of any stations that might not be part
+                  res.maxcml[[station]][[nrow(res.maxcml)]]<-unique(unlist(res.temp[[station]][j:k]))
+                }
+                # Go to next row
+                j<-j+1
+                break
+              }
             }
-            # Go to next row
-            j<-j+1
-            break
+            # If there is just one residence, so add directly
+            else {
+              res.maxcml[nrow(res.maxcml)+1,]<-res.temp[j,]
+              j<-j+1
+              break
+            }
           }
         }
+        else {break}
       }
-      else {break}
     }
+
+    # If class(station) is not a list (no drift)
+    else {
+      j<-1
+      repeat {
+        # If there are more than or equal (single residence) to j rows
+        if (nrow(res.temp)>=j){
+          # Set k = j to mark beginning
+          k<-j
+          repeat{
+            # If there are multiple residences and the first station
+            # name is the same as the next record
+            if (nrow(res.temp)>j&
+                (res.temp[[station]][j]==res.temp[[station]][j+1])){
+              # Go to next row
+              j<-j+1
+            }
+            # Otherwise, there is a station change after j
+            else {
+              # Add record j (before station change)
+              res.maxcml[nrow(res.maxcml)+1,]<-res.temp[j,]
+              # If the previous station change was before j (as marked by k)
+              if (k!=j){
+                # Adust StartUTC so it is the start of the cumulative residence
+                res.maxcml[[res.start]][nrow(res.maxcml)]<-res.temp[[res.start]][k]
+              }
+              # Go to next row
+              j<-j+1
+              break
+            }
+          }
+        }
+        else {break}
+      }
+    }
+
   }
 
   res.maxcml[[residences]]<-difftime(res.maxcml[[res.end]],

@@ -54,10 +54,18 @@ backwards<-function(data,morts,ID,station,res.start,season=NULL,
         j<-nrow(res.temp)
         repeat{
           if (j>=2){
-            if (res.temp[[station]][j]==res.temp[[station]][j-1]){
-              j<-j-1
+            if (class(res.temp[[station]])=="list"){
+              if (any(res.temp[[station]][[j]] %in% res.temp[[station]][[j-1]])){
+                j<-j-1
+              }
+              else {break}
             }
-            else {break}
+            else {
+              if (res.temp[[station]][j]==res.temp[[station]][j-1]){
+                j<-j-1
+              }
+              else {break}
+            }
           }
           else {break}
         }

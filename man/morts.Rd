@@ -15,8 +15,14 @@ morts(
   units = "auto",
   residences = "auto",
   season = NULL,
-  singles = FALSE,
+  singles = TRUE,
   backwards = FALSE,
+  drift = "none",
+  ddd = NULL,
+  from.station = NULL,
+  to.station = NULL,
+  drift.cutoff = NULL,
+  drift.units = NULL,
   morts.prev = NULL
 )
 }
@@ -54,14 +60,37 @@ that holds the duration of the residence events.}
 \item{season}{a dataframe with start and end dates of the season(s) of interest}
 
 \item{singles}{specifies if single detections (length of residence event = 0)
-should be removed. Removing single detections is the most conservative method,
-so chance or potentially invalid detections do not affect mortality estimates.}
+should be retained. Default is \code{TRUE}. Note that if single detections are
+removed (\code{singles=FALSE}), \code{backwards} will also not include single detections.}
 
 \item{backwards}{option to examine residence events prior to the one that was
 flagged as a potential mortality. If prior residence events are at the same
 station/location as the flagged event, the time of the potential mortality is shifted
 earlier. Note that if \code{backwards=TRUE}, then the output of \code{method="last"} is
 the same as \code{method="any"}.}
+
+\item{drift}{option to account for potential drifting in identifying
+thresholds and/or mortalities. Options are "none", "threshold",
+"morts", "both". Default is "none".}
+
+\item{ddd}{a dataframe of stations/locations where detected movement between
+stations may be due to drifting of an expelled tag or dead animal.}
+
+\item{from.station}{a string of the name of the column in \code{ddd} that contains
+the station/location names where drifting detections may start from. Must
+be identical to the station/location names in \code{data}.}
+
+\item{to.station}{a string of the name of the column in \code{ddd} that contains
+the station/location names where drifting detections may move to. Must
+be identical to the station/location names in \code{data}.}
+
+\item{drift.cutoff}{the maximum allowable time difference between detections to be
+considered a single residence event. Recommended to be the same as used
+to generate residence events in \code{data}.}
+
+\item{drift.units}{the units of the cutoff. Options are "secs", "mins", "hours",
+"days", and "weeks". Recommended to be the same as used to generate
+residence events in \code{data}.}
 
 \item{morts.prev}{a dataframe containing potential mortalities. The dataframe must
 have the same columns and in the same order as \code{data}.}

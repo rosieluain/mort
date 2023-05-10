@@ -10,9 +10,15 @@ stationchange(
   ID,
   station,
   res.start,
+  res.end,
   residences,
-  singles = FALSE,
-  ddd = NULL
+  singles = TRUE,
+  drift = FALSE,
+  ddd = NULL,
+  from.station = NULL,
+  to.station = NULL,
+  drift.cutoff = NULL,
+  drift.units = NULL
 )
 }
 \arguments{
@@ -36,8 +42,29 @@ start date and time. Must be specified and in POSIXt if \code{format="manual"}.}
 that holds the duration of the residence events.}
 
 \item{singles}{specifies if single detections (length of residence event = 0)
-should be removed. Removing single detections is the most conservative method,
-so chance or potentially invalid detections do not affect mortality estimates.}
+should be retained. Default is \code{TRUE}.}
+
+\item{drift}{option to account for potential drifting in identifying
+station changes.}
+
+\item{ddd}{a dataframe of stations/locations where detected movement between
+stations may be due to drifting of an expelled tag or dead animal.}
+
+\item{from.station}{a string of the name of the column in \code{ddd} that contains
+the station/location names where drifting detections may start from. Must
+be identical to the station/location names in \code{data}.}
+
+\item{to.station}{a string of the name of the column in \code{ddd} that contains
+the station/location names where drifting detections may move to. Must
+be identical to the station/location names in \code{data}.}
+
+\item{drift.cutoff}{the maximum allowable time difference between detections to be
+considered a single residence event. Recommended to be the same as used
+to generate residence events in \code{data}.}
+
+\item{drift.units}{the units of the cutoff. Options are "secs", "mins", "hours",
+"days", and "weeks". Recommended to be the same as used to generate
+residence events in \code{data}.}
 }
 \value{
 a dataframe with one row for each tag ID, including the date/time of
