@@ -194,7 +194,155 @@ drift<-function(data,format,ID,station,res.start,res.end,
   res.drift
 }
 
-
-
-
 #### Seasonal ####
+# Two options - specified date ranges (so start date is different among years)
+# - same day of year each year
+# - what to call these two options? season.method - custom and ddmm (for day-month)
+# The season function should go through the data and just select by the
+# season method
+# The other functions will then run on the reduced dataset
+# BUT - will need to find a way to make backwards work on the full dataset
+# Should drift operate before or after season? Should operate before if
+# backwards is working on the full dataset
+
+# Overlap - if FALSE, cuts residence off at start date, adjusts calculation of duration
+
+
+#' Select residence events from specified seasons
+#' @description Select residence events from specified seasons, to be used to
+#' identify potential mortalities or expelled tags. Useful when animals show
+#' strong seasonal patterns in behaviour. For example, a reduction in movement during
+#' winter may be falsely identified as a mortality, or
+#' increase the threshold use to identify mortalities, which would then cause
+#' potential mortalities to be missed.
+#'
+#' @param data a dataframe of residence events. Residence events must include
+#' tag ID, start time, end time, and duration.
+#' @param res.start a string of the name of the column in `data` that holds the
+#' start date and time. Must be specified and in POSIXt or character in the format
+#' YYYY-mm-dd HH:MM:SS if `format="manual"`.
+#' @param res.end a string of the name of the column in `data` that holds the
+#' end date and time. Must be specified and in POSIXt or character in the format
+#' YYYY-mm-dd HH:MM:SS if `format="manual"`.
+#' @param residences a character string with the name of the column in `data`
+#' that holds the duration of the residence events.
+#' @param units Units of the duration of the residence events in `data`. Options are "secs",
+#' "mins", "hours", "days", and "weeks".
+#' @param season.start the start date/time(s) of the period of interest. If the
+#' period of interest is the same in all study years, must be a character string
+#' in format "dd-mm". Otherwise, must be in POSIXt, or a character string in
+#' format YYYY-mm-dd HH:MM:SS.
+#' @param season.end the end date/time(s) of the period of interest. If the
+#' period of interest is the same in all study years, must be a character string
+#' in format "dd-mm". Otherwise, must be in POSIXt, or a character string in
+#' format YYYY-mm-dd HH:MM:SS.
+#' @param overlap option to include residence events that overlap either the
+#' beginning or the end of the period of interest. If `TRUE`, the full overlapping
+#' residence events will be retained. If `FALSE`, only the portion of the
+#' residence events that is within the period of interest will be retained,
+#' and `residences` will be recalculated, using specified `units`.
+#' Default is `TRUE`.
+#'
+#' @return a dataframe in the same format as the input data, with residence
+#' events limited to the period(s) of interest.
+#' @export
+#'
+#' @examples
+#' \dontrun{season(data=data,res.start="ResidenceStart",res.end="ResidenceEnd",
+#' residences="ResidenceDuration",units="days",season.start="01-06",
+#' season.end="31-10")}
+season<-function(data,res.start,res.end,residences,units,season.start,
+                 season.end,overlap=TRUE){
+  if (all(class(data[[res.start]])!="POSIXt")){
+    try(data[[res.start]]<-as.POSIXct(data[[res.start]],tz="UTC",silent=TRUE))
+    if (all(class(data[[res.start]])!="POSIXt")){
+      stop("res.start is not in the format YYYY-mm-dd HH:MM:SS")
+    }
+  }
+  if (all(class(data[[res.end]])!="POSIXt")){
+    try(data[[res.end]]<-as.POSIXct(data[[res.end]],tz="UTC",silent=TRUE))
+    if (all(class(data[[res.end]])!="POSIXt")){
+      stop("res.end is not in the format YYYY-mm-dd HH:MM:SS")
+    }
+  }
+
+  # Checks for format of season
+  if (length(season.start)!=length(season.end)){
+    stop("season.start must be the same length as season.end")
+  }
+  if (all(class(season.start)!="POSIXt")){
+    try(season.start<-as.POSIXct(season.start,tz="UTC",silent=TRUE))
+    if (all(class(season.start)!="POSIXt")&
+        length(season.start)!=1&
+        all(nchar(season.start)!=5)){
+      stop("season.start is not in the format YYYY-mm-dd HH:MM:SS or dd-mm")
+    }
+  }
+  if (all(class(season.end)!="POSIXt")){
+    try(season.end<-as.POSIXct(season.end,tz="UTC",silent=TRUE))
+    if (all(class(season.end)!="POSIXt")&
+        length(season.end)!=1&
+        all(nchar(season.end)!=5)){
+      stop("season.end is not in the format YYYY-mm-dd HH:MM:SS or dd-mm")
+    }
+  }
+  if (all(class(season.start)!=class(season.end))){
+    stop("season.start is not the same format as season.end")
+  }
+
+  # If start and end are in dd-mm format, convert to pairs of full dates
+  if (all(class(season.start)!="POSIXt")){
+    years<-unique(c(as.POSIXlt(data[[res.start]])$year+1900,
+                    as.POSIXlt(data[[res.end]])$year+1900))
+    start.m<-substr(season.start,4,5)
+    start.d<-substr(season.start,1,2)
+    end.m<-substr(season.end,4,5)
+    end.d<-substr(season.end,1,2)
+    season.start<-as.POSIXct(as.character(),tz="UTC")
+    season.end<-as.POSIXct(as.character(),tz="UTC")
+    for (i in 1:length(years)){
+      season.start<-c(season.start,
+                      as.POSIXct(paste0(years[i],"-",start.m,"-",start.d),
+                                 tz="UTC"))
+      season.end<-c(season.end,
+                    as.POSIXct(paste0(years[i],"-",start.m,"-",start.d),
+                               tz="UTC"))
+    }
+  }
+
+  data.season<-data[0,]
+
+  for (i in 1:length(season.start)){
+    data.temp<-data[0,]
+    # Four scenarios:
+    # 1 - starts after season start, and ends before season end
+    j<-which(data[data[[res.start]]>=season.start[i]&
+                    data[[res.end]]<=season.end[i],])
+    data.temp<-rbind(data.temp,data[j,])
+    # 2 - starts before season start, and ends after season end
+    j<-which(data[data[[res.start]]<=season.start[i]&
+                    data[[res.end]]>=season.end[i],])
+    data.temp<-rbind(data.temp,data[j,])
+    # 3 - starts before season start, and ends after season start and before season end
+    j<-which(data[data[[res.start]]<=season.start[i]&
+                    data[[res.end]]>=season.start[i]&
+                    data[[res.end]]<season.end[i],])
+    data.temp<-rbind(data.temp,data[j,])
+    # 4 - starts after season start and before season end, and ends after season end
+    j<-which(data[data[[res.start]]>season.start[i]&
+                    data[[res.start]]<=season.end[i]&
+                    data[[res.end]]>=season.end[i],])
+    data.temp<-rbind(data.temp,data[j,])
+    if (overlap==FALSE){
+      data.temp[[res.start]][data.temp[[res.start]]<season.start[i]]<-season.start[i]
+      data.temp[[res.end]][data.temp[[res.start]]>season.end[i]]<-season.end[i]
+      # Recalculate residences
+      data.temp[[residences]]<-difftime(data.temp[[res.end]],
+                                        date.temp[[res.start]],
+                                        units=units)
+    }
+    data.season<-rbind(data.season,data.temp)
+  }
+
+  data.season
+}

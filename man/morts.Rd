@@ -23,6 +23,9 @@ morts(
   to.station = NULL,
   drift.cutoff = NULL,
   drift.units = NULL,
+  season.start = NULL,
+  season.end = NULL,
+  season.overlap = TRUE,
   morts.prev = NULL
 )
 }

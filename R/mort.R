@@ -86,7 +86,8 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
                method="all",units="auto",residences="auto",season=NULL,
                singles=TRUE,backwards=FALSE,drift="none",ddd=NULL,
                from.station=NULL, to.station=NULL,drift.cutoff=NULL,
-               drift.units=NULL,morts.prev=NULL){
+               drift.units=NULL,season.start=NULL,season.end=NULL,
+               season.overlap=TRUE,morts.prev=NULL){
   # if (format=="mort"){
   #   units=sub("ResidenceLength.","",colnames(data)[grep("ResidenceLength",colnames(data))])
   # }
