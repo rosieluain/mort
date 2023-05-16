@@ -38,6 +38,10 @@ station name or receiver location.}
 \item{res.start}{a string of the name of the column in \code{data} that holds the
 start date and time. Must be specified and in POSIXt if \code{format="manual"}.}
 
+\item{res.end}{a string of the name of the column in \code{data} that holds the
+end date and time. Must be specified and in POSIXt or character in the format
+YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
+
 \item{residences}{a character string with the name of the column in \code{data}
 that holds the duration of the residence events.}
 

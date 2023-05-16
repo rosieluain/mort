@@ -72,18 +72,34 @@
 #' @param drift.units the units of the cutoff. Options are "secs", "mins", "hours",
 #' "days", and "weeks". Recommended to be the same as used to generate
 #' residence events in `data`.
+#' @param season.start the start date/time(s) of the period of interest. If the
+#' period of interest is the same in all study years, must be a character string
+#' in format "dd-mm". Otherwise, must be in POSIXt, or a character string in
+#' format YYYY-mm-dd HH:MM:SS.
+#' @param season.end the end date/time(s) of the period of interest. If the
+#' period of interest is the same in all study years, must be a character string
+#' in format "dd-mm". Otherwise, must be in POSIXt, or a character string in
+#' format YYYY-mm-dd HH:MM:SS.
+#' @param season.overlap option to include residence events that overlap either the
+#' beginning or the end of the period of interest. If `TRUE`, the full overlapping
+#' residence events will be retained. If `FALSE`, only the portion of the
+#' residence events that is within the period of interest will be retained,
+#' and `residences` will be recalculated, using specified `units`.
+#' Default is `TRUE`
 #'
 #' @return a dataframe with one row for each tag ID, including the date/time of
 #' the residence start when the potential mortality or expelled tag was identified.
 #' All input data fields
 #' (e.g., any name, location, or species information that was included with the
 #' input data) will be retained.
+#' @import methods
+#' @importFrom methods is
 #' @export
 #'
 #' @examples
 #' \dontrun{mort(data=res.events,format="manual",units="days",residences="ResidenceLength")}
 morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
-               method="all",units="auto",residences="auto",season=NULL,
+               method="all",units="auto",residences="auto",
                singles=TRUE,backwards=FALSE,drift="none",ddd=NULL,
                from.station=NULL, to.station=NULL,drift.cutoff=NULL,
                drift.units=NULL,season.start=NULL,season.end=NULL,
@@ -114,17 +130,25 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
   ### Add in a check that if any parameters are missing for manual method,
   # then give an error
 
-  if (all(class(data[[res.start]])!="POSIXt")){
+  if (is(data[[res.start]],"POSIXt")){
     try(data[[res.start]]<-as.POSIXct(data[[res.start]],tz="UTC",silent=TRUE))
-    if (all(class(data[[res.start]])!="POSIXt")){
+    if (is(data[[res.start]],"POSIXt")){
       stop("res.start is not in the format YYYY-mm-dd HH:MM:SS")
     }
   }
-  if (all(class(data[[res.end]])!="POSIXt")){
+  if (is(data[[res.end]],"POSIXt")){
     try(data[[res.end]]<-as.POSIXct(data[[res.end]],tz="UTC",silent=TRUE))
-    if (all(class(data[[res.end]])!="POSIXt")){
+    if (is(data[[res.end]],"POSIXt")){
       stop("res.end is not in the format YYYY-mm-dd HH:MM:SS")
     }
+  }
+
+  if (!is.null(season.start)|
+      !is.null(season.end)){
+    data.full<-data
+    data<-season(data=data,res.start=res.start,res.end=res.end,
+                 residences=residences,units=units,season.start=season.start,
+                 season.end=season.end,overlap=season.overlap)
   }
 
   # Get list of unique tag IDs
@@ -168,48 +192,68 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
 
   # none, threshold, morts, both
   if (drift=="none"){
-    data.morts=data
-    stn.change=stationchange(data=data,ID=ID,station=station,res.start=res.start,
+    data.morts<-data
+    if (!is.null(season.start)){
+      data.full.morts<-data.full
+    }
+    stn.change<-stationchange(data=data,ID=ID,station=station,res.start=res.start,
                              residences=residences,singles=singles)
-    stn.change.morts=stn.change
+    stn.change.morts<-stn.change
   }
   else if (drift=="threshold"){
-    data.morts=data
-    data=drift(data=data,ID=ID,station=station,
+    data.morts<-data
+    if (!is.null(season.start)){
+      data.full.morts<-data.full
+    }
+    data<-drift(data=data,ID=ID,station=station,
                res.start=res.start,res.end=res.end,residences=residences,
                ddd=ddd,from.station=from.station,to.station=to.station,
                units=drift.units,
                if(!is.null(drift.cutoff)){cutoff=drift.cutoff})
-    stn.change=stationchange(data=data,ID=ID,station=station,res.start=res.start,
+    stn.change<-stationchange(data=data,ID=ID,station=station,res.start=res.start,
                              residences=residences,singles=singles)
-    stn.change.morts=stationchange(data=data.morts,ID=ID,station=station,res.start=res.start,
+    stn.change.morts<-stationchange(data=data.morts,ID=ID,station=station,res.start=res.start,
                                    residences=residences,singles=singles)
   }
   else if (drift=="morts"){
-    data.morts=drift(data=data,ID=ID,station=station,
+    data.morts<-drift(data=data,ID=ID,station=station,
                      res.start=res.start,res.end=res.end,residences=residences,
                      ddd=ddd,from.station=from.station,to.station=to.station,
                      units=drift.units,
                      if(!is.null(drift.cutoff)){cutoff=drift.cutoff})
-    stn.change=stationchange(data=data,ID=ID,station=station,res.start=res.start,
+    if (!is.null(season.start)){
+      data.full.morts<-drift(data=data.full,ID=ID,station=station,
+                             res.start=res.start,res.end=res.end,residences=residences,
+                             ddd=ddd,from.station=from.station,to.station=to.station,
+                             units=drift.units,
+                             if(!is.null(drift.cutoff)){cutoff=drift.cutoff})
+    }
+    stn.change<-stationchange(data=data,ID=ID,station=station,res.start=res.start,
                              residences=residences,singles=singles)
-    stn.change.morts=stationchange(data=data.morts,ID=ID,station=station,res.start=res.start,
+    stn.change.morts<-stationchange(data=data.morts,ID=ID,station=station,res.start=res.start,
                                    residences=residences,singles=singles)
-    if (class(morts[[station]])!="list"){
+    if (is(morts[[station]],"list")){
       morts[[station]]<-as.list(morts[[station]])
     }
   }
   else if (drift=="both"){
-    data=drift(data=data,ID=ID,station=station,
+    data<-drift(data=data,ID=ID,station=station,
                res.start=res.start,res.end=res.end,residences=residences,
                ddd=ddd,from.station=from.station,to.station=to.station,
                units=drift.units,
                if(!is.null(drift.cutoff)){cutoff=drift.cutoff})
-    data.morts=data
-    stn.change=stationchange(data=data,ID=ID,station=station,res.start=res.start,
+    data.morts<-data
+    if (!is.null(season.start)){
+      data.full.morts<-drift(data=data.full,ID=ID,station=station,
+                             res.start=res.start,res.end=res.end,residences=residences,
+                             ddd=ddd,from.station=from.station,to.station=to.station,
+                             units=drift.units,
+                             if(!is.null(drift.cutoff)){cutoff=drift.cutoff})
+    }
+    stn.change<-stationchange(data=data,ID=ID,station=station,res.start=res.start,
                              residences=residences,singles=singles)
-    stn.change.morts=stn.change
-    if (class(morts[[station]])!="list"){
+    stn.change.morts<-stn.change
+    if (is(morts[[station]],"list")){
       morts[[station]]<-as.list(morts[[station]])
     }
   }
@@ -218,8 +262,6 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
   # Most recent residence longer than max residence before station change
   if (method %in% c("last","any","all")){
     # Identify the longest residence followed by a station change
-    # stnchange here is for threshold, so use stn.change
-
     max.res<-max(resmax(data=data,ID=ID,station=station,res.start=res.start,
                         residences=residences,stnchange=stn.change)[[residences]])
     if (method=="last"){
@@ -312,8 +354,14 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
       }
     }
     else {
-      morts<-backwards(data=data.morts,morts=morts,ID=ID,station=station,
-                       res.start=res.start,season=NULL,stnchange=stn.change.morts)
+      if (is.null(season.start)){
+        morts<-backwards(data=data.morts,morts=morts,ID=ID,station=station,
+                         res.start=res.start,stnchange=stn.change.morts)
+      }
+      else {
+        morts<-backwards(data=data.full.morts,morts=morts,ID=ID,station=station,
+                         res.start=res.start,stnchange=NULL)
+      }
     }
   }
 
@@ -377,6 +425,20 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
 #' flagged as a potential mortality. If prior residence events are at the same
 #' station/location as the flagged event, the time of the potential mortality is shifted
 #' earlier.
+#' @param ddd an optional dataframe of stations/locations where detected movement between
+#' stations may be due to drifting of an expelled tag or dead animal.
+#' @param from.station a string of the name of the column in `ddd` that contains
+#' the station/location names where drifting detections may start from. Must
+#' be identical to the station/location names in `data`.
+#' @param to.station a string of the name of the column in `ddd` that contains
+#' the station/location names where drifting detections may move to. Must
+#' be identical to the station/location names in `data`.
+#' @param drift.cutoff the maximum allowable time difference between detections to be
+#' considered a single residence event. Recommended to be the same as used
+#' to generate residence events in `data`.
+#' @param drift.units the units of the cutoff. Options are "secs", "mins", "hours",
+#' "days", and "weeks". Recommended to be the same as used to generate
+#' residence events in `data`.
 #'
 #' @details Example of `method="recent"`: if `threshold=10` and `recent.period=1` and
 #' `recent.units="years"`, an animal will be flagged as a potential mortality if
@@ -411,17 +473,19 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
 
 infrequent<-function(data,format,ID,station,res.start,res.end,residences,units,
                      method,threshold,threshold.units=NULL,recent.period=NULL,recent.units=NULL,
-                     start=NULL,end=NULL,morts.prev=NULL,replace=FALSE,backwards=FALSE){
+                     start=NULL,end=NULL,morts.prev=NULL,replace=FALSE,backwards=FALSE,
+                     ddd=NULL,from.station=NULL,to.station=NULL,
+                     drift.cutoff=NULL,drift.units=NULL){
 
-  if (all(class(data[[res.start]])!="POSIXt")){
+  if (is(data[[res.start]],"POSIXt")){
     try(data[[res.start]]<-as.POSIXct(data[[res.start]],tz="UTC",silent=TRUE))
-    if (all(class(data[[res.start]])!="POSIXt")){
+    if (is(data[[res.start]],"POSIXt")){
       stop("res.start is not in the format YYYY-mm-dd HH:MM:SS")
     }
   }
-  if (all(class(data[[res.end]])!="POSIXt")){
+  if (is(data[[res.end]],"POSIXt")){
     try(data[[res.end]]<-as.POSIXct(data[[res.end]],tz="UTC",silent=TRUE))
-    if (all(class(data[[res.end]])!="POSIXt")){
+    if (is(data[[res.end]],"POSIXt")){
       stop("res.end is not in the format YYYY-mm-dd HH:MM:SS")
     }
   }
@@ -432,6 +496,14 @@ infrequent<-function(data,format,ID,station,res.start,res.end,residences,units,
   #   # Convert threshold.units to units
   #
   # }
+
+  if (!is.null(ddd)){
+    data<-drift(data=data,ID=ID,station=station,
+                res.start=res.start,res.end=res.end,residences=residences,
+                ddd=ddd,from.station=from.station,to.station=to.station,
+                units=drift.units,
+                if(!is.null(drift.cutoff)){cutoff=drift.cutoff})
+    }
 
   tag<-unique(data[[ID]])
 
@@ -496,11 +568,11 @@ infrequent<-function(data,format,ID,station,res.start,res.end,residences,units,
     }
     # Convert start and end to POSIXt
     try(start<-as.POSIXct(start,tz=attributes(data[[res.start]])$tzone),silent=TRUE)
-    if (all(class(start)!="POSIXt")){
+    if (is(start,"POSIXt")){
       stop("start is not in the format YYYY-mm-dd HH:MM:SS")
     }
     try(end<-as.POSIXct(end,tz=attributes(data[[res.start]])$tzone),silent=TRUE)
-    if (all(class(end)!="POSIXt")){
+    if (is(end,"POSIXt")){
       stop("end is not in the format YYYY-mm-dd HH:MM:SS")
     }
     for (i in 1:length(tag)){
@@ -526,7 +598,7 @@ infrequent<-function(data,format,ID,station,res.start,res.end,residences,units,
   if (backwards==TRUE){
     if (is.null(morts.prev)){
     inf.morts<-backwards(data=data,morts=inf.morts,ID=ID,station=station,
-                         res.start=res.start,season=FALSE)
+                         res.start=res.start)
     }
     else {
       if (nrow(inf.morts)>nrow(morts.prev)){
@@ -535,7 +607,7 @@ infrequent<-function(data,format,ID,station,res.start,res.end,residences,units,
       if (length(new.morts)>0){
         for (i in 1:length(new.morts)){
           inf.morts[new.morts[i],]<-backwards(data=data,morts=inf.morts[new.morts[i],],ID=ID,station=station,
-                                           res.start=res.start,season=NULL)
+                                           res.start=res.start)
         }
       }
     }

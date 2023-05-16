@@ -13,3 +13,5 @@ BugReports: https://github.com/rosieluain/mort/issues
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 LazyData: true
+Imports: 
+    methods

@@ -41,6 +41,9 @@ YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
 end date and time. Must be specified and in POSIXt or character in the format
 YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
 
+\item{residences}{a character string with the name of the column in \code{data}
+that holds the duration of the residence events.}
+
 \item{ddd}{a dataframe of stations/locations where detected movement between
 stations may be due to drifting of an expelled tag or dead animal.}
 

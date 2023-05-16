@@ -14,7 +14,6 @@ morts(
   method = "all",
   units = "auto",
   residences = "auto",
-  season = NULL,
   singles = TRUE,
   backwards = FALSE,
   drift = "none",
@@ -60,8 +59,6 @@ YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
 \item{residences}{a character string with the name of the column in \code{data}
 that holds the duration of the residence events.}
 
-\item{season}{a dataframe with start and end dates of the season(s) of interest}
-
 \item{singles}{specifies if single detections (length of residence event = 0)
 should be retained. Default is \code{TRUE}. Note that if single detections are
 removed (\code{singles=FALSE}), \code{backwards} will also not include single detections.}
@@ -95,8 +92,27 @@ to generate residence events in \code{data}.}
 "days", and "weeks". Recommended to be the same as used to generate
 residence events in \code{data}.}
 
+\item{season.start}{the start date/time(s) of the period of interest. If the
+period of interest is the same in all study years, must be a character string
+in format "dd-mm". Otherwise, must be in POSIXt, or a character string in
+format YYYY-mm-dd HH:MM:SS.}
+
+\item{season.end}{the end date/time(s) of the period of interest. If the
+period of interest is the same in all study years, must be a character string
+in format "dd-mm". Otherwise, must be in POSIXt, or a character string in
+format YYYY-mm-dd HH:MM:SS.}
+
+\item{season.overlap}{option to include residence events that overlap either the
+beginning or the end of the period of interest. If \code{TRUE}, the full overlapping
+residence events will be retained. If \code{FALSE}, only the portion of the
+residence events that is within the period of interest will be retained,
+and \code{residences} will be recalculated, using specified \code{units}.
+Default is \code{TRUE}}
+
 \item{morts.prev}{a dataframe containing potential mortalities. The dataframe must
 have the same columns and in the same order as \code{data}.}
+
+\item{season}{a dataframe with start and end dates of the season(s) of interest}
 }
 \value{
 a dataframe with one row for each tag ID, including the date/time of

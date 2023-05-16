@@ -19,6 +19,9 @@
 #' that holds the duration of the residence events.
 #' @param res.start a string of the name of the column in `data` that holds the
 #' start date and time. Must be specified and in POSIXt if `format="manual"`.
+#' @param res.end a string of the name of the column in `data` that holds the
+#' end date and time. Must be specified and in POSIXt or character in the format
+#' YYYY-mm-dd HH:MM:SS if `format="manual"`.
 #' @param drift option to account for potential drifting in identifying
 #' station changes.
 #' @param ddd a dataframe of stations/locations where detected movement between
@@ -74,7 +77,7 @@ stationchange<-function(data,format="mort",ID,station,res.start,res.end,residenc
         repeat {
           if (j>0){
             # If residences at j and j+1 are at the same station
-            if (class(res.temp[[station]])=="list"){
+            if (is(res.temp[[station]],"list")){
               if (any(res.temp[[station]][[j]] %in% res.temp[[station]][[j+1]])){
                 j<-j-1
               }
@@ -258,7 +261,7 @@ resmaxcml<-function(data,ID,station,res.start,res.end,
     # Subset residences for ID i, where res.start < res.start of stnchange
     res.temp<-data[data[[ID]]==stnchange[[ID]][i]&
                      data[[res.start]]<stnchange[[res.start]][i],]
-    if (class(res.temp[[station]])=="list"){
+    if (is(res.temp[[station]],"list")){
       j<-1
       repeat {
         # If there are more than or equal (single residence) to j rows

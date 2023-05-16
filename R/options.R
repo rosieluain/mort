@@ -14,8 +14,6 @@
 #' station name or receiver location.
 #' @param res.start a string of the name of the column in `data` that holds the
 #' start date and time. Must be specified and in POSIXt if `format="manual"`.
-#' @param season a dataframe with the start and end times of the season(s) or
-#' time period(s) of interest.
 #' @param stnchange a dataframe with the start time and location of the most
 #' recent station or location change. Must use the same column names and in
 #' the same order as `data`.
@@ -33,11 +31,9 @@
 #' @examples
 #' \dontrun{backwards(data=data,morts=morts,ID="TagID",station="Receiver",
 #' res.start="ResidencesStart",stnchange=stn.change)}
-backwards<-function(data,morts,ID,station,res.start,season=NULL,
-                    stnchange=NULL){
-  # If morts was not based on season, then shift records earlier to station change
-  if (is.null(season)&
-      !is.null(stnchange)){
+backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
+  # If stnchange was provided, shift morts to stnchange
+  if (!is.null(stnchange)){
     for (i in 1:nrow(morts)){
       j<-which(stnchange[[ID]]==morts[[ID]][i])
       if (morts[[res.start]][i]>stnchange[[res.start]][j]){
@@ -54,7 +50,7 @@ backwards<-function(data,morts,ID,station,res.start,season=NULL,
         j<-nrow(res.temp)
         repeat{
           if (j>=2){
-            if (class(res.temp[[station]])=="list"){
+            if (is(res.temp[[station]],"list")){
               if (any(res.temp[[station]][[j]] %in% res.temp[[station]][[j-1]])){
                 j<-j-1
               }
@@ -100,6 +96,8 @@ backwards<-function(data,morts,ID,station,res.start,season=NULL,
 #' @param res.end a string of the name of the column in `data` that holds the
 #' end date and time. Must be specified and in POSIXt or character in the format
 #' YYYY-mm-dd HH:MM:SS if `format="manual"`.
+#' @param residences a character string with the name of the column in `data`
+#' that holds the duration of the residence events.
 #' @param ddd a dataframe of stations/locations where detected movement between
 #' stations may be due to drifting of an expelled tag or dead animal.
 #' @param from.station a string of the name of the column in `data` that contains
@@ -125,15 +123,15 @@ drift<-function(data,format,ID,station,res.start,res.end,
                 cutoff=NULL,units=NULL){
 
   # Could make this check be a function
-  if (all(class(data[[res.start]])!="POSIXt")){
+  if (is(data[[res.start]],"POSIXt")){
     try(data[[res.start]]<-as.POSIXct(data[[res.start]],tz="UTC",silent=TRUE))
-    if (all(class(data[[res.start]])!="POSIXt")){
+    if (is(data[[res.start]],"POSIXt")){
       stop("res.start is not in the format YYYY-mm-dd HH:MM:SS")
     }
   }
-  if (all(class(data[[res.end]])!="POSIXt")){
+  if (is(data[[res.end]],"POSIXt")){
     try(data[[res.end]]<-as.POSIXct(data[[res.end]],tz="UTC",silent=TRUE))
-    if (all(class(data[[res.end]])!="POSIXt")){
+    if (is(data[[res.end]],"POSIXt")){
       stop("res.end is not in the format YYYY-mm-dd HH:MM:SS")
     }
   }
@@ -195,17 +193,9 @@ drift<-function(data,format,ID,station,res.start,res.end,
 }
 
 #### Seasonal ####
-# Two options - specified date ranges (so start date is different among years)
-# - same day of year each year
-# - what to call these two options? season.method - custom and ddmm (for day-month)
-# The season function should go through the data and just select by the
-# season method
-# The other functions will then run on the reduced dataset
-# BUT - will need to find a way to make backwards work on the full dataset
-# Should drift operate before or after season? Should operate before if
+# will need to find a way to make backwards work on the full dataset
+# Should drift operate before or after season? Should operate before - if
 # backwards is working on the full dataset
-
-# Overlap - if FALSE, cuts residence off at start date, adjusts calculation of duration
 
 
 #' Select residence events from specified seasons
@@ -253,15 +243,15 @@ drift<-function(data,format,ID,station,res.start,res.end,
 #' season.end="31-10")}
 season<-function(data,res.start,res.end,residences,units,season.start,
                  season.end,overlap=TRUE){
-  if (all(class(data[[res.start]])!="POSIXt")){
+  if (is(data[[res.start]],"POSIXt")){
     try(data[[res.start]]<-as.POSIXct(data[[res.start]],tz="UTC",silent=TRUE))
-    if (all(class(data[[res.start]])!="POSIXt")){
+    if (is(data[[res.start]],"POSIXt")){
       stop("res.start is not in the format YYYY-mm-dd HH:MM:SS")
     }
   }
-  if (all(class(data[[res.end]])!="POSIXt")){
+  if (is(data[[res.end]],"POSIXt")){
     try(data[[res.end]]<-as.POSIXct(data[[res.end]],tz="UTC",silent=TRUE))
-    if (all(class(data[[res.end]])!="POSIXt")){
+    if (is(data[[res.end]],"POSIXt")){
       stop("res.end is not in the format YYYY-mm-dd HH:MM:SS")
     }
   }
@@ -270,28 +260,28 @@ season<-function(data,res.start,res.end,residences,units,season.start,
   if (length(season.start)!=length(season.end)){
     stop("season.start must be the same length as season.end")
   }
-  if (all(class(season.start)!="POSIXt")){
-    try(season.start<-as.POSIXct(season.start,tz="UTC",silent=TRUE))
-    if (all(class(season.start)!="POSIXt")&
+  if (is(season.start,"POSIXt")){
+    try(season.start<-as.POSIXct(season.start,tz="UTC"),silent=TRUE)
+    if (is(season.start,"POSIXt")&
         length(season.start)!=1&
         all(nchar(season.start)!=5)){
       stop("season.start is not in the format YYYY-mm-dd HH:MM:SS or dd-mm")
     }
   }
-  if (all(class(season.end)!="POSIXt")){
-    try(season.end<-as.POSIXct(season.end,tz="UTC",silent=TRUE))
-    if (all(class(season.end)!="POSIXt")&
+  if (is(season.end,"POSIXt")){
+    try(season.end<-as.POSIXct(season.end,tz="UTC"),silent=TRUE)
+    if (is(season.end,"POSIXt")&
         length(season.end)!=1&
         all(nchar(season.end)!=5)){
       stop("season.end is not in the format YYYY-mm-dd HH:MM:SS or dd-mm")
     }
   }
-  if (all(class(season.start)!=class(season.end))){
+  if (class(season.start)!=class(season.end)){
     stop("season.start is not the same format as season.end")
   }
 
   # If start and end are in dd-mm format, convert to pairs of full dates
-  if (all(class(season.start)!="POSIXt")){
+  if (is(season.start,"POSIXt")){
     years<-unique(c(as.POSIXlt(data[[res.start]])$year+1900,
                     as.POSIXlt(data[[res.end]])$year+1900))
     start.m<-substr(season.start,4,5)
@@ -305,7 +295,7 @@ season<-function(data,res.start,res.end,residences,units,season.start,
                       as.POSIXct(paste0(years[i],"-",start.m,"-",start.d),
                                  tz="UTC"))
       season.end<-c(season.end,
-                    as.POSIXct(paste0(years[i],"-",start.m,"-",start.d),
+                    as.POSIXct(paste0(years[i],"-",end.m,"-",end.d),
                                tz="UTC"))
     }
   }
@@ -316,29 +306,29 @@ season<-function(data,res.start,res.end,residences,units,season.start,
     data.temp<-data[0,]
     # Four scenarios:
     # 1 - starts after season start, and ends before season end
-    j<-which(data[data[[res.start]]>=season.start[i]&
-                    data[[res.end]]<=season.end[i],])
+    j<-which(data[[res.start]]>=season.start[i]&
+                    data[[res.end]]<=season.end[i])
     data.temp<-rbind(data.temp,data[j,])
     # 2 - starts before season start, and ends after season end
-    j<-which(data[data[[res.start]]<=season.start[i]&
-                    data[[res.end]]>=season.end[i],])
+    j<-which(data[[res.start]]<=season.start[i]&
+                    data[[res.end]]>=season.end[i])
     data.temp<-rbind(data.temp,data[j,])
     # 3 - starts before season start, and ends after season start and before season end
-    j<-which(data[data[[res.start]]<=season.start[i]&
+    j<-which(data[[res.start]]<=season.start[i]&
                     data[[res.end]]>=season.start[i]&
-                    data[[res.end]]<season.end[i],])
+                    data[[res.end]]<season.end[i])
     data.temp<-rbind(data.temp,data[j,])
     # 4 - starts after season start and before season end, and ends after season end
-    j<-which(data[data[[res.start]]>season.start[i]&
+    j<-which(data[[res.start]]>season.start[i]&
                     data[[res.start]]<=season.end[i]&
-                    data[[res.end]]>=season.end[i],])
+                    data[[res.end]]>=season.end[i])
     data.temp<-rbind(data.temp,data[j,])
     if (overlap==FALSE){
       data.temp[[res.start]][data.temp[[res.start]]<season.start[i]]<-season.start[i]
       data.temp[[res.end]][data.temp[[res.start]]>season.end[i]]<-season.end[i]
       # Recalculate residences
       data.temp[[residences]]<-difftime(data.temp[[res.end]],
-                                        date.temp[[res.start]],
+                                        data.temp[[res.start]],
                                         units=units)
     }
     data.season<-rbind(data.season,data.temp)

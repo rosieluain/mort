@@ -4,7 +4,7 @@
 \alias{backwards}
 \title{Shift start time of potential mortalities earlier}
 \usage{
-backwards(data, morts, ID, station, res.start, season = NULL, stnchange = NULL)
+backwards(data, morts, ID, station, res.start, stnchange = NULL)
 }
 \arguments{
 \item{data}{a dataframe of residence events. Residence events must include
@@ -22,9 +22,6 @@ station name or receiver location.}
 
 \item{res.start}{a string of the name of the column in \code{data} that holds the
 start date and time. Must be specified and in POSIXt if \code{format="manual"}.}
-
-\item{season}{a dataframe with the start and end times of the season(s) or
-time period(s) of interest.}
 
 \item{stnchange}{a dataframe with the start time and location of the most
 recent station or location change. Must use the same column names and in
