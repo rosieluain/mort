@@ -78,14 +78,22 @@ stationchange<-function(data,format="mort",ID,station,res.start,res.end,residenc
           if (j>0){
             # If residences at j and j+1 are at the same station
             if (is(res.temp[[station]],"list")){
-              if (any(res.temp[[station]][[j]] %in% res.temp[[station]][[j+1]])){
+              if (any(res.temp[[station]][[j+1]]=="Break")|
+                  any(res.temp[[station]][[j]]=="Break")){
+                j<-j-1
+              }
+              else if (any(res.temp[[station]][[j]] %in% res.temp[[station]][[j+1]])){
                 j<-j-1
               }
               # This means that there is a station change between row j and j+1
               else {break}
             }
             else {
-              if (res.temp[[station]][j]==res.temp[[station]][j+1]){
+              if (res.temp[[station]][j+1]=="Break"|
+                  res.temp[[station]][j]=="Break"){
+                j<-j-1
+              }
+              else if (res.temp[[station]][j]==res.temp[[station]][j+1]){
                 j<-j-1
               }
               # This means that there is a station change between row j and j+1
@@ -207,7 +215,7 @@ resmax<-function(data,ID,station,res.start,
     res.temp<-data[data[[ID]]==stnchange[[ID]][i]&
                      data[[res.start]]<stnchange[[res.start]][i],]
     if (nrow(res.temp)>0){
-      j<-which(res.temp[[residences]]==max(res.temp[[residences]]))
+      j<-which(res.temp[[residences]]==max(res.temp[[residences]],na.rm=TRUE))
       for (k in 1:length(j)){
         res.max[nrow(res.max)+1,]<-res.temp[j[k],]
       }

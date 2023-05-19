@@ -208,8 +208,6 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
                         cutoff.units=drift.units,cutoff=drift.cutoff)
     }
     else {
-      # The problem with difftime happens in here:
-      # When come back, remember to change units back to "days"
       data.morts<-drift(data=data,ID=ID,station=station,
                         res.start=res.start,res.end=res.end,residences=residences,
                         units=units,
@@ -234,6 +232,7 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
                              residences=residences,singles=singles)
     stn.change.morts<-stationchange(data=data.morts,ID=ID,station=station,res.start=res.start,
                                    residences=residences,singles=singles)
+    ### What is this meant to be? ###
     if (is(morts[[station]],"list")){
       morts[[station]]<-as.list(morts[[station]])
     }
@@ -334,12 +333,13 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
     # Identify the longest cumulative residence followed by a station change
     max.rescml<-max(resmaxcml(data=data,ID=ID,station=station,res.start=res.start,
                               res.end=res.end,residences=residences,units=units,
-                              stnchange=stn.change)[[residences]])
+                              stnchange=stn.change)[[residences]],na.rm=TRUE)
     for (i in 1:nrow(stn.change.morts)){
       res.temp<-data.morts[data.morts[[ID]]==stn.change.morts[[ID]][i],]
       # If the cumulative residence at the most recent station is longer than the
       # threshold of max.rescml
-      if (any(difftime(res.temp[[res.end]][res.temp[[res.end]]==max(res.temp[[res.end]])],
+      if (any(difftime(res.temp[[res.end]][!is.na(res.temp[[res.end]])&
+                                                  res.temp[[res.end]]==max(res.temp[[res.end]],na.rm=TRUE)],
                    stn.change.morts[[res.start]][i],units=units)>max.rescml)){
         # If the ID is already in morts
         if (stn.change.morts[[ID]][i] %in% morts[[ID]]){

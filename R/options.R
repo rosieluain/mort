@@ -303,39 +303,63 @@ season<-function(data,res.start,res.end,residences,units,season.start,
     }
   }
 
+  # Get list of unique tag IDs
+  tag<-unique(data[[ID]])
+
   data.season<-data[0,]
 
+  # season.break<-data[0,]
+  # season.break[1,]<-NA
+  # season.break$Station.Name<-"Break"
+
   for (i in 1:length(season.start)){
-    data.temp<-data[0,]
-    # Four scenarios:
-    # 1 - starts after season start, and ends before season end
-    j<-which(data[[res.start]]>=season.start[i]&
-                    data[[res.end]]<=season.end[i])
-    data.temp<-rbind(data.temp,data[j,])
-    # 2 - starts before season start, and ends after season end
-    j<-which(data[[res.start]]<=season.start[i]&
-                    data[[res.end]]>=season.end[i])
-    data.temp<-rbind(data.temp,data[j,])
-    # 3 - starts before season start, and ends after season start and before season end
-    j<-which(data[[res.start]]<=season.start[i]&
-                    data[[res.end]]>=season.start[i]&
-                    data[[res.end]]<season.end[i])
-    data.temp<-rbind(data.temp,data[j,])
-    # 4 - starts after season start and before season end, and ends after season end
-    j<-which(data[[res.start]]>season.start[i]&
-                    data[[res.start]]<=season.end[i]&
-                    data[[res.end]]>=season.end[i])
-    data.temp<-rbind(data.temp,data[j,])
-    if (overlap==FALSE){
-      data.temp[[res.start]][data.temp[[res.start]]<season.start[i]]<-season.start[i]
-      data.temp[[res.end]][data.temp[[res.start]]>season.end[i]]<-season.end[i]
-      # Recalculate residences
-      data.temp[[residences]]<-difftime(data.temp[[res.end]],
-                                        data.temp[[res.start]],
-                                        units=units)
+    for (j in 1:length(tag)){
+      data.temp<-data[0,]
+      # Four scenarios:
+      # 1 - starts after season start, and ends before season end
+      k<-which(data[[ID]]==tag[j]&
+                 data[[res.start]]>=season.start[i]&
+                 data[[res.end]]<=season.end[i])
+      data.temp<-rbind(data.temp,data[k,])
+      # 2 - starts before season start, and ends after season end
+      k<-which(data[[ID]]==tag[j]&
+                 data[[res.start]]<=season.start[i]&
+                 data[[res.end]]>=season.end[i])
+      data.temp<-rbind(data.temp,data[k,])
+      # 3 - starts before season start, and ends after season start and before season end
+      k<-which(data[[ID]]==tag[j]&
+                 data[[res.start]]<=season.start[i]&
+                 data[[res.end]]>=season.start[i]&
+                 data[[res.end]]<season.end[i])
+      data.temp<-rbind(data.temp,data[k,])
+      # 4 - starts after season start and before season end, and ends after season end
+      k<-which(data[[ID]]==tag[j]&
+                 data[[res.start]]>season.start[i]&
+                 data[[res.start]]<=season.end[i]&
+                 data[[res.end]]>=season.end[i])
+      data.temp<-rbind(data.temp,data[k,])
+      if (overlap==FALSE){
+        data.temp[[res.start]][data.temp[[res.start]]<season.start[i]]<-season.start[i]
+        data.temp[[res.end]][data.temp[[res.start]]>season.end[i]]<-season.end[i]
+
+      }
+      data.temp<-data.temp[order(data.temp[[res.start]]),]
+      if (nrow(data.temp)>0){
+        k<-nrow(data.temp)+1
+        data.temp[k,]<-NA
+        data.temp[[ID]][k]<-tag[j]
+        data.temp[[station]][k]<-"Break"
+        data.temp[[res.start]][k]<-data.temp[[res.start]][k-1]+1
+      }
+      data.season<-rbind(data.season,data.temp)
     }
-    data.season<-rbind(data.season,data.temp)
+
   }
+
+  # Recalculate residences
+  data.season[[residences]]<-difftime(data.season[[res.end]],
+                                    data.season[[res.start]],
+                                    units=units)
 
   data.season
 }
