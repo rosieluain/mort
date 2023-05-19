@@ -12,11 +12,12 @@ drift(
   res.start,
   res.end,
   residences,
+  units,
   ddd,
   from.station,
   to.station,
   cutoff = NULL,
-  units = NULL
+  cutoff.units = NULL
 )
 }
 \arguments{
@@ -44,6 +45,8 @@ YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
 \item{residences}{a character string with the name of the column in \code{data}
 that holds the duration of the residence events.}
 
+\item{units}{units of the duration of the residence events in \code{data}.}
+
 \item{ddd}{a dataframe of stations/locations where detected movement between
 stations may be due to drifting of an expelled tag or dead animal.}
 
@@ -56,7 +59,7 @@ the station/location names where drifting detections may move to.}
 \item{cutoff}{the maximum allowable time difference between detections to be
 considered a single residence event. Default is \code{NULL}.}
 
-\item{units}{the units of the cutoff. Options are "secs", "mins", "hours",
+\item{cutoff.units}{the units of the cutoff. Options are "secs", "mins", "hours",
 "days", and "weeks".}
 }
 \value{

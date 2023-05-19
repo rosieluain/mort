@@ -32,10 +32,10 @@ residences<-function(data,ID,station,datetime,cutoff,units){
 
   # Format date/times
   # If datetime column is not already formatted as POSIXt
-  if (all(class(data[[datetime]])!="POSIXt")){
+  if (!is(data[[datetime]],"POSIXt")){
     # If data not already in POSIXt, assume that time zone is UTC
     try(data[[datetime]]<-as.POSIXct(data[[datetime]],tz="UTC"),silent=TRUE)
-    if (all(class(data[[datetime]])!="POSIXt")){
+    if (!is(data[[datetime]],"POSIXt")){
       stop(paste(datetime,"is not of class POSIXt and is not in the format YYYY-mm-dd HH:MM:SS"))
     }
   }

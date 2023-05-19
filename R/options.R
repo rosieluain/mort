@@ -98,6 +98,7 @@ backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
 #' YYYY-mm-dd HH:MM:SS if `format="manual"`.
 #' @param residences a character string with the name of the column in `data`
 #' that holds the duration of the residence events.
+#' @param units units of the duration of the residence events in `data`.
 #' @param ddd a dataframe of stations/locations where detected movement between
 #' stations may be due to drifting of an expelled tag or dead animal.
 #' @param from.station a string of the name of the column in `data` that contains
@@ -106,7 +107,7 @@ backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
 #' the station/location names where drifting detections may move to.
 #' @param cutoff the maximum allowable time difference between detections to be
 #' considered a single residence event. Default is `NULL`.
-#' @param units the units of the cutoff. Options are "secs", "mins", "hours",
+#' @param cutoff.units the units of the cutoff. Options are "secs", "mins", "hours",
 #' "days", and "weeks".
 #'
 #' @return A data frame with one row for each residence event. Format is the
@@ -119,19 +120,19 @@ backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
 #' res.start="ResidenceStart",res.end="ResidenceEnd",ddd=driftstations,
 #' from.station="FrStation",to.station="ToStation")}
 drift<-function(data,format,ID,station,res.start,res.end,
-                residences,ddd,from.station,to.station,
-                cutoff=NULL,units=NULL){
+                residences,units,ddd,from.station,to.station,
+                cutoff=NULL,cutoff.units=NULL){
 
   # Could make this check be a function
-  if (is(data[[res.start]],"POSIXt")){
+  if (!is(data[[res.start]],"POSIXt")){
     try(data[[res.start]]<-as.POSIXct(data[[res.start]],tz="UTC",silent=TRUE))
-    if (is(data[[res.start]],"POSIXt")){
+    if (!is(data[[res.start]],"POSIXt")){
       stop("res.start is not in the format YYYY-mm-dd HH:MM:SS")
     }
   }
-  if (is(data[[res.end]],"POSIXt")){
+  if (!is(data[[res.end]],"POSIXt")){
     try(data[[res.end]]<-as.POSIXct(data[[res.end]],tz="UTC",silent=TRUE))
-    if (is(data[[res.end]],"POSIXt")){
+    if (!is(data[[res.end]],"POSIXt")){
       stop("res.end is not in the format YYYY-mm-dd HH:MM:SS")
     }
   }
@@ -144,7 +145,10 @@ drift<-function(data,format,ID,station,res.start,res.end,
 
   res.drift<-data[0,]
 
+
   for (i in 1:length(tag)){
+    # print(paste("first check i =",i))
+    # Ok, so this counts up just fine
     res.temp<-data[data[[ID]]==tag[i],]
     if (nrow(res.temp)>1&
         any(res.temp[[station]][1:(nrow(res.temp)-1)] %in% ddd[[from.station]])){
@@ -158,9 +162,8 @@ drift<-function(data,format,ID,station,res.start,res.end,
         for (k in 1:length(j)){
           if (res.temp[[station]][j[k]+1] %in%
               ddd[[to.station]][ddd[[from.station]]==res.temp[[station]][[j[k]]][length(res.temp[[station]][[j[k]]])]]){
-            res.temp[[res.start]][j[k+1]]<-res.temp[[res.start]][j[k]]
-            res.temp[[station]][[j[k+1]]]<-append(res.temp[[station]][[j[k]]],res.temp[[station]][[j[k+1]]])
-            # res.temp[[station]][j[k+1]]<-res.temp[[station]][j[k]]
+            res.temp[[res.start]][j[k]+1]<-res.temp[[res.start]][j[k]]
+            res.temp[[station]][[j[k]+1]]<-append(res.temp[[station]][[j[k]]],res.temp[[station]][[j[k]+1]])
             del<-c(del,j[k])
           }
         }
@@ -171,9 +174,9 @@ drift<-function(data,format,ID,station,res.start,res.end,
                ddd[[to.station]][ddd[[from.station]]==res.temp[[station]][j[k]]])&
               difftime(res.temp[[res.start]][j[k]+1],
                        res.temp[[res.end]][j[k]],
-                       units=units)<cutoff){
-            res.temp[[res.start]][j[k+1]]<-res.temp[[res.start]][j[k]]
-            res.temp[[station]][j[k+1]]<-res.temp[[station]][j[k]]
+                       units=cutoff.units)<cutoff){
+            res.temp[[res.start]][j[k]+1]<-res.temp[[res.start]][j[k]]
+            res.temp[[station]][j[k]+1]<-res.temp[[station]][j[k]]
             del<-c(del,j[k])
           }
         }
@@ -243,15 +246,15 @@ drift<-function(data,format,ID,station,res.start,res.end,
 #' season.end="31-10")}
 season<-function(data,res.start,res.end,residences,units,season.start,
                  season.end,overlap=TRUE){
-  if (is(data[[res.start]],"POSIXt")){
+  if (!is(data[[res.start]],"POSIXt")){
     try(data[[res.start]]<-as.POSIXct(data[[res.start]],tz="UTC",silent=TRUE))
-    if (is(data[[res.start]],"POSIXt")){
+    if (!is(data[[res.start]],"POSIXt")){
       stop("res.start is not in the format YYYY-mm-dd HH:MM:SS")
     }
   }
-  if (is(data[[res.end]],"POSIXt")){
+  if (!is(data[[res.end]],"POSIXt")){
     try(data[[res.end]]<-as.POSIXct(data[[res.end]],tz="UTC",silent=TRUE))
-    if (is(data[[res.end]],"POSIXt")){
+    if (!is(data[[res.end]],"POSIXt")){
       stop("res.end is not in the format YYYY-mm-dd HH:MM:SS")
     }
   }
@@ -260,28 +263,28 @@ season<-function(data,res.start,res.end,residences,units,season.start,
   if (length(season.start)!=length(season.end)){
     stop("season.start must be the same length as season.end")
   }
-  if (is(season.start,"POSIXt")){
+  if (!is(season.start,"POSIXt")){
     try(season.start<-as.POSIXct(season.start,tz="UTC"),silent=TRUE)
-    if (is(season.start,"POSIXt")&
+    if (!is(season.start,"POSIXt")&
         length(season.start)!=1&
         all(nchar(season.start)!=5)){
       stop("season.start is not in the format YYYY-mm-dd HH:MM:SS or dd-mm")
     }
   }
-  if (is(season.end,"POSIXt")){
+  if (!is(season.end,"POSIXt")){
     try(season.end<-as.POSIXct(season.end,tz="UTC"),silent=TRUE)
-    if (is(season.end,"POSIXt")&
+    if (!is(season.end,"POSIXt")&
         length(season.end)!=1&
         all(nchar(season.end)!=5)){
       stop("season.end is not in the format YYYY-mm-dd HH:MM:SS or dd-mm")
     }
   }
-  if (class(season.start)!=class(season.end)){
+  if (all(class(season.start)!=class(season.end))){
     stop("season.start is not the same format as season.end")
   }
 
   # If start and end are in dd-mm format, convert to pairs of full dates
-  if (is(season.start,"POSIXt")){
+  if (!is(season.start,"POSIXt")){
     years<-unique(c(as.POSIXlt(data[[res.start]])$year+1900,
                     as.POSIXlt(data[[res.end]])$year+1900))
     start.m<-substr(season.start,4,5)
