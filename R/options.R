@@ -32,6 +32,10 @@
 #' \dontrun{backwards(data=data,morts=morts,ID="TagID",station="Receiver",
 #' res.start="ResidencesStart",stnchange=stn.change)}
 backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
+  if (any(data[[station]]=="Break")){
+    warning("Either a station name was 'Break' or data included seasonal
+            breaks. Breaks were removed.")
+  }
   # If stnchange was provided, shift morts to stnchange
   if (!is.null(stnchange)){
     for (i in 1:nrow(morts)){
@@ -46,12 +50,17 @@ backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
       for (i in 1:nrow(morts)){
         res.temp<-data[data[[ID]]==morts[[ID]][i]&
                          data[[res.start]]<=morts[[res.start]][i],]
+        k<-which(res.temp[[station]]=="Break")
+        if (length(k)>0){
+          res.temp<-res.temp[-k,]
+        }
         # Start at end and work backwards, looking for station change
         j<-nrow(res.temp)
         repeat{
           if (j>=2){
             if (is(res.temp[[station]],"list")){
-              if (any(res.temp[[station]][[j]] %in% res.temp[[station]][[j-1]])){
+              if (res.temp[[station]][[j-1]][length(res.temp[[station]][[j-1]])]==
+                  res.temp[[station]][[j]][1]){
                 j<-j-1
               }
               else {break}
@@ -144,7 +153,6 @@ drift<-function(data,format,ID,station,res.start,res.end,
   tag<-unique(data[[ID]])
 
   res.drift<-data[0,]
-
 
   for (i in 1:length(tag)){
     # print(paste("first check i =",i))

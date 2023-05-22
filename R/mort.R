@@ -200,42 +200,29 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
                                    residences=residences,singles=singles)
   }
   else if (drift=="morts"){
+    data.morts<-drift(data=data,ID=ID,station=station,
+                      res.start=res.start,res.end=res.end,residences=residences,
+                      units=units,
+                      ddd=ddd,from.station=from.station,to.station=to.station)
     if (!is.null(drift.cutoff)){
-      data.morts<-drift(data=data,ID=ID,station=station,
-                        res.start=res.start,res.end=res.end,residences=residences,
-                        units=units,
-                        ddd=ddd,from.station=from.station,to.station=to.station,
-                        cutoff.units=drift.units,cutoff=drift.cutoff)
+      data.resmax<-drift(data=data,ID=ID,station=station,
+                         res.start=res.start,res.end=res.end,residences=residences,
+                         units=units,
+                         ddd=ddd,from.station=from.station,to.station=to.station,
+                         cutoff.units=drift.units,cutoff=drift.cutoff)
     }
-    else {
-      data.morts<-drift(data=data,ID=ID,station=station,
-                        res.start=res.start,res.end=res.end,residences=residences,
-                        units=units,
-                        ddd=ddd,from.station=from.station,to.station=to.station)
-    }
+    else {data.resmax<-data.morts}
+    drift.resmax<-FALSE
     if (!is.null(season.start)){
-      if (is.null(drift.cutoff)){
-        data.full.morts<-drift(data=data.full,ID=ID,station=station,
-                               res.start=res.start,res.end=res.end,residences=residences,
-                               units=units,
-                               ddd=ddd,from.station=from.station,to.station=to.station)
-      }
-      else {
-        data.full.morts<-drift(data=data.full,ID=ID,station=station,
-                               res.start=res.start,res.end=res.end,residences=residences,
-                               units=units,
-                               ddd=ddd,from.station=from.station,to.station=to.station,
-                               cutoff.units=drift.units,cutoff=drift.cutoff)
-      }
+      data.full<-drift(data=data.full,ID=ID,station=station,
+                       res.start=res.start,res.end=res.end,residences=residences,
+                       units=units,
+                       ddd=ddd,from.station=from.station,to.station=to.station)
     }
-    stn.change<-stationchange(data=data,ID=ID,station=station,res.start=res.start,
-                             residences=residences,singles=singles)
-    stn.change.morts<-stationchange(data=data.morts,ID=ID,station=station,res.start=res.start,
-                                   residences=residences,singles=singles)
-    ### What is this meant to be? ###
-    if (is(morts[[station]],"list")){
-      morts[[station]]<-as.list(morts[[station]])
-    }
+    sc1<-stationchange(data=data.morts,ID=ID,station=station,res.start=res.start,
+                       residences=residences,singles=singles)
+    sc2<-stationchange(data=data.full,ID=ID,station=station,res.start=res.start,
+                       residences=residences,singles=singles)
   }
   else if (drift=="both"){
     if (is.null(drift.cutoff)){
@@ -279,8 +266,9 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
   # Most recent residence longer than max residence before station change
   if (method %in% c("last","any","all")){
     # Identify the longest residence followed by a station change
-    max.res<-max(resmax(data=data,ID=ID,station=station,res.start=res.start,
-                        residences=residences,stnchange=stn.change)[[residences]])
+    max.res<-max(resmax(data=data.resmax,ID=ID,station=station,res.start=res.start,
+                        residences=residences,stnchange=sc1,
+                        drift=drift.resmax)[[residences]])
     if (method=="last"){
       # Note that not run for "all" or "any", because "last" is also captured with "any"
       for (i in 1:length(tag)){
@@ -288,10 +276,12 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
         # If it is already in morts, it would be from infrequent function, which
         # would identify a time earlier or equal to the most recent detection
         if (!(tag[i] %in% morts[[ID]])){
-          if (data[[residences]][data[[ID]]==tag[i]&
-                                 data[[res.start]]==max(data[[res.start]][data[[ID]]==tag[i]])]>max.res){
-            morts[nrow(morts)+1,]<-data[data[[ID]]==tag[i]&
-                                        data[[res.start]]==max(data[[res.start]][data[[ID]]==tag[i]]),]
+          if (data.morts[[residences]][data.morts[[ID]]==tag[i]&
+                                       data.morts[[res.start]]==max(data.morts[[res.start]][data.morts[[ID]]==tag[i]&
+                                                                                            data.morts[[station]]!="Break"])]>max.res){
+            morts[nrow(morts)+1,]<-data.morts[data.morts[[ID]]==tag[i]&
+                                                data.morts[[res.start]]==max(data.morts[[res.start]][data.morts[[ID]]==tag[i]&
+                                                                                                       data.morts[[station]]!="Break"]),]
           }
         }
       }
@@ -302,7 +292,7 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
       for (i in 1:length(tag)){
         res.temp<-data.morts[data.morts[[ID]]==tag[i],]
         j<-which(res.temp[[residences]]>max.res&
-                   res.temp[[res.start]]>=stn.change.morts[[res.start]][stn.change.morts[[ID]]==tag[i]])
+                   res.temp[[res.start]]>=sc2[[res.start]][sc2[[ID]]==tag[i]])
         # If there are any long residences after the station change
         if (length(j)>0){
           # Find which one is the earliest
@@ -331,34 +321,53 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
 
   if (method %in% c("cumulative","all")){
     # Identify the longest cumulative residence followed by a station change
-    max.rescml<-max(resmaxcml(data=data,ID=ID,station=station,res.start=res.start,
+    max.rescml<-max(resmaxcml(data=data.morts,ID=ID,station=station,res.start=res.start,
                               res.end=res.end,residences=residences,units=units,
-                              stnchange=stn.change)[[residences]],na.rm=TRUE)
-    for (i in 1:nrow(stn.change.morts)){
-      res.temp<-data.morts[data.morts[[ID]]==stn.change.morts[[ID]][i],]
+                              stnchange=sc1)[[residences]],na.rm=TRUE)
+    for (i in 1:nrow(sc2)){
+      res.temp<-data.morts[data.morts[[ID]]==sc2[[ID]][i],]
+      res.temp<-res.temp[order(res.temp[[res.start]]),]
+      repeat {
+        if (res.temp[[station]][nrow(res.temp)]=="Break"){
+          res.temp<-res.temp[-nrow(res.temp),]
+        }
+        else {break}
+      }
+      if (any(res.temp[[station]]=="Break")){
+        # Need two values, and determine which is lower
+        # difftime between end of most recent residence and station change (sc2)
+        dt1<-difftime(res.temp[[res.end]][nrow(res.temp)],
+                      sc2[[res.start]][i],
+                      units=units)
+        # difftime between end of most recent residence and most recent break
+        k<-(which(res.temp[[res.start]]==max(res.temp[[res.start]][res.temp[[station]]=="Break"])))+1
+        dt2<-difftime(res.temp[[res.end]][nrow(res.temp)],
+                      res.temp[[res.start]][k],
+                      units=units)
+        comp<-min(dt1,dt2)
+      }
+      else {
+        comp<-difftime(res.temp[[res.end]][nrow(res.temp)],
+                           sc2[[res.start]][i],
+                           units=units)
+      }
       # If the cumulative residence at the most recent station is longer than the
       # threshold of max.rescml
-      if (any(difftime(res.temp[[res.end]][!is.na(res.temp[[res.end]])&
-                                                  res.temp[[res.end]]==max(res.temp[[res.end]],na.rm=TRUE)],
-                   stn.change.morts[[res.start]][i],units=units)>max.rescml)){
+      if (comp>max.rescml){
         # If the ID is already in morts
-        if (stn.change.morts[[ID]][i] %in% morts[[ID]]){
+        if (sc2[[ID]][i] %in% morts[[ID]]){
           # Identify which row
-          j<-which(morts[[ID]]==stn.change.morts[[ID]][i])
+          j<-which(morts[[ID]]==sc2[[ID]][i])
           # If the residence currently in res.morts ocurred later
           # than the cumulative residence period
-          if (morts[[res.start]][j]>stn.change.morts[[res.start]][i]){
+          if (morts[[res.start]][j]>sc2[[res.start]][i]){
             # Adjust the start time to the earlier date
-            morts[j,]<-stn.change.morts[i,]
-            if (backwards==TRUE&
-                !is.null(morts.prev)){
-              new.morts<-c(new.morts,j)
-            }
+            morts[j,]<-sc2[i,]
           }
         }
         # If the ID is not yet in morts
         else {
-          morts[nrow(morts)+1,]<-stn.change.morts[i,]
+          morts[nrow(morts)+1,]<-sc2[i,]
         }
       }
     }
@@ -370,19 +379,13 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
         new.morts<-unique(c(new.morts,seq((nm+1),nrow(morts),1)))
         for (i in 1:length(new.morts)){
           morts[i,]<-backwards(data=data.morts,morts=morts[i,],ID=ID,station=station,
-                               res.start=res.start,season=FALSE,stnchange=stn.change.morts)
+                               res.start=res.start,stnchange=sc2)
         }
       }
     }
     else {
-      if (is.null(season.start)){
-        morts<-backwards(data=data.morts,morts=morts,ID=ID,station=station,
-                         res.start=res.start,stnchange=stn.change.morts)
-      }
-      else {
-        morts<-backwards(data=data.full.morts,morts=morts,ID=ID,station=station,
-                         res.start=res.start,stnchange=NULL)
-      }
+      morts<-backwards(data=data.full.morts,morts=morts,ID=ID,station=station,
+                         res.start=res.start,stnchange=sc2)
     }
   }
 
@@ -511,20 +514,38 @@ infrequent<-function(data,format,ID,station,res.start,res.end,residences,units,
     }
   }
 
+  if (any(data[[station]]=="Break")){
+    warning("Either a station name was 'Break' or data included seasonal
+            breaks. Breaks were removed.")
+  }
+
   #### If want to be able to specify units, will need to write unit functions
   # if (!is.null(threshold.units)&
   #     units!=threshold.units){
   #   # Convert threshold.units to units
   #
   # }
-
+  k<-which(data[[station]]=="Break")
+  if (length(k)>0){
+    data<-data[-k,]
+  }
   if (!is.null(ddd)){
-    data<-drift(data=data,ID=ID,station=station,
-                res.start=res.start,res.end=res.end,residences=residences,
-                ddd=ddd,from.station=from.station,to.station=to.station,
-                units=drift.units,
-                if(!is.null(drift.cutoff)){cutoff=drift.cutoff})
+    if (is.null(drift.cutoff)){
+      data.og<-data
+      data<-drift(data=data,ID=ID,station=station,
+                  res.start=res.start,res.end=res.end,residences=residences,
+                  units=units,
+                  ddd=ddd,from.station=from.station,to.station=to.station)
     }
+    else {
+      data.og<-data
+      data<-drift(data=data,ID=ID,station=station,
+                  res.start=res.start,res.end=res.end,residences=residences,
+                  units=units,
+                  ddd=ddd,from.station=from.station,to.station=to.station,
+                  cutoff=drift.cutoff,cutoff.units=drift.units)
+    }
+  }
 
   tag<-unique(data[[ID]])
 
@@ -553,26 +574,73 @@ infrequent<-function(data,format,ID,station,res.start,res.end,residences,units,
           (!is.null(morts.prev)&
            (replace==TRUE|
             !(tag[i] %in% morts.prev[[ID]])))){
-        res.temp<-data[data[[ID]]==tag[i]&
-                         difftime(data[[res.end]][data[[res.end]]==max(data[[res.end]])],
-                                  data[[res.end]],units=recent.units)<recent.period,]
-        if (nrow(res.temp)>=1&
-            length(unique(res.temp[[station]]))==1&
-            sum(res.temp[[residences]])<threshold){
-          if (tag[i] %in% inf.morts[[ID]]){
-            j<-which(inf.morts[[ID]]==tag[i])
-            if (res.temp[[res.start]][1]<inf.morts[[res.start]][j]){
-              inf.morts[j,]<-res.temp[1,]
-              if (!is.null(morts.prev)&backwards==TRUE){
-                new.morts<-c(new.morts,j)
+        res.temp<-data[data[[ID]]==tag[i],]
+        res.temp<-res.temp[order(res.temp[[res.start]]),]
+        j<-min(which(difftime(res.temp[[res.end]][nrow(res.temp)],
+                          res.temp[[res.end]],
+                          units=recent.units)<=recent.period))
+        # if (length(j)>0){
+        #   res.temp<-res.temp[-j,]
+        # }
+        if (is.null(ddd)){
+          if (nrow(res.temp)>=1&
+              length(unique(res.temp[[station]][j:nrow(res.temp)]))==1&
+              sum(res.temp[[residences]])<threshold){
+            if (tag[i] %in% inf.morts[[ID]]){
+              j<-which(inf.morts[[ID]]==tag[i])
+              if (res.temp[[res.start]][1]<inf.morts[[res.start]][j]){
+                inf.morts[j,]<-res.temp[1,]
+                if (!is.null(morts.prev)&backwards==TRUE){
+                  new.morts<-c(new.morts,j)
+                }
+              }
+            }
+            else {
+              inf.morts[nrow(inf.morts)+1,]<-res.temp[1,]
+            }
+          }
+        }
+        else {
+          res.temp.drift<-drift(data=res.temp[j:nrow(res.temp),],ID=ID,station=station,
+                          res.start=res.start,res.end=res.end,
+                          residences=residences,units=units,ddd=ddd,
+                          from.station=from.station,to.station=to.station)
+          if (nrow(res.temp.drift)>1){
+            # Then run backwards
+            rb<-backwards(data=res.temp.drift,morts=res.temp.drift[nrow(res.temp.drift),],
+                          ID=ID,station=station,res.start=res.start)
+            k<-which(res.temp.drift[[res.start]]==rb[[res.start]])
+            if (k==1){
+              if (j>1){
+                # Run drift on whole dataset
+                res.temp<-drift(data=res.temp,ID=ID,station=station,
+                                res.start=res.start,res.end=res.end,
+                                residences=residences,units=units,ddd=ddd,
+                                from.station=from.station,to.station=to.station)
+                # Run backwards on dataset, starting with j, and add to inf.morts
+                inf.morts[nrow(inf.morts)+1,]<-backwards(data=res.temp,
+                                                         morts=res.temp[j,],
+                                                         ID=ID,station=station,res.start=res.start)
+              }
+              else {
+                inf.morts[nrow(inf.morts)+1,]<-res.temp.drift[1,]
               }
             }
           }
-          else {
-            inf.morts[nrow(inf.morts)+1,]<-res.temp[1,]
-            # if (!is.null(morts.prev)&backwards==TRUE){
-            #   new.morts<-c(new.morts,nrow(inf.morts))
-            # }
+          else if (nrow(res.temp.drift)==1){
+            if (j>1){
+              # Run drift on whole dataset
+              res.temp<-drift(data=res.temp,ID=ID,station=station,
+                              res.start=res.start,res.end=res.end,
+                              residences=residences,units=units,ddd=ddd,
+                              from.station=from.station,to.station=to.station)
+              # Then add the result from backwards to inf.morts
+              inf.morts[nrow(inf.morts)+1,]<-backwards(data=res.temp,morts=res.temp[nrow(res.temp),],
+                                                       ID=ID,station=station,res.start=res.start)
+            }
+            else {
+              inf.morts[nrow(inf.morts)+1,]<-res.temp.drift[1,]
+            }
           }
         }
       }
@@ -608,9 +676,6 @@ infrequent<-function(data,format,ID,station,res.start,res.end,residences,units,
             length(unique(res.temp[[station]]))==1&
             sum(res.temp[[residences]])<threshold){
           inf.morts[nrow(inf.morts)+1,]<-res.temp[1,]
-          # if (!is.null(morts.prev)&backwards==TRUE){
-          #   new.morts<-c(new.morts,nrow(inf.morts))
-          # }
         }
       }
     }
@@ -618,7 +683,7 @@ infrequent<-function(data,format,ID,station,res.start,res.end,residences,units,
 
   if (backwards==TRUE){
     if (is.null(morts.prev)){
-    inf.morts<-backwards(data=data,morts=inf.morts,ID=ID,station=station,
+    inf.morts<-backwards(data=data.og,morts=inf.morts,ID=ID,station=station,
                          res.start=res.start)
     }
     else {
@@ -627,7 +692,7 @@ infrequent<-function(data,format,ID,station,res.start,res.end,residences,units,
       }
       if (length(new.morts)>0){
         for (i in 1:length(new.morts)){
-          inf.morts[new.morts[i],]<-backwards(data=data,morts=inf.morts[new.morts[i],],ID=ID,station=station,
+          inf.morts[new.morts[i],]<-backwards(data=data.og,morts=inf.morts[new.morts[i],],ID=ID,station=station,
                                            res.start=res.start)
         }
       }

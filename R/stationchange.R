@@ -32,12 +32,6 @@
 #' @param to.station a string of the name of the column in `ddd` that contains
 #' the station/location names where drifting detections may move to. Must
 #' be identical to the station/location names in `data`.
-#' @param drift.cutoff the maximum allowable time difference between detections to be
-#' considered a single residence event. Recommended to be the same as used
-#' to generate residence events in `data`.
-#' @param drift.units the units of the cutoff. Options are "secs", "mins", "hours",
-#' "days", and "weeks". Recommended to be the same as used to generate
-#' residence events in `data`.
 #'
 #' @return a dataframe with one row for each tag ID, including the date/time of
 #' the residence start at the most recent station or location, the date/time of
@@ -51,7 +45,7 @@
 #' station="Receiver",res.start="StartUTC",residences="ResidencesLength.days")}
 stationchange<-function(data,format="mort",ID,station,res.start,res.end,residences,
                         singles=TRUE,drift=FALSE,ddd=NULL,from.station=NULL,
-                        to.station=NULL,drift.cutoff=NULL,drift.units=NULL){
+                        to.station=NULL){
 
   # Check that if drift==TRUE, then drift.units are given
 
@@ -60,7 +54,8 @@ stationchange<-function(data,format="mort",ID,station,res.start,res.end,residenc
 
   stn.change<-data[0,]
 
-  if (drift==FALSE){
+  if (drift==FALSE&
+      !is(data[[station]],"list")){
     for (i in 1:length(tag)){
       res.temp<-data[data[[ID]]==tag[i],]
       # Order by time
@@ -69,62 +64,46 @@ stationchange<-function(data,format="mort",ID,station,res.start,res.end,residenc
         # Remove single detections
         res.temp<-res.temp[res.temp[[residences]]!=0,]
       }
-
-      # If there are at least two records
+        # If there are at least two records
       if (nrow(res.temp)>=2){
         # Set j to second last record
         j<-nrow(res.temp)-1
         repeat {
           if (j>0){
             # If residences at j and j+1 are at the same station
-            if (is(res.temp[[station]],"list")){
-              if (any(res.temp[[station]][[j+1]]=="Break")|
-                  any(res.temp[[station]][[j]]=="Break")){
-                j<-j-1
-              }
-              else if (any(res.temp[[station]][[j]] %in% res.temp[[station]][[j+1]])){
-                j<-j-1
-              }
-              # This means that there is a station change between row j and j+1
-              else {break}
+            if (res.temp[[station]][j+1]=="Break"|
+               res.temp[[station]][j]=="Break"){
+             j<-j-1
             }
-            else {
-              if (res.temp[[station]][j+1]=="Break"|
-                  res.temp[[station]][j]=="Break"){
-                j<-j-1
-              }
-              else if (res.temp[[station]][j]==res.temp[[station]][j+1]){
-                j<-j-1
-              }
-              # This means that there is a station change between row j and j+1
-              else {break}
+            else if (res.temp[[station]][j]==res.temp[[station]][j+1]){
+             j<-j-1
             }
+            # This means that there is a station change between row j and j+1
+            else {break}
           }
           else {break}
         }
-
         if (j>0){
           stn.change[nrow(stn.change)+1,]<-res.temp[(j+1),]
         }
         # If the fish has not changed locations for the whole detection history
         else {
-          stn.change[nrow(stn.change)+1,]<-res.temp[1,]
+         stn.change[nrow(stn.change)+1,]<-res.temp[1,]
         }
-      }
+       }
       else if (nrow(res.temp)==1){
         stn.change[nrow(stn.change)+1,]<-res.temp[1,]
       }
     }
   }
 
-  #### Delete if get data=drift.data to work
   else {
-    data.drift<-drift(data=data,ID=ID,station=station,
-             res.start=res.start,res.end=res.end,residences=residences,
-             ddd=ddd,from.station=from.station,to.station=to.station,
-             units=drift.units,
-             if(!is.null(drift.cutoff)){cutoff=drift.cutoff})
-
+    if (drift==TRUE){
+      data.drift<-drift(data=data,ID=ID,station=station,
+                         res.start=res.start,res.end=res.end,residences=residences,
+                         ddd=ddd,from.station=from.station,to.station=to.station)
+    }
+    else {data.drift<-data}
     for (i in 1:length(tag)){
       res.temp<-data.drift[data.drift[[ID]]==tag[i],]
       # Order by time
@@ -138,19 +117,15 @@ stationchange<-function(data,format="mort",ID,station,res.start,res.end,residenc
       if (nrow(res.temp)>=2){
         # Set j to second last record
         j<-nrow(res.temp)-1
-
-        # If there is a cutoff
-        # a - b
-        # b - c - would show up as the same (no station change)
-        # a - b
-        # a - b - would show up as different (station change)
-        # could get around this by using any:
-        # if any match, then it is not a station change
-
         repeat {
           if (j>0){
             # If residences at j and j+1 are at the same station
-            if (any(res.temp[[station]][[j]] %in% res.temp[[station]][[j+1]])){
+            if (any(res.temp[[station]][[j+1]]=="Break")|
+                any(res.temp[[station]][[j]]=="Break")){
+              j<-j-1
+            }
+            else if (res.temp[[station]][[j]][length(res.temp[[station]][[j]])]==
+                     res.temp[[station]][[j+1]][1]){
               j<-j-1
             }
             # This means that there is a station change between row j and j+1
@@ -158,7 +133,6 @@ stationchange<-function(data,format="mort",ID,station,res.start,res.end,residenc
           }
           else {break}
         }
-
         if (j>0){
           stn.change[nrow(stn.change)+1,]<-res.temp[(j+1),]
         }
@@ -175,11 +149,6 @@ stationchange<-function(data,format="mort",ID,station,res.start,res.end,residenc
 
   stn.change
 }
-
-
-
-
-#### Need to add season option
 
 #' Maximum residence duration
 #' @description Find the maximum duration of a single residence in the dataset that occurred
@@ -198,6 +167,8 @@ stationchange<-function(data,format="mort",ID,station,res.start,res.end,residenc
 #' that holds the duration of the residence events.
 #' @param stnchange a dataframe with the start time and location of the most
 #' recent station or location change. Must use the same column names as `data`.
+#' @param drift indicates if drift residence events should be included in
+#' determining the the maximum residence duration
 #'
 #' @return a dataframe with the residence information for the longest residence
 #' for each tag ID that occurred before the most recent station/location change.
@@ -207,7 +178,7 @@ stationchange<-function(data,format="mort",ID,station,res.start,res.end,residenc
 #' \dontrun{resmax(data=res.events,ID="TagID",station="Receiver",
 #' res.start="StartUTC",residences="ResidencesLength.days",stnchange=station.change)}
 resmax<-function(data,ID,station,res.start,
-                 residences,stnchange){
+                 residences,stnchange,drift=FALSE){
   res.max<-data[0,]
 
   for (i in 1:nrow(stnchange)){
@@ -215,9 +186,23 @@ resmax<-function(data,ID,station,res.start,
     res.temp<-data[data[[ID]]==stnchange[[ID]][i]&
                      data[[res.start]]<stnchange[[res.start]][i],]
     if (nrow(res.temp)>0){
-      j<-which(res.temp[[residences]]==max(res.temp[[residences]],na.rm=TRUE))
-      for (k in 1:length(j)){
-        res.max[nrow(res.max)+1,]<-res.temp[j[k],]
+      if (drift==FALSE&
+          is(data[[station]],"list")){
+        del<-as.numeric()
+        for (j in 1:nrow(res.temp)){
+          if (length(res.temp[[station]][[j]])>1){
+            del<-c(del,j)
+          }
+        }
+        if (length(del)>0){
+          res.temp<-res.temp[-del,]
+        }
+      }
+      if (nrow(res.temp)>0){
+        j<-which(res.temp[[residences]]==max(res.temp[[residences]],na.rm=TRUE))
+        for (k in 1:length(j)){
+          res.max[nrow(res.max)+1,]<-res.temp[j[k],]
+        }
       }
     }
   }
@@ -269,6 +254,7 @@ resmaxcml<-function(data,ID,station,res.start,res.end,
     # Subset residences for ID i, where res.start < res.start of stnchange
     res.temp<-data[data[[ID]]==stnchange[[ID]][i]&
                      data[[res.start]]<stnchange[[res.start]][i],]
+    # If station is a list, then drift was included
     if (is(res.temp[[station]],"list")){
       j<-1
       repeat {
@@ -279,9 +265,10 @@ resmaxcml<-function(data,ID,station,res.start,res.end,
           repeat{
             # If there are multiple residences
             if (nrow(res.temp)>j){
-              # If any of the first station
-              # name(s) matches any of the second station name(s)
-              if (any(res.temp[[station]][[j]] %in% res.temp[[station]][[j+1]])){
+              # If the last station of the first record matches the first
+              # station of the next record
+              if (res.temp[[station]][[j]][length(res.temp[[station]][[j]])]==
+                  res.temp[[station]][[j+1]][1]){
                 # Go to next row
                 j<-j+1
               }
@@ -291,7 +278,7 @@ resmaxcml<-function(data,ID,station,res.start,res.end,
                 res.maxcml[nrow(res.maxcml)+1,]<-res.temp[j,]
                 # If the previous station change was before j (as marked by k)
                 if (k!=j){
-                  # Adust StartUTC so it is the start of the cumulative residence
+                  # Adjust StartUTC so it is the start of the cumulative residence
                   res.maxcml[[res.start]][nrow(res.maxcml)]<-res.temp[[res.start]][k]
                   # Add list of any stations that might not be part
                   res.maxcml[[station]][[nrow(res.maxcml)]]<-unique(unlist(res.temp[[station]][j:k]))
@@ -301,7 +288,7 @@ resmaxcml<-function(data,ID,station,res.start,res.end,
                 break
               }
             }
-            # If there is just one residence, so add directly
+            # There is just one residence, so add directly
             else {
               res.maxcml[nrow(res.maxcml)+1,]<-res.temp[j,]
               j<-j+1
@@ -313,7 +300,7 @@ resmaxcml<-function(data,ID,station,res.start,res.end,
       }
     }
 
-    # If class(station) is not a list (no drift)
+    # If station is not a list (no drift)
     else {
       j<-1
       repeat {

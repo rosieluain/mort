@@ -4,7 +4,7 @@
 \alias{resmax}
 \title{Maximum residence duration}
 \usage{
-resmax(data, ID, station, res.start, residences, stnchange)
+resmax(data, ID, station, res.start, residences, stnchange, drift = FALSE)
 }
 \arguments{
 \item{data}{a dataframe of residence events. Residence events must include
@@ -25,6 +25,9 @@ that holds the duration of the residence events.}
 
 \item{stnchange}{a dataframe with the start time and location of the most
 recent station or location change. Must use the same column names as \code{data}.}
+
+\item{drift}{indicates if drift residence events should be included in
+determining the the maximum residence duration}
 }
 \value{
 a dataframe with the residence information for the longest residence

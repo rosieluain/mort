@@ -16,9 +16,7 @@ stationchange(
   drift = FALSE,
   ddd = NULL,
   from.station = NULL,
-  to.station = NULL,
-  drift.cutoff = NULL,
-  drift.units = NULL
+  to.station = NULL
 )
 }
 \arguments{
@@ -61,14 +59,6 @@ be identical to the station/location names in \code{data}.}
 \item{to.station}{a string of the name of the column in \code{ddd} that contains
 the station/location names where drifting detections may move to. Must
 be identical to the station/location names in \code{data}.}
-
-\item{drift.cutoff}{the maximum allowable time difference between detections to be
-considered a single residence event. Recommended to be the same as used
-to generate residence events in \code{data}.}
-
-\item{drift.units}{the units of the cutoff. Options are "secs", "mins", "hours",
-"days", and "weeks". Recommended to be the same as used to generate
-residence events in \code{data}.}
 }
 \value{
 a dataframe with one row for each tag ID, including the date/time of
