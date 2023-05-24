@@ -17,7 +17,8 @@ drift(
   from.station,
   to.station,
   cutoff = NULL,
-  cutoff.units = NULL
+  cutoff.units = NULL,
+  progress.bar = TRUE
 )
 }
 \arguments{
@@ -61,6 +62,9 @@ considered a single residence event. Default is \code{NULL}.}
 
 \item{cutoff.units}{the units of the cutoff. Options are "secs", "mins", "hours",
 "days", and "weeks".}
+
+\item{progress.bar}{option to display progress bar as \code{drift} is applied.
+Default is TRUE.}
 }
 \value{
 A data frame with one row for each residence event. Format is the

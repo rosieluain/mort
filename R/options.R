@@ -1,4 +1,3 @@
-#### Working backwards ####
 #' Shift start time of potential mortalities earlier
 #' @description Shift the start time of potential mortalities earlier, if
 #' station/location has not changed.
@@ -85,7 +84,6 @@ backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
   morts
 }
 
-#### ddd (dead drift direction) ####
 #' Dead drift
 #' @description Identifies sequential residence events where detected movement
 #' between stations may be due to drifting of an expelled tag or dead animal.
@@ -118,6 +116,8 @@ backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
 #' considered a single residence event. Default is `NULL`.
 #' @param cutoff.units the units of the cutoff. Options are "secs", "mins", "hours",
 #' "days", and "weeks".
+#' @param progress.bar option to display progress bar as `drift` is applied.
+#' Default is TRUE.
 #'
 #' @return A data frame with one row for each residence event. Format is the
 #' same as the input residence events, but events that may be due to dead drift
@@ -130,7 +130,7 @@ backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
 #' from.station="FrStation",to.station="ToStation")}
 drift<-function(data,format,ID,station,res.start,res.end,
                 residences,units,ddd,from.station,to.station,
-                cutoff=NULL,cutoff.units=NULL){
+                cutoff=NULL,cutoff.units=NULL,progress.bar=TRUE){
 
   # Could make this check be a function
   if (!is(data[[res.start]],"POSIXt")){
@@ -154,6 +154,9 @@ drift<-function(data,format,ID,station,res.start,res.end,
 
   res.drift<-data[0,]
 
+  if (progress.bar==TRUE){
+    pb<-txtProgressBar(1,length(tag),style=3)
+  }
   for (i in 1:length(tag)){
     # print(paste("first check i =",i))
     # Ok, so this counts up just fine
@@ -194,6 +197,9 @@ drift<-function(data,format,ID,station,res.start,res.end,
       }
     }
     res.drift[(nrow(res.drift)+1):(nrow(res.drift)+nrow(res.temp)),]<-res.temp[,]
+    if (progress.bar==TRUE){
+      setTxtProgressBar(pb,i)
+    }
   }
 
   res.drift[[residences]]<-difftime(res.drift[[res.end]],
@@ -202,12 +208,6 @@ drift<-function(data,format,ID,station,res.start,res.end,
 
   res.drift
 }
-
-#### Seasonal ####
-# will need to find a way to make backwards work on the full dataset
-# Should drift operate before or after season? Should operate before - if
-# backwards is working on the full dataset
-
 
 #' Select residence events from specified seasons
 #' @description Select residence events from specified seasons, to be used to
@@ -321,6 +321,8 @@ season<-function(data,res.start,res.end,residences,units,season.start,
   # season.break$Station.Name<-"Break"
 
   for (i in 1:length(season.start)){
+    print(paste("season/period",i,"of",length(season.start)))
+    pb<-txtProgressBar(1,length(tag),style=3)
     for (j in 1:length(tag)){
       data.temp<-data[0,]
       # Four scenarios:
@@ -360,8 +362,8 @@ season<-function(data,res.start,res.end,residences,units,season.start,
         data.temp[[res.start]][k]<-data.temp[[res.start]][k-1]+1
       }
       data.season<-rbind(data.season,data.temp)
+      setTxtProgressBar(pb,j)
     }
-
   }
 
   # Recalculate residences

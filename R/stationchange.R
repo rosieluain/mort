@@ -1,5 +1,3 @@
-#### Need to add season option
-
 #' Identify most recent station change
 #' @description Identify the most recent station or location change from passive
 #' acoustic telemetry data.
@@ -56,6 +54,7 @@ stationchange<-function(data,format="mort",ID,station,res.start,res.end,residenc
 
   if (drift==FALSE&
       !is(data[[station]],"list")){
+    pb<-txtProgressBar(1,length(tag),style=3)
     for (i in 1:length(tag)){
       res.temp<-data[data[[ID]]==tag[i],]
       # Order by time
@@ -94,6 +93,7 @@ stationchange<-function(data,format="mort",ID,station,res.start,res.end,residenc
       else if (nrow(res.temp)==1){
         stn.change[nrow(stn.change)+1,]<-res.temp[1,]
       }
+      setTxtProgressBar(pb,i)
     }
   }
 
@@ -104,6 +104,7 @@ stationchange<-function(data,format="mort",ID,station,res.start,res.end,residenc
                          ddd=ddd,from.station=from.station,to.station=to.station)
     }
     else {data.drift<-data}
+    pb<-txtProgressBar(1,length(tag),style=3)
     for (i in 1:length(tag)){
       res.temp<-data.drift[data.drift[[ID]]==tag[i],]
       # Order by time
@@ -144,6 +145,7 @@ stationchange<-function(data,format="mort",ID,station,res.start,res.end,residenc
       else if (nrow(res.temp)==1){
         stn.change[nrow(stn.change)+1,]<-res.temp[1,]
       }
+      setTxtProgressBar(pb,i)
     }
   }
 
@@ -181,6 +183,7 @@ resmax<-function(data,ID,station,res.start,
                  residences,stnchange,drift=FALSE){
   res.max<-data[0,]
 
+  pb<-txtProgressBar(1,nrow(stnchange),style=3)
   for (i in 1:nrow(stnchange)){
     # Subset residences for ID i, where res.start < res.start of stnchange
     res.temp<-data[data[[ID]]==stnchange[[ID]][i]&
@@ -205,6 +208,7 @@ resmax<-function(data,ID,station,res.start,
         }
       }
     }
+    setTxtProgressBar(pb,i)
   }
 
   res.max
@@ -250,6 +254,7 @@ resmaxcml<-function(data,ID,station,res.start,res.end,
                     residences,units,stnchange){
   res.maxcml<-data[0,]
 
+  pb<-txtProgressBar(1,nrow(stnchange),style=3)
   for (i in 1:nrow(stnchange)){
     # Subset residences for ID i, where res.start < res.start of stnchange
     res.temp<-data[data[[ID]]==stnchange[[ID]][i]&
@@ -334,7 +339,7 @@ resmaxcml<-function(data,ID,station,res.start,res.end,
         else {break}
       }
     }
-
+    setTxtProgressBar(pb,i)
   }
 
   res.maxcml[[residences]]<-difftime(res.maxcml[[res.end]],
