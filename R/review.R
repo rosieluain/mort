@@ -32,6 +32,13 @@
 #' @param to.station a string of the name of the column in `ddd` that contains
 #' the station/location names where drifting detections may move to. Must
 #' be identical to the station/location names in `morts` and `new.data`.
+#' @param res.end an optional string of the name of the column in `morts` and `new data`
+#' that holds the end date and time. Only needed if drift is applied.
+#' @param units optional units of the duration of the residence events in
+#' `morts` and `new.data`. Only needed if drift is applied.
+#' @param residences an optional character string with the name of the column
+#' in `morts` and `new.data` that holds the duration of the residence events.
+#' Only needed if drift is applied.
 #'
 #' @return A dataframe with one row for each tag ID from `morts`
 #' with a station/location change that was identified
@@ -46,6 +53,7 @@
 #' \dontrun{undead<-review(morts=morts,new.data=new.data,old.data=old.data,
 #' ID="TagID",station="Station.Name",res.start="ResidenceStart")}
 review<-function(morts,new.data,old.data=NULL,ID,station,res.start,
+                 res.end=NULL,residences=NULL,units=NULL,
                  ddd=NULL,from.station=NULL,to.station=NULL){
   #### POSIXt checks ####
   if (!is(morts[[res.start]],"POSIXt")){
@@ -54,10 +62,18 @@ review<-function(morts,new.data,old.data=NULL,ID,station,res.start,
       stop("res.start is not in the format YYYY-mm-dd HH:MM:SS")
     }
   }
-  if (!is(morts[[res.end]],"POSIXt")){
-    try(morts[[res.end]]<-as.POSIXct(morts[[res.end]],tz="UTC",silent=TRUE))
+  if (!is.null(res.end)){
     if (!is(morts[[res.end]],"POSIXt")){
-      stop("res.end is not in the format YYYY-mm-dd HH:MM:SS")
+      try(morts[[res.end]]<-as.POSIXct(morts[[res.end]],tz="UTC",silent=TRUE))
+      if (!is(morts[[res.end]],"POSIXt")){
+        stop("res.end is not in the format YYYY-mm-dd HH:MM:SS")
+      }
+    }
+    if (!is(new.data[[res.end]],"POSIXt")){
+      try(new.data[[res.end]]<-as.POSIXct(new.data[[res.end]],tz="UTC",silent=TRUE))
+      if (!is(new.data[[res.end]],"POSIXt")){
+        stop("res.end is not in the format YYYY-mm-dd HH:MM:SS")
+      }
     }
   }
   if (!is(new.data[[res.start]],"POSIXt")){
@@ -66,22 +82,18 @@ review<-function(morts,new.data,old.data=NULL,ID,station,res.start,
       stop("res.start is not in the format YYYY-mm-dd HH:MM:SS")
     }
   }
-  if (!is(new.data[[res.end]],"POSIXt")){
-    try(new.data[[res.end]]<-as.POSIXct(new.data[[res.end]],tz="UTC",silent=TRUE))
-    if (!is(new.data[[res.end]],"POSIXt")){
-      stop("res.end is not in the format YYYY-mm-dd HH:MM:SS")
-    }
-  }
-  if (!is(old.data[[res.start]],"POSIXt")){
-    try(old.data[[res.start]]<-as.POSIXct(old.data[[res.start]],tz="UTC",silent=TRUE))
+  if (!is.null(old.data)){
     if (!is(old.data[[res.start]],"POSIXt")){
-      stop("res.start is not in the format YYYY-mm-dd HH:MM:SS")
+      try(old.data[[res.start]]<-as.POSIXct(old.data[[res.start]],tz="UTC",silent=TRUE))
+      if (!is(old.data[[res.start]],"POSIXt")){
+        stop("res.start is not in the format YYYY-mm-dd HH:MM:SS")
+      }
     }
-  }
-  if (!is(old.data[[res.end]],"POSIXt")){
-    try(old.data[[res.end]]<-as.POSIXct(old.data[[res.end]],tz="UTC",silent=TRUE))
     if (!is(old.data[[res.end]],"POSIXt")){
-      stop("res.end is not in the format YYYY-mm-dd HH:MM:SS")
+      try(old.data[[res.end]]<-as.POSIXct(old.data[[res.end]],tz="UTC",silent=TRUE))
+      if (!is(old.data[[res.end]],"POSIXt")){
+        stop("res.end is not in the format YYYY-mm-dd HH:MM:SS")
+      }
     }
   }
 
@@ -89,26 +101,28 @@ review<-function(morts,new.data,old.data=NULL,ID,station,res.start,
   unmorts<-new.data[0,]
 
   if (is.null(ddd)){
-    res.temp<-new.data[new.data[[ID]]==tag[i],]
-    if (nrow(res.temp)>0){
-      if (any(res.temp[[station]]!=morts[[station]][i])){
-        # Identify the station change
-        j<-1
-        if (res.temp[[station]][j]==morts[[station]][i]){
-          repeat {
-            if (nrow(res.temp)>j){
-              if (res.temp[[station]][j+1]==res.temp[[station]][j]){
-                j<-j+1
+    for (i in 1:nrow(morts)){
+      res.temp<-new.data[new.data[[ID]]==morts[[ID]][i],]
+      if (nrow(res.temp)>0){
+        if (any(res.temp[[station]]!=morts[[station]][i])){
+          # Identify the station change
+          j<-1
+          if (res.temp[[station]][j]==morts[[station]][i]){
+            repeat {
+              if (nrow(res.temp)>j){
+                if (res.temp[[station]][j+1]==res.temp[[station]][j]){
+                  j<-j+1
+                }
+                else {
+                  unmorts[nrow(unmorts)+1,]<-res.temp[(j+1),]
+                  break
+                }
               }
-              else {
-                unmorts[nrow(unmorts)+1,]<-res.temp[(j+1),]
-                break
-              }
+              else {break}
             }
-            else {break}
           }
+          else {unmorts[nrow(unmorts)+1,]<-res.temp[1,]}
         }
-        else {unmorts[nrow(unmorts)+1,]<-res.temp[1,]}
       }
     }
   }
@@ -123,15 +137,17 @@ review<-function(morts,new.data,old.data=NULL,ID,station,res.start,
     else {
       k<-as.numeric()
       for (j in 1:nrow(morts)){
-        k<-c(k,which(old.data[old.data[[ID]]==morts[[ID]][j]&
-                                old.data[[res.start]]>=morts[[res.start]][j],]))
+        k<-c(k,which(old.data[[ID]]==morts[[ID]][j]&
+                       old.data[[res.start]]>=morts[[res.start]][j]))
       }
       data<-rbind(old.data[k,],
                   new.data[new.data[[ID]] %in% unique(morts[[ID]]),])
     }
     data<-drift(data=data,ID=ID,station=station,
                 res.start=res.start,res.end=res.end,
-                ddd=ddd,from.station=from.station,to.station=to.station)
+                ddd=ddd,from.station=from.station,to.station=to.station,
+                residences=residences,
+                units=units)
     for (i in 1:nrow(morts)){
       res.temp<-data[data[[ID]]==morts[[ID]][i],]
       j<-1

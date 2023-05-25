@@ -22,7 +22,7 @@
 #' format.auto("glatos","res.start")
 #' format.auto("mort","res.end")
 #' format.auto("vtrack","residences")
-format.auto<-function(format,field,data){
+autoformat<-function(format,field,data){
   # data is optional - just for format="mort" and "units" and "residences"
   # also for actel and vtrack?
   if (is.null(format)){

@@ -11,6 +11,9 @@ review(
   ID,
   station,
   res.start,
+  res.end = NULL,
+  residences = NULL,
+  units = NULL,
   ddd = NULL,
   from.station = NULL,
   to.station = NULL
@@ -38,6 +41,16 @@ that holds the station name or receiver location.}
 \item{res.start}{a string of the name of the column in \code{morts} and \code{new.data}
 that holds the start date and time. Must be specified and in POSIXt or
 character in the format YYYY-mm-dd HH:MM:SS.}
+
+\item{res.end}{an optional string of the name of the column in \code{morts} and \verb{new data}
+that holds the end date and time. Only needed if drift is applied.}
+
+\item{residences}{an optional character string with the name of the column
+in \code{morts} and \code{new.data} that holds the duration of the residence events.
+Only needed if drift is applied.}
+
+\item{units}{optional units of the duration of the residence events in
+\code{morts} and \code{new.data}. Only needed if drift is applied.}
 
 \item{ddd}{a dataframe of stations/locations where detected movement between
 stations may be due to drifting of an expelled tag or dead animal.}
