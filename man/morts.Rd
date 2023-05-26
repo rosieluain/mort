@@ -6,7 +6,7 @@
 \usage{
 morts(
   data,
-  format = "mort",
+  type = "mort",
   ID,
   station,
   res.start = "auto",
@@ -33,7 +33,7 @@ morts(
 tag ID, location name, start time, and duration. Residence events must also
 include end time if \code{season} is provided.}
 
-\item{format}{the format used to generate the residence events. Options are
+\item{type}{the method used to generate the residence events. Options are
 "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
 must specify \code{ID}, \code{station}, \code{res.start}, \code{res.end}, \code{residences}, and \code{units}.}
 

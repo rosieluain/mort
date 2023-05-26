@@ -90,7 +90,7 @@ backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
 #'
 #' @param data a data frame of residence events. Residence events must include
 #' tag ID, location name, start time, and end time.
-#' @param format the format used to generate the residence events in `data`.
+#' @param type the method used to generate the residence events in `data`.
 #' Options are "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then
 #' user must specify `ID`, `station`, `res.start`, and `res.end`.
 #' @param ID a string of the name of the column in `data` that holds the tag or
@@ -131,6 +131,40 @@ backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
 drift<-function(data,format,ID,station,res.start,res.end,
                 residences,units,ddd,from.station,to.station,
                 cutoff=NULL,cutoff.units=NULL,progress.bar=TRUE){
+
+  if (type %in% c("actel","vtrack")){
+    data<-extractres(data=data,type=type)
+  }
+
+  if (type=="manual"&"auto" %in% c(ID,station,res.start,res.end,residences,units)){
+    stop("For type='manual', all the following parameters must be specified:
+    ID, station, res.start, res.end, residences, and units")
+  }
+
+  # Check that ID and station are specified (not "auto") for format="mort"
+  if (type=="mort"&(ID=="auto"|station=="auto")){
+    stop("ID and station must be specified (i.e., cannot be 'auto') for format='mort'")
+  }
+
+  # Fill in auto fields
+  if (ID=="auto"){
+    ID<-autofield(type=type,field="ID")
+  }
+  if (station=="auto"){
+    station<-autofield(type=type,field="station")
+  }
+  if (res.start=="auto"){
+    res.start<-autofield(type=type,field="res.start")
+  }
+  if (res.end=="auto"){
+    res.end<-autofield(type=type,field="res.end")
+  }
+  if (residences=="auto"){
+    residences<-autofield(type=type,field="residences")
+  }
+  if (units=="auto"){
+    units<-autofield(type=type,field="units")
+  }
 
   # Could make this check be a function
   if (!is(data[[res.start]],"POSIXt")){
@@ -254,6 +288,30 @@ drift<-function(data,format,ID,station,res.start,res.end,
 #' season.end="31-10")}
 season<-function(data,res.start,res.end,residences,units,season.start,
                  season.end,overlap=TRUE){
+
+  if (type %in% c("actel","vtrack")){
+    data<-extractres(data=data,type=type)
+  }
+
+  if (type=="manual"&"auto" %in% c(res.start,res.end,residences,units)){
+    stop("For type='manual', all the following parameters must be specified:
+    res.start, res.end, residences, and units")
+  }
+
+  # Fill in auto fields
+  if (res.start=="auto"){
+    res.start<-autofield(type=type,field="res.start")
+  }
+  if (res.end=="auto"){
+    res.end<-autofield(type=type,field="res.end")
+  }
+  if (residences=="auto"){
+    residences<-autofield(type=type,field="residences")
+  }
+  if (units=="auto"){
+    units<-autofield(type=type,field="units")
+  }
+
   if (!is(data[[res.start]],"POSIXt")){
     try(data[[res.start]]<-as.POSIXct(data[[res.start]],tz="UTC",silent=TRUE))
     if (!is(data[[res.start]],"POSIXt")){

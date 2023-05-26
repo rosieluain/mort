@@ -6,12 +6,12 @@
 \usage{
 stationchange(
   data,
-  format = "mort",
+  type = "mort",
   ID,
   station,
-  res.start,
-  res.end,
-  residences,
+  res.start = "auto",
+  res.end = "auto",
+  residences = "auto",
   singles = TRUE,
   drift = FALSE,
   ddd = NULL,
@@ -23,7 +23,7 @@ stationchange(
 \item{data}{a dataframe of residence events. Residence events must include
 tag ID, location name, start time, and duration.}
 
-\item{format}{the format used to generate the residence events. Options are
+\item{type}{the method used to generate the residence events. Options are
 "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
 must specify \code{ID}, \code{station}, \code{res.start}, and \code{residences}.}
 

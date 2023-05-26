@@ -8,9 +8,10 @@ review(
   morts,
   new.data,
   old.data = NULL,
+  type,
   ID,
   station,
-  res.start,
+  res.start = "auto",
   res.end = NULL,
   residences = NULL,
   units = NULL,
@@ -31,6 +32,10 @@ detection data that were not included in earlier \code{mort} analyses).}
 in earlier \code{mort} analyses. If \code{drift} was applied in earlier analyses,
 including \code{old.data} is recommended to avoid falsely identifying station
 changes.}
+
+\item{type}{the method used to generate the residence events. Options are
+"mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
+must specify \code{ID}, \code{station}, \code{res.start}, \code{res.end}, \code{residences}, and \code{units}.}
 
 \item{ID}{a string of the name of the column in \code{morts} and \code{new.data} that
 holds the tag or sample IDs.}

@@ -1,23 +1,3 @@
-#### Actel notes ####
-# Output of explore function
-# Residence events are called movement events
-# And are saved in a list, under valid.movements and then the transmitter (including code space)
-# Name of the ID/transmitter is not in the file (but is the name of the list)
-# Units are always in minutes
-# Times are in local time
-
-#### VTrack notes ####
-# Residences events are called residences
-# And are saved in a list, under residences
-# Units are always in seconds
-
-#### glatos notes ####
-# Residence events are called detection events
-# And are saved in a dataframe
-# Units are always in seconds
-
-
-
 #' Identify potential mortalities or expelled tags
 #' @description Identifies potential mortalities or expelled tags from passive
 #' acoustic telemetry data. Mortalities are identified based on thresholds
@@ -26,7 +6,7 @@
 #' @param data a dataframe of residence events. Residence events must include
 #' tag ID, location name, start time, and duration. Residence events must also
 #' include end time if `season` is provided.
-#' @param format the format used to generate the residence events. Options are
+#' @param type the method used to generate the residence events. Options are
 #' "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
 #' must specify `ID`, `station`, `res.start`, `res.end`, `residences`, and `units`.
 #' @param units units of the duration of the residence events in `data`.
@@ -98,41 +78,48 @@
 #'
 #' @examples
 #' \dontrun{mort(data=res.events,format="manual",units="days",residences="ResidenceLength")}
-morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
+morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
                method="all",units="auto",residences="auto",
                singles=TRUE,backwards=FALSE,drift="none",ddd=NULL,
                from.station=NULL, to.station=NULL,drift.cutoff=NULL,
                drift.units=NULL,season.start=NULL,season.end=NULL,
                season.overlap=TRUE,morts.prev=NULL){
-  # if (format=="mort"){
-  #   units=sub("ResidenceLength.","",colnames(data)[grep("ResidenceLength",colnames(data))])
-  # }
-  # else if (format=="actel"){
-  #   units="mins"
-  # }
-  # else if (format=="glatos"){
-  #   units="secs"
-  # }
-  # else if (format=="vtrack"){
-  #   units="secs"
-  # }
-  # else if (format=="manual"){
-  #   # Check that units were provided
-  # }
-  # # if (is.null(season)){
-  # #
-  # # }
-  # # else {
-  # #
-  # # }
-  #
 
-  if (res.start=="auto"){
-    res.start<-auto.format(format=format,field="res.start")
+  if (type %in% c("actel","vtrack")){
+    data<-extractres(data=data,type=type)
   }
 
-  ### Add in a check that if any parameters are missing for manual method,
-  # then give an error
+  if (type=="manual"&"auto" %in% c(ID,station,res.start,res.end,residences,units)){
+    stop("For type='manual', all the following parameters must be specified:
+    ID, station, res.start, res.end, residences, and units")
+  }
+
+  # Check that ID and station are specified (not "auto") for format="mort"
+  if (type=="mort"&(ID=="auto"|station=="auto")){
+    stop("ID and station must be specified (i.e., cannot be 'auto') for format='mort'")
+  }
+
+  # Fill in auto fields
+  if (ID=="auto"){
+    ID<-autofield(type=type,field="ID")
+  }
+  if (station=="auto"){
+    station<-autofield(type=type,field="station")
+  }
+  if (res.start=="auto"){
+    res.start<-autofield(type=type,field="res.start")
+  }
+  if (res.end=="auto"){
+    res.end<-autofield(type=type,field="res.end")
+  }
+  if (residences=="auto"){
+    residences<-autofield(type=type,field="residences")
+  }
+  if (units=="auto"){
+    units<-autofield(type=type,field="units")
+  }
+
+  #### Time zones and actel ####
 
   if (!is(data[[res.start]],"POSIXt")){
     try(data[[res.start]]<-as.POSIXct(data[[res.start]],tz="UTC",silent=TRUE))
@@ -452,7 +439,7 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
 #' @param data a dataframe of residence events. Residence events must include
 #' tag ID, location name, start time, and duration. Residence events must also
 #' include end time if `season` is provided.
-#' @param format the format used to generate the residence events. Options are
+#' @param type the format used to generate the residence events. Options are
 #' "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
 #' must specify `ID`, `station`, `res.start`, `res.end`, `residences`, and `units`.
 #' @param ID a string of the name of the column in `data` that holds the tag or
@@ -545,11 +532,46 @@ morts<-function(data,format="mort",ID,station,res.start="auto",res.end="auto",
 #' end="2020-06-01")}
 
 
-infrequent<-function(data,format,ID,station,res.start,res.end,residences,units,
+infrequent<-function(data,type="mort",ID,station,res.start="auto",
+                     res.end="auto",residences="auto",units="auto",
                      method,threshold,threshold.units=NULL,recent.period=NULL,recent.units=NULL,
                      start=NULL,end=NULL,morts.prev=NULL,replace=FALSE,backwards=FALSE,
                      ddd=NULL,from.station=NULL,to.station=NULL,
                      drift.cutoff=NULL,drift.units=NULL){
+
+  if (type %in% c("actel","vtrack")){
+    data<-extractres(data=data,type=type)
+  }
+
+  if (type=="manual"&"auto" %in% c(ID,station,res.start,res.end,residences,units)){
+    stop("For type='manual', all the following parameters must be specified:
+    ID, station, res.start, res.end, residences, and units")
+  }
+
+  # Check that ID and station are specified (not "auto") for format="mort"
+  if (type=="mort"&(ID=="auto"|station=="auto")){
+    stop("ID and station must be specified (i.e., cannot be 'auto') for format='mort'")
+  }
+
+  # Fill in auto fields
+  if (ID=="auto"){
+    ID<-autofield(type=type,field="ID")
+  }
+  if (station=="auto"){
+    station<-autofield(type=type,field="station")
+  }
+  if (res.start=="auto"){
+    res.start<-autofield(type=type,field="res.start")
+  }
+  if (res.end=="auto"){
+    res.end<-autofield(type=type,field="res.end")
+  }
+  if (residences=="auto"){
+    residences<-autofield(type=type,field="residences")
+  }
+  if (units=="auto"){
+    units<-autofield(type=type,field="units")
+  }
 
   if (!is(data[[res.start]],"POSIXt")){
     try(data[[res.start]]<-as.POSIXct(data[[res.start]],tz="UTC",silent=TRUE))

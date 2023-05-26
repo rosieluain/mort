@@ -17,6 +17,9 @@
 #' in earlier `mort` analyses. If `drift` was applied in earlier analyses,
 #' including `old.data` is recommended to avoid falsely identifying station
 #' changes.
+#' @param type the method used to generate the residence events. Options are
+#' "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
+#' must specify `ID`, `station`, `res.start`, `res.end`, `residences`, and `units`.
 #' @param ID a string of the name of the column in `morts` and `new.data` that
 #' holds the tag or sample IDs.
 #' @param station a string of the name of the column in `morts` and `new.data`
@@ -52,9 +55,54 @@
 #' @examples
 #' \dontrun{undead<-review(morts=morts,new.data=new.data,old.data=old.data,
 #' ID="TagID",station="Station.Name",res.start="ResidenceStart")}
-review<-function(morts,new.data,old.data=NULL,ID,station,res.start,
+review<-function(morts,new.data,old.data=NULL,type,ID,station,res.start="auto",
                  res.end=NULL,residences=NULL,units=NULL,
                  ddd=NULL,from.station=NULL,to.station=NULL){
+
+  if (type %in% c("actel","vtrack")){
+    new.data<-extractres(data=new.data,type=type)
+    if (!is.null(old.data)){
+      old.data<-extractres(data=old.data,type=type)
+    }
+  }
+
+  if (type=="manual"&"auto" %in% c(ID,station,res.start,res.end,residences,units)){
+    stop("For type='manual', all the following parameters must be specified:
+    ID, station, and res.start. If drift is applied, then res.end, residences,
+    and units must also be specified.")
+  }
+
+  # Check that ID and station are specified (not "auto") for format="mort"
+  if (type=="mort"&(ID=="auto"|station=="auto")){
+    stop("ID and station must be specified (i.e., cannot be 'auto') for format='mort'")
+  }
+
+  # Fill in auto fields
+  if (ID=="auto"){
+    ID<-autofield(type=type,field="ID")
+  }
+  if (station=="auto"){
+    station<-autofield(type=type,field="station")
+  }
+  if (res.start=="auto"){
+    res.start<-autofield(type=type,field="res.start")
+  }
+  if (!is.null(res.end)){
+    if (res.end=="auto"){
+      res.end<-autofield(type=type,field="res.end")
+    }
+  }
+  if (!is.null(residences)){
+    if (residences=="auto"){
+      residences<-autofield(type=type,field="residences")
+    }
+  }
+  if (!is.null(units)){
+    if (units=="auto"){
+      units<-autofield(type=type,field="units")
+    }
+  }
+
   #### POSIXt checks ####
   if (!is(morts[[res.start]],"POSIXt")){
     try(morts[[res.start]]<-as.POSIXct(morts[[res.start]],tz="UTC",silent=TRUE))

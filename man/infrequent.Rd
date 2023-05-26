@@ -6,13 +6,13 @@
 \usage{
 infrequent(
   data,
-  format,
+  type = "mort",
   ID,
   station,
-  res.start,
-  res.end,
-  residences,
-  units,
+  res.start = "auto",
+  res.end = "auto",
+  residences = "auto",
+  units = "auto",
   method,
   threshold,
   threshold.units = NULL,
@@ -35,7 +35,7 @@ infrequent(
 tag ID, location name, start time, and duration. Residence events must also
 include end time if \code{season} is provided.}
 
-\item{format}{the format used to generate the residence events. Options are
+\item{type}{the format used to generate the residence events. Options are
 "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
 must specify \code{ID}, \code{station}, \code{res.start}, \code{res.end}, \code{residences}, and \code{units}.}
 

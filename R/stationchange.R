@@ -4,7 +4,7 @@
 #'
 #' @param data a dataframe of residence events. Residence events must include
 #' tag ID, location name, start time, and duration.
-#' @param format the format used to generate the residence events. Options are
+#' @param type the method used to generate the residence events. Options are
 #' "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
 #' must specify `ID`, `station`, `res.start`, and `residences`.
 #' @param ID a string of the name of the column in `data` that holds the tag or
@@ -41,9 +41,41 @@
 #' @examples
 #' \dontrun{stationchange(data=res.events,format="manual",ID="TagID",
 #' station="Receiver",res.start="StartUTC",residences="ResidencesLength.days")}
-stationchange<-function(data,format="mort",ID,station,res.start,res.end,residences,
+stationchange<-function(data,type="mort",ID,station,res.start="auto",
+                        res.end="auto",residences="auto",
                         singles=TRUE,drift=FALSE,ddd=NULL,from.station=NULL,
                         to.station=NULL){
+
+  if (type %in% c("actel","vtrack")){
+    data<-extractres(data=data,type=type)
+  }
+
+  if (type=="manual"&"auto" %in% c(ID,station,res.start,res.end,residences)){
+    stop("For type='manual', all the following parameters must be specified:
+    ID, station, res.start, res.end, and residences")
+  }
+
+  # Check that ID and station are specified (not "auto") for format="mort"
+  if (type=="mort"&(ID=="auto"|station=="auto")){
+    stop("ID and station must be specified (i.e., cannot be 'auto') for format='mort'")
+  }
+
+  # Fill in auto fields
+  if (ID=="auto"){
+    ID<-autofield(type=type,field="ID")
+  }
+  if (station=="auto"){
+    station<-autofield(type=type,field="station")
+  }
+  if (res.start=="auto"){
+    res.start<-autofield(type=type,field="res.start")
+  }
+  if (res.end=="auto"){
+    res.end<-autofield(type=type,field="res.end")
+  }
+  if (residences=="auto"){
+    residences<-autofield(type=type,field="residences")
+  }
 
   # Check that if drift==TRUE, then drift.units are given
 
