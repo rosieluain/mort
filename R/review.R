@@ -1,8 +1,3 @@
-#### If drift was used for the first one, then it is important that the full
-# dataset - from the time of the identified mortality - as well as the original
-# ddd file - are included
-
-
 #' Review previously identified mortalities using new data
 #' @description Uses new data to determine if an animal that was previously
 #' flagged as a mortality made a station/location change and may therefore be
@@ -77,6 +72,10 @@ review<-function(morts,new.data,old.data=NULL,type,ID,station,res.start="auto",
     stop("ID and station must be specified (i.e., cannot be 'auto') for format='mort'")
   }
 
+  if (!(type %in% c("manual","actel"))&units!="auto"){
+    unitcheck(type=type,units=units,data=data)
+  }
+
   # Fill in auto fields
   if (ID=="auto"){
     ID<-autofield(type=type,field="ID")
@@ -103,7 +102,6 @@ review<-function(morts,new.data,old.data=NULL,type,ID,station,res.start="auto",
     }
   }
 
-  #### POSIXt checks ####
   if (!is(morts[[res.start]],"POSIXt")){
     try(morts[[res.start]]<-as.POSIXct(morts[[res.start]],tz="UTC",silent=TRUE))
     if (!is(morts[[res.start]],"POSIXt")){
@@ -145,7 +143,6 @@ review<-function(morts,new.data,old.data=NULL,type,ID,station,res.start="auto",
     }
   }
 
-  #### Main function ####
   unmorts<-new.data[0,]
 
   if (is.null(ddd)){

@@ -6,10 +6,13 @@
 \usage{
 season(
   data,
-  res.start,
-  res.end,
-  residences,
-  units,
+  type = "mort",
+  ID,
+  station,
+  res.start = "auto",
+  res.end = "auto",
+  residences = "auto",
+  units = "auto",
   season.start,
   season.end,
   overlap = TRUE
@@ -18,6 +21,16 @@ season(
 \arguments{
 \item{data}{a dataframe of residence events. Residence events must include
 tag ID, start time, end time, and duration.}
+
+\item{type}{the method used to generate the residence events. Options are
+"mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
+must specify \code{res.start}, \code{res.end}, \code{residences}, and \code{units}.}
+
+\item{ID}{a string of the name of the column in \code{data} that holds the tag or
+sample IDs.}
+
+\item{station}{a string of the name of the column in \code{data} that holds the
+station name or receiver location.}
 
 \item{res.start}{a string of the name of the column in \code{data} that holds the
 start date and time. Must be specified and in POSIXt or character in the format

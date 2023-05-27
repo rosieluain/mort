@@ -53,7 +53,6 @@ residences<-function(data,ID,station,datetime,cutoff,units){
   res<-cbind(data[0,],ResidenceEnd=as.POSIXct(as.character()))
 
   pb<-txtProgressBar(1,length(tag),style=3)
-  # for (i in 45){
   for (i in 1:length(tag)){
     # Subset by ID
     res.sub<-data[data[[ID]]==tag[i],]

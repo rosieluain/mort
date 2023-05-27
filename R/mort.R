@@ -85,6 +85,11 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
                drift.units=NULL,season.start=NULL,season.end=NULL,
                season.overlap=TRUE,morts.prev=NULL){
 
+  if (!(type %in% c("actel","glatos","manual","mort","vtrack"))){
+    stop("invalid type. Please enter valid type: 'actel', 'glatos',
+    'manual', 'mort', or 'vtrack' (note lowercase 'v')")
+  }
+
   if (type %in% c("actel","vtrack")){
     data<-extractres(data=data,type=type)
   }
@@ -92,6 +97,10 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
   if (type=="manual"&"auto" %in% c(ID,station,res.start,res.end,residences,units)){
     stop("For type='manual', all the following parameters must be specified:
     ID, station, res.start, res.end, residences, and units")
+  }
+
+  if (!(type %in% c("manual","actel"))&units!="auto"){
+    unitcheck(type=type,units=units,data=data)
   }
 
   # Check that ID and station are specified (not "auto") for format="mort"
@@ -113,13 +122,11 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     res.end<-autofield(type=type,field="res.end")
   }
   if (residences=="auto"){
-    residences<-autofield(type=type,field="residences")
+    residences<-autofield(type=type,field="residences",data=data)
   }
   if (units=="auto"){
-    units<-autofield(type=type,field="units")
+    units<-autofield(type=type,field="units",data=data)
   }
-
-  #### Time zones and actel ####
 
   if (!is(data[[res.start]],"POSIXt")){
     try(data[[res.start]]<-as.POSIXct(data[[res.start]],tz="UTC",silent=TRUE))
@@ -193,7 +200,7 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     if (method %in% c("all","cumulative")){
       if(!is.null(drift.cutoff)){
         # This just gets used for resmaxcml, so there should not be a cutoff
-        # to correctly identify the drift residence events
+        # when identifying the drift residence events
         print("Applying drift to identify cumulative threshold")
         data<-drift(data=data,ID=ID,station=station,
                     res.start=res.start,res.end=res.end,residences=residences,
@@ -368,11 +375,11 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
       }
       if (any(res.temp[[station]]=="Break")){
         # Need two values, and determine which is lower
-        # difftime between end of most recent residence and station change (sc2)
+        # Value 1: difftime between end of most recent residence and station change (sc2)
         dt1<-difftime(res.temp[[res.end]][nrow(res.temp)],
                       sc2[[res.start]][i],
                       units=units)
-        # difftime between end of most recent residence and most recent break
+        # Value 2: difftime between end of most recent residence and most recent break
         k<-(which(res.temp[[res.start]]==max(res.temp[[res.start]][res.temp[[station]]=="Break"])))+1
         dt2<-difftime(res.temp[[res.end]][nrow(res.temp)],
                       res.temp[[res.start]][k],
@@ -548,6 +555,10 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
     ID, station, res.start, res.end, residences, and units")
   }
 
+  if (!(type %in% c("manual","actel"))&units!="auto"){
+    unitcheck(type=type,units=units,data=data)
+  }
+
   # Check that ID and station are specified (not "auto") for format="mort"
   if (type=="mort"&(ID=="auto"|station=="auto")){
     stop("ID and station must be specified (i.e., cannot be 'auto') for format='mort'")
@@ -591,12 +602,6 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
             breaks. Breaks were removed.")
   }
 
-  #### If want to be able to specify units, will need to write unit functions
-  # if (!is.null(threshold.units)&
-  #     units!=threshold.units){
-  #   # Convert threshold.units to units
-  #
-  # }
   k<-which(data[[station]]=="Break")
   if (length(k)>0){
     data<-data[-k,]
@@ -660,9 +665,6 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
         j<-min(which(difftime(res.temp[[res.end]][nrow(res.temp)],
                           res.temp[[res.end]],
                           units=recent.units)<=recent.period))
-        # if (length(j)>0){
-        #   res.temp<-res.temp[-j,]
-        # }
         if (is.null(ddd)){
           if (nrow(res.temp)>=1&
               length(unique(res.temp[[station]][j:nrow(res.temp)]))==1&
@@ -793,11 +795,11 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
       stop("end is not specified")
     }
     # Convert start and end to POSIXt
-    try(start<-as.POSIXct(start,tz=attributes(data[[res.start]])$tzone),silent=TRUE)
+    try(start<-as.POSIXct(start,tz="UTC",silent=TRUE))
     if (!is(start,"POSIXt")){
       stop("start is not in the format YYYY-mm-dd HH:MM:SS")
     }
-    try(end<-as.POSIXct(end,tz=attributes(data[[res.start]])$tzone),silent=TRUE)
+    try(end<-as.POSIXct(end,tz="UTC",silent=TRUE))
     if (!is(end,"POSIXt")){
       stop("end is not in the format YYYY-mm-dd HH:MM:SS")
     }

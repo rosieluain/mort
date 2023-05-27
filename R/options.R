@@ -128,7 +128,7 @@ backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
 #' \dontrun{drift(data=data,format="manual",ID="TagID",station="Receiver",
 #' res.start="ResidenceStart",res.end="ResidenceEnd",ddd=driftstations,
 #' from.station="FrStation",to.station="ToStation")}
-drift<-function(data,format,ID,station,res.start,res.end,
+drift<-function(data,type,ID,station,res.start,res.end,
                 residences,units,ddd,from.station,to.station,
                 cutoff=NULL,cutoff.units=NULL,progress.bar=TRUE){
 
@@ -139,6 +139,10 @@ drift<-function(data,format,ID,station,res.start,res.end,
   if (type=="manual"&"auto" %in% c(ID,station,res.start,res.end,residences,units)){
     stop("For type='manual', all the following parameters must be specified:
     ID, station, res.start, res.end, residences, and units")
+  }
+
+  if (!(type %in% c("manual","actel"))&units!="auto"){
+    unitcheck(type=type,units=units,data=data)
   }
 
   # Check that ID and station are specified (not "auto") for format="mort"
@@ -192,8 +196,6 @@ drift<-function(data,format,ID,station,res.start,res.end,
     pb<-txtProgressBar(1,length(tag),style=3)
   }
   for (i in 1:length(tag)){
-    # print(paste("first check i =",i))
-    # Ok, so this counts up just fine
     res.temp<-data[data[[ID]]==tag[i],]
     if (nrow(res.temp)>1&
         any(res.temp[[station]][1:(nrow(res.temp)-1)] %in% ddd[[from.station]])){
@@ -253,6 +255,13 @@ drift<-function(data,format,ID,station,res.start,res.end,
 #'
 #' @param data a dataframe of residence events. Residence events must include
 #' tag ID, start time, end time, and duration.
+#' @param type the method used to generate the residence events. Options are
+#' "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
+#' must specify `res.start`, `res.end`, `residences`, and `units`.
+#' @param ID a string of the name of the column in `data` that holds the tag or
+#' sample IDs.
+#' @param station a string of the name of the column in `data` that holds the
+#' station name or receiver location.
 #' @param res.start a string of the name of the column in `data` that holds the
 #' start date and time. Must be specified and in POSIXt or character in the format
 #' YYYY-mm-dd HH:MM:SS if `format="manual"`.
@@ -286,19 +295,35 @@ drift<-function(data,format,ID,station,res.start,res.end,
 #' \dontrun{season(data=data,res.start="ResidenceStart",res.end="ResidenceEnd",
 #' residences="ResidenceDuration",units="days",season.start="01-06",
 #' season.end="31-10")}
-season<-function(data,res.start,res.end,residences,units,season.start,
+season<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
+                 residences="auto",units="auto",season.start,
                  season.end,overlap=TRUE){
 
   if (type %in% c("actel","vtrack")){
     data<-extractres(data=data,type=type)
   }
 
-  if (type=="manual"&"auto" %in% c(res.start,res.end,residences,units)){
+  if (type=="manual"&"auto" %in% c(ID,station,res.start,res.end,residences,units)){
     stop("For type='manual', all the following parameters must be specified:
-    res.start, res.end, residences, and units")
+    ID, station, res.start, res.end, residences, and units")
+  }
+
+  if (!(type %in% c("manual","actel"))&units!="auto"){
+    unitcheck(type=type,units=units,data=data)
+  }
+
+  # Check that ID and station are specified (not "auto") for format="mort"
+  if (type=="mort"&(ID=="auto"|station=="auto")){
+    stop("ID and station must be specified (i.e., cannot be 'auto') for format='mort'")
   }
 
   # Fill in auto fields
+  if (ID=="auto"){
+    ID<-autofield(type=type,field="ID")
+  }
+  if (station=="auto"){
+    station<-autofield(type=type,field="station")
+  }
   if (res.start=="auto"){
     res.start<-autofield(type=type,field="res.start")
   }
@@ -373,10 +398,6 @@ season<-function(data,res.start,res.end,residences,units,season.start,
   tag<-unique(data[[ID]])
 
   data.season<-data[0,]
-
-  # season.break<-data[0,]
-  # season.break[1,]<-NA
-  # season.break$Station.Name<-"Break"
 
   for (i in 1:length(season.start)){
     print(paste("season/period",i,"of",length(season.start)))

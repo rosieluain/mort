@@ -1,10 +1,12 @@
 Package: mort
 Title: mort: Identifying potential mortalities and expelled tags in aquatic acoustic telemetry arrays
 Version: 0.0.1
-Authors@R: 
+Authors@R: c(
     person("Rosie", "Smith", , "rosieluain@gmail.com", role = c("aut", "cre"),
-           comment = c(ORCID = "0000-0003-2675-4452"))
-Description: WA toolkit for identifying potential mortalities and expelled tags in aquatic acoustic telemetry arrays. 
+           comment = c(ORCID = "0000-0003-2675-4452")),
+    person("Heidi", "Swanson", role = "fnd")
+  )
+Description: A toolkit for identifying potential mortalities and expelled tags in aquatic acoustic telemetry arrays. 
     Designed for arrays with non-overlapping receivers. 
 License: GPL (>= 3)
 Encoding: UTF-8

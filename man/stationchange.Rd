@@ -15,6 +15,7 @@ stationchange(
   singles = TRUE,
   drift = FALSE,
   ddd = NULL,
+  units = NULL,
   from.station = NULL,
   to.station = NULL
 )
@@ -51,6 +52,10 @@ station changes.}
 
 \item{ddd}{a dataframe of stations/locations where detected movement between
 stations may be due to drifting of an expelled tag or dead animal.}
+
+\item{units}{optional units of the duration of the residence events in \code{data}.
+Required if \code{drift=TRUE}. Options are "auto", or "secs", "mins", "hours", "days",
+or "weeks".}
 
 \item{from.station}{a string of the name of the column in \code{ddd} that contains
 the station/location names where drifting detections may start from. Must

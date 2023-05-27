@@ -6,7 +6,7 @@
 \usage{
 drift(
   data,
-  format,
+  type,
   ID,
   station,
   res.start,
@@ -24,6 +24,10 @@ drift(
 \arguments{
 \item{data}{a data frame of residence events. Residence events must include
 tag ID, location name, start time, and end time.}
+
+\item{type}{the method used to generate the residence events in \code{data}.
+Options are "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then
+user must specify \code{ID}, \code{station}, \code{res.start}, and \code{res.end}.}
 
 \item{ID}{a string of the name of the column in \code{data} that holds the tag or
 sample IDs.}
@@ -61,10 +65,6 @@ considered a single residence event. Default is \code{NULL}.}
 
 \item{progress.bar}{option to display progress bar as \code{drift} is applied.
 Default is TRUE.}
-
-\item{type}{the method used to generate the residence events in \code{data}.
-Options are "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then
-user must specify \code{ID}, \code{station}, \code{res.start}, and \code{res.end}.}
 }
 \value{
 A data frame with one row for each residence event. Format is the

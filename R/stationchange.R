@@ -24,6 +24,9 @@
 #' station changes.
 #' @param ddd a dataframe of stations/locations where detected movement between
 #' stations may be due to drifting of an expelled tag or dead animal.
+#' @param units optional units of the duration of the residence events in `data`.
+#' Required if `drift=TRUE`. Options are "auto", or "secs", "mins", "hours", "days",
+#' or "weeks".
 #' @param from.station a string of the name of the column in `ddd` that contains
 #' the station/location names where drifting detections may start from. Must
 #' be identical to the station/location names in `data`.
@@ -43,16 +46,20 @@
 #' station="Receiver",res.start="StartUTC",residences="ResidencesLength.days")}
 stationchange<-function(data,type="mort",ID,station,res.start="auto",
                         res.end="auto",residences="auto",
-                        singles=TRUE,drift=FALSE,ddd=NULL,from.station=NULL,
+                        singles=TRUE,drift=FALSE,ddd=NULL,units=NULL,from.station=NULL,
                         to.station=NULL){
 
-  if (type %in% c("actel","vtrack")){
+  if (type %in% c("actel","vtrack")&is(data,"list")){
     data<-extractres(data=data,type=type)
   }
 
   if (type=="manual"&"auto" %in% c(ID,station,res.start,res.end,residences)){
     stop("For type='manual', all the following parameters must be specified:
     ID, station, res.start, res.end, and residences")
+  }
+
+  if (drift==TRUE&is.null(units)){
+    stop("units must be specified if applying drift")
   }
 
   # Check that ID and station are specified (not "auto") for format="mort"
@@ -74,10 +81,8 @@ stationchange<-function(data,type="mort",ID,station,res.start="auto",
     res.end<-autofield(type=type,field="res.end")
   }
   if (residences=="auto"){
-    residences<-autofield(type=type,field="residences")
+    residences<-autofield(type=type,field="residences",data=data)
   }
-
-  # Check that if drift==TRUE, then drift.units are given
 
   # Get list of unique tag IDs
   tag<-unique(data[[ID]])
@@ -131,9 +136,9 @@ stationchange<-function(data,type="mort",ID,station,res.start="auto",
 
   else {
     if (drift==TRUE){
-      data.drift<-drift(data=data,ID=ID,station=station,
+      data.drift<-drift(data=data,type=type,ID=ID,station=station,
                          res.start=res.start,res.end=res.end,residences=residences,
-                         ddd=ddd,from.station=from.station,to.station=to.station)
+                         units=units,ddd=ddd,from.station=from.station,to.station=to.station)
     }
     else {data.drift<-data}
     pb<-txtProgressBar(1,length(tag),style=3)
