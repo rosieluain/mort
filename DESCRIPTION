@@ -17,4 +17,8 @@ RoxygenNote: 7.2.3
 LazyData: true
 Imports: 
     lubridate,
-    methods
+    methods,
+    rlang
+Suggests: 
+    ggplot2,
+    plotly

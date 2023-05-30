@@ -137,20 +137,23 @@ extractres<-function(data,type){
     }
     data.unlisted$Time.in.array.s<-period_to_seconds(hms(data.unlisted$Time.in.array))
     warning("If actel date/times are in local time, they will be converted to
-            UTC. Verify that time zone in actel output is valid.")
+            UTC. Verify that time zone in actel output is valid.",
+            call. = FALSE)
     attributes(data.unlisted$First.time)$tzone<-"UTC"
     attributes(data.unlisted$Last.time)$tzone<-"UTC"
   }
   else if (type=="vtrack"){
     data.unlisted<-data$residences
     warning("Assuming that Vtrack date/times are in UTC. If they are in local
-            time, please convert to UTC before running")
+            time, please convert to UTC before running",
+            call. = FALSE)
     warning("When the duration of an event is 0 s (a single detection) and
             the reason for ending the event (ENDREASON) is 'timeout', Vtrack
-            gives DURATION the time between the current event and the next, not
+            gives DURATION as the time between the current event and the next, not
             the duration of the current event. DURATION was recalculated as
             the duration of the events themselves, to better align with other
-            packages.")
+            packages.",
+            call. = FALSE)
     data.unlisted$STARTTIME<-as.POSIXct(as.character(data.unlisted$STARTTIME),tz="UTC")
     data.unlisted$ENDTIME<-as.POSIXct(as.character(data.unlisted$ENDTIME),tz="UTC")
     data.unlisted$DURATION<-difftime(data.unlisted$ENDTIME,
