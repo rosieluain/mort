@@ -18,7 +18,9 @@ mortsplot(
   units = NULL,
   season.start = NULL,
   season.end = NULL,
-  facet = FALSE
+  facet = FALSE,
+  facet.axis = "x",
+  facet.by = "season"
 )
 }
 \arguments{
@@ -72,6 +74,13 @@ format YYYY-mm-dd HH:MM:SS.}
 
 \item{facet}{option to facet by year or season. If \code{TRUE}, then \code{season.start}
 and \code{season.end} must be provided.}
+
+\item{facet.axis}{option to position facets along x or y axis. Options are
+"x" and "y". Default is "x". Note that \code{facet.axis} can only be "y" if
+\code{facet.by="year"}.}
+
+\item{facet.by}{option to facet by "season" (as defined with \code{season.start}
+and \code{season.end}) or "year". Default is "season".}
 }
 \value{
 a ggplot2 plot. Additional arguments (e.g., formatting axes,

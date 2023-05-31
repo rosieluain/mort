@@ -429,7 +429,7 @@ season<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
       data.temp<-rbind(data.temp,data[k,])
       if (overlap==FALSE){
         data.temp[[res.start]][data.temp[[res.start]]<season.start[i]]<-season.start[i]
-        data.temp[[res.end]][data.temp[[res.start]]>season.end[i]]<-season.end[i]
+        data.temp[[res.end]][data.temp[[res.end]]>season.end[i]]<-season.end[i]
 
       }
       data.temp<-data.temp[order(data.temp[[res.start]]),]

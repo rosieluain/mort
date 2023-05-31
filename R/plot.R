@@ -40,6 +40,11 @@
 #' format YYYY-mm-dd HH:MM:SS.
 #' @param facet option to facet by year or season. If `TRUE`, then `season.start`
 #' and `season.end` must be provided.
+#' @param facet.axis option to position facets along x or y axis. Options are
+#' "x" and "y". Default is "x". Note that `facet.axis` can only be "y" if
+#' `facet.by="year"`.
+#' @param facet.by option to facet by "season" (as defined with `season.start`
+#' and `season.end`) or "year". Default is "season".
 #'
 #' @return a ggplot2 plot. Additional arguments (e.g., formatting axes,
 #' legend, aes, manual colour scales) can be added as for any ggplot2 plot.
@@ -54,7 +59,8 @@
 mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
                     morts=NULL,singles=TRUE,interactive=FALSE,residences=NULL,
                     units=NULL,
-                    season.start=NULL,season.end=NULL,facet=FALSE){
+                    season.start=NULL,season.end=NULL,facet=FALSE,
+                    facet.axis="x",facet.by="season"){
 
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package \"ggplot2\" must be installed to use this function.",
@@ -137,9 +143,10 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
       units<-autofield(type=type,field="units",data=data)
     }
     print("Extracting data from the period/season(s) of interest")
-    data<-season(data=data,res.start=res.start,res.end=res.end,
+    data<-season(data=data,ID=ID,station=station,res.start=res.start,res.end=res.end,
                  residences=residences,units=units,season.start=season.start,
                  season.end=season.end,overlap=FALSE)
+    data<-data[data[[station]]!="Break",]
     if (!is(season.start,"POSIXt")){
       try(season.start<-as.POSIXct(season.start,tz="UTC"),silent=TRUE)
     }
@@ -168,9 +175,11 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
     ssn<-ssn[order(ssn$Start),]
     if (!is.null(morts)){
       print("Extracting morts from the period/season(s) of interest")
-      morts.ssn<-season(data=morts,res.start=res.start,res.end=res.end,
+      morts.ssn<-season(data=morts,ID=ID,station=station,res.start=res.start,
+                        res.end=res.end,
                    residences=residences,units=units,season.start=season.start,
                    season.end=season.end,overlap=FALSE)
+      morts.ssn<-morts.ssn[morts.ssn[[station]]!="Break",]
       if (nrow(morts.ssn)<nrow(morts)){
         # Then some morts were identified outside of the season of interest
         # Need to shift mort to next season start
@@ -185,15 +194,14 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
             morts.ssn[[res.end]][m]<-ssn$End[k]
           }
         }
-        morts<-morts.ssn
       }
+      morts<-morts.ssn
     }
 
     if (facet==TRUE){
       # If there is more than one season
       if (nrow(ssn)>1){
-        # If more than 1 year, set up to facet along y (by year)
-        if (length(years)>1){
+        if (facet.by=="year"){
           data$Year<-as.numeric(NA)
           if (!is.null(morts)){
             morts$Year<-as.numeric(NA)
@@ -204,53 +212,63 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
               morts$Year[(as.POSIXlt(morts[[res.start]])$year+1900)==years[i]]<-years[i]
             }
           }
-          # Make a date with the same year for plotting
-          start.og<-paste0(res.start,".og")
-          end.og<-paste0(res.end,".og")
-          data$Start.og<-data[[res.start]]
-          data$End.og<-data[[res.end]]
-          data[[res.start]]<-as.character(data[[res.start]])
-          data[[res.end]]<-as.character(data[[res.end]])
-          if (!is.null(morts)){
-            morts$Start.og<-morts[[res.start]]
-            morts$End.og<-morts[[res.end]]
-            morts[[res.start]]<-as.character(morts[[res.start]])
-            morts[[res.end]]<-as.character(morts[[res.end]])
-          }
-          for (i in 1:length(years)){
-            if (any(leap_year(years))){
-              k<-which(leap_year(years))
-              if (length(k)>1){
-                k<-min(k)
+          if (facet.axis=="y"){
+            # Make a date with the same year for plotting
+            start.og<-paste0(res.start,".og")
+            end.og<-paste0(res.end,".og")
+            data$Start.og<-data[[res.start]]
+            data$End.og<-data[[res.end]]
+            data[[res.start]]<-as.character(data[[res.start]])
+            data[[res.end]]<-as.character(data[[res.end]])
+            if (!is.null(morts)){
+              morts$Start.og<-morts[[res.start]]
+              morts$End.og<-morts[[res.end]]
+              morts[[res.start]]<-as.character(morts[[res.start]])
+              morts[[res.end]]<-as.character(morts[[res.end]])
+            }
+            for (i in 1:length(years)){
+              if (any(leap_year(years))){
+                k<-which(leap_year(years))
+                if (length(k)>1){
+                  k<-min(k)
+                }
+              }
+              else {k<-1}
+              if (k!=i){
+                data[[res.start]]<-sub(years[i],years[k],data[[res.start]])
+                data[[res.end]]<-sub(years[i],years[k],data[[res.start]])
+                if (!is.null(morts)){
+                  morts[[res.start]]<-sub(years[i],years[k],morts[[res.start]])
+                  morts[[res.end]]<-sub(years[i],years[k],morts[[res.start]])
+                }
               }
             }
-            else {k<-1}
-            if (k!=i){
-              data[[res.start]]<-sub(years[i],years[k],data[[res.start]])
-              data[[res.end]]<-sub(years[i],years[k],data[[res.start]])
-              if (!is.null(morts)){
-                morts[[res.start]]<-sub(years[i],years[k],morts[[res.start]])
-                morts[[res.end]]<-sub(years[i],years[k],morts[[res.start]])
-              }
+            data[[res.start]]<-as.POSIXct(data[[res.start]],tz="UTC")
+            data[[res.end]]<-as.POSIXct(data[[res.end]],tz="UTC")
+            if (!is.null(morts)){
+              morts[[res.start]]<-as.POSIXct(morts[[res.start]],tz="UTC")
+              morts[[res.end]]<-as.POSIXct(morts[[res.end]],tz="UTC")
             }
-          }
-          data[[res.start]]<-as.POSIXct(data[[res.start]],tz="UTC")
-          data[[res.end]]<-as.POSIXct(data[[res.end]],tz="UTC")
-          if (!is.null(morts)){
-            morts[[res.start]]<-as.POSIXct(morts[[res.start]],tz="UTC")
-            morts[[res.end]]<-as.POSIXct(morts[[res.end]],tz="UTC")
           }
         }
         # Otherwise, there are multiple seasons of interest within a year
-        # So facet along x
+        # or user wants to facet by season
         else {
           data$Season<-as.numeric(NA)
-          morts$Season<-as.numeric(NA)
+          if (!is.null(morts)){
+            morts$Season<-as.numeric(NA)
+          }
           for (i in 1:nrow(ssn)){
             data$Season[data[[res.start]]>=ssn$Start[i]&
                           data[[res.end]]<=ssn$End[i]]<-i
-            morts$Season[morts[[res.start]]>=ssn$Start[i]&
-                           morts[[res.end]]<=ssn$End[i]]<-i
+            if (!is.null(morts)){
+              morts$Season[morts[[res.start]]>=ssn$Start[i]&
+                             morts[[res.end]]<=ssn$End[i]]<-i
+            }
+          }
+          data$Season<-paste("Season",data$Season)
+          if (!is.null(morts)){
+            morts$Season<-paste("Season",morts$Season)
           }
         }
       }
@@ -259,9 +277,15 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
 
   # Scale linewidth based on number of IDs
   if (facet==TRUE){
-    if (nrow(ssn)>1&length(years)>1){
+    if (facet.axis=="y"){
       if ((length(unique(data[[ID]]))*length(years))<150){
         lw<-((length(unique(data[[ID]]))*length(years))-200)/-50
+      }
+      else {lw<-1}
+    }
+    else {
+      if (length(unique(data[[ID]]))<150){
+        lw<-(length(unique(data[[ID]]))-200)/-50
       }
       else {
         lw<-1
@@ -281,10 +305,10 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
     # Add a brief period to res.end so residences with 0 detections are visible
     if (facet==TRUE){
       ssn$Length<-difftime(ssn$End,ssn$Start,units="days")
-      if (!is.null(data$Year)){
+      if (facet.axis=="y"){
         resadd<-max(as.numeric(ssn$Length))*10
       }
-      else if (!is.null(data$Season)){
+      else {
         resadd<-sum(as.numeric(ssn$Length))*10
       }
     }
@@ -316,11 +340,14 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
     ggplot2::xlab("")+
     ggplot2::theme_bw()
 
-  ### Facet ####
   if (facet==TRUE){
-    if (!is.null(data$Year)){
+    if (!is.null(data$Year)&facet.axis=="y"){
       plot<-plot+
         ggplot2::facet_grid(Year~.,scales="free",space="free_y")
+    }
+    else if (!is.null(data$Year)&facet.axis=="x"){
+      plot<-plot+
+        ggplot2::facet_grid(.~Year,scales="free",space="free_x")
     }
     else if (!is.null(data$Season)){
       plot<-plot+
