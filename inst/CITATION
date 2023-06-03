@@ -1,19 +1,13 @@
 citHeader("To cite mort in publications use:")
 
 citEntry(
-  entry    = "Misc",
-  title    =  "Identifying potential mortalities and expelled tags in aquatic acoustic telemetry arrays"",
-  author   = c(
-    person("Rosie", "Smith", , "rosieluain@gmail.com", role = c("aut", "cre"),
+  entry    = "Manual",
+  title    = "mort: Identifying potential mortalities and expelled tags in aquatic acoustic telemetry arrays",
+  author   =  c(
+    person("Rosie", "Smith", email="rosieluain@gmail.com", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0003-2675-4452")),
-    person("Heidi", "Swanson", role = "fnd"),
-  journal  = ,
+    person("Heidi", "Swanson", role = "fnd")),
   year     = 2023,
-  volume   = ,
-  number   = ,
-  pages    = ,
-  url      = "https://rosieluain.github.io/mort/"",
-  textVersion = paste(
-
-  )
+  url      = "https://rosieluain.github.io/mort/",
+  textVersion = paste()
 )
