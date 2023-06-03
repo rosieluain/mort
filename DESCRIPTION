@@ -10,7 +10,8 @@ Description: A toolkit for identifying potential mortalities and expelled tags i
     Designed for arrays with non-overlapping receivers. 
 License: GPL (>= 3)
 Encoding: UTF-8
-URL: https://github.com/rosieluain/mort
+URL: https://github.com/rosieluain/mort,
+    https://rosieluain.github.io/mort/
 BugReports: https://github.com/rosieluain/mort/issues
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3

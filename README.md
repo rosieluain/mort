@@ -1,7 +1,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# mort <img src="man/figures/hex-mort.png" align="right" height="138" />
+# mort <img src="man/figures/logo.png" align="right" height="139" />
 
 <!-- badges: start -->
 <!-- badges: end -->
@@ -37,8 +37,9 @@ devtools::install_github("rosieluain/mort")
 ### Package contents
 
 Please see the package vignettes for more details, as well as guidelines
-and tips for the following functions. \#### Data preparation and
-visualization
+and tips for the following functions.
+
+#### Data preparation and visualization
 
 `residences` condenses detection records into residence events, with a
 start time, end time, and duration. Residence events are used as the
