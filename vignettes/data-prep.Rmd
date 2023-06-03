@@ -1,0 +1,19 @@
+---
+title: "Preparing your data"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Preparing your data}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(mort)
+```

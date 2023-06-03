@@ -145,7 +145,7 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
   if (!is.null(season.start)|
       !is.null(season.end)){
     print("Extracting data from the period/season(s) of interest")
-    data<-season(data=data,res.start=res.start,res.end=res.end,
+    data<-season(data=data,type=type,ID=ID,station=station,res.start=res.start,res.end=res.end,
                  residences=residences,units=units,season.start=season.start,
                  season.end=season.end,overlap=season.overlap)
   }
@@ -171,11 +171,11 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     data.resmax<-data
     drift.resmax<-FALSE
     print("Identifying last station change")
-    sc1<-stationchange(data=data.morts,ID=ID,station=station,res.start=res.start,
+    sc1<-stationchange(data=data.morts,type=type,ID=ID,station=station,res.start=res.start,
                        residences=residences,singles=singles)
     if(!is.null(season.start)){
       print("Identifying last station change in full dataset")
-      sc2<-stationchange(data=data.full,ID=ID,station=station,res.start=res.start,
+      sc2<-stationchange(data=data.full,type=type,ID=ID,station=station,res.start=res.start,
                          residences=residences,singles=singles)
     }
     else {sc2<-sc1}
@@ -184,14 +184,14 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     data.morts<-data
     print("Applying drift")
     if (!is.null(drift.cutoff)){
-      data.resmax<-drift(data=data,ID=ID,station=station,
+      data.resmax<-drift(data=data,type=type,ID=ID,station=station,
                   res.start=res.start,res.end=res.end,residences=residences,
                   units=units,
                   ddd=ddd,from.station=from.station,to.station=to.station,
                   cutoff.units=drift.units,cutoff=drift.cutoff)
     }
     else {
-      data.resmax<-drift(data=data,ID=ID,station=station,
+      data.resmax<-drift(data=data,type=type,ID=ID,station=station,
                          res.start=res.start,res.end=res.end,residences=residences,
                          units=units,
                          ddd=ddd,from.station=from.station,to.station=to.station)
@@ -202,7 +202,7 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
         # This just gets used for resmaxcml, so there should not be a cutoff
         # when identifying the drift residence events
         print("Applying drift to identify cumulative threshold")
-        data<-drift(data=data,ID=ID,station=station,
+        data<-drift(data=data,type=type,ID=ID,station=station,
                     res.start=res.start,res.end=res.end,residences=residences,
                     units=units,
                     ddd=ddd,from.station=from.station,to.station=to.station)
@@ -212,24 +212,24 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
       }
     }
     print("Identifying last station change")
-    sc1<-stationchange(data=data.morts,ID=ID,station=station,res.start=res.start,
+    sc1<-stationchange(data=data.morts,type=type,ID=ID,station=station,res.start=res.start,
                        residences=residences,singles=singles)
     if(!is.null(season.start)){
       print("Identifying last station change in full dataset")
-      sc2<-stationchange(data=data.full,ID=ID,station=station,res.start=res.start,
+      sc2<-stationchange(data=data.full,type=type,ID=ID,station=station,res.start=res.start,
                          residences=residences,singles=singles)
     }
     else {sc2<-sc1}
   }
   else if (drift=="morts"){
     print("Applying drift")
-    data.morts<-drift(data=data,ID=ID,station=station,
+    data.morts<-drift(data=data,type=type,ID=ID,station=station,
                       res.start=res.start,res.end=res.end,residences=residences,
                       units=units,
                       ddd=ddd,from.station=from.station,to.station=to.station)
     if (!is.null(drift.cutoff)){
       print("Identifying drift residence events to be removed from identifying resmax threshold")
-      data.resmax<-drift(data=data,ID=ID,station=station,
+      data.resmax<-drift(data=data,type=type,ID=ID,station=station,
                          res.start=res.start,res.end=res.end,residences=residences,
                          units=units,
                          ddd=ddd,from.station=from.station,to.station=to.station,
@@ -239,30 +239,30 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     drift.resmax<-FALSE
     if (!is.null(season.start)){
       print("Applying drift to full dataset")
-      data.full<-drift(data=data.full,ID=ID,station=station,
+      data.full<-drift(data=data.full,type=type,ID=ID,station=station,
                        res.start=res.start,res.end=res.end,residences=residences,
                        units=units,
                        ddd=ddd,from.station=from.station,to.station=to.station)
     }
     print("Identifying last station change")
-    sc1<-stationchange(data=data.morts,ID=ID,station=station,res.start=res.start,
+    sc1<-stationchange(data=data.morts,type=type,ID=ID,station=station,res.start=res.start,
                        residences=residences,singles=singles)
     if(!is.null(season.start)){
       print("Identifying last station change in full dataset")
-      sc2<-stationchange(data=data.full,ID=ID,station=station,res.start=res.start,
+      sc2<-stationchange(data=data.full,type=type,ID=ID,station=station,res.start=res.start,
                          residences=residences,singles=singles)
     }
     else {sc2<-sc1}
   }
   else if (drift=="both"){
     print("Applying drift")
-    data.morts<-drift(data=data,ID=ID,station=station,
+    data.morts<-drift(data=data,type=type,ID=ID,station=station,
                       res.start=res.start,res.end=res.end,residences=residences,
                       units=units,
                       ddd=ddd,from.station=from.station,to.station=to.station)
     if (!is.null(drift.cutoff)){
       print("Applying drift to identify resmax threshold")
-      data.resmax<-drift(data=data,ID=ID,station=station,
+      data.resmax<-drift(data=data,type=type,ID=ID,station=station,
                          res.start=res.start,res.end=res.end,residences=residences,
                          units=units,
                          ddd=ddd,from.station=from.station,to.station=to.station,
@@ -274,17 +274,17 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     drift.resmax<-TRUE
     if (!is.null(season.start)){
       print("Applying drift to full dataset")
-      data.full<-drift(data=data.full,ID=ID,station=station,
+      data.full<-drift(data=data.full,type=type,ID=ID,station=station,
                        res.start=res.start,res.end=res.end,residences=residences,
                        units=units,
                        ddd=ddd,from.station=from.station,to.station=to.station)
     }
     print("Identifying last station change")
-    sc1<-stationchange(data=data.morts,ID=ID,station=station,res.start=res.start,
+    sc1<-stationchange(data=data.morts,type=type,ID=ID,station=station,res.start=res.start,
                        residences=residences,singles=singles)
     if(!is.null(season.start)){
       print("Identifying last station change in full dataset")
-      sc2<-stationchange(data=data.full,ID=ID,station=station,res.start=res.start,
+      sc2<-stationchange(data=data.full,type=type,ID=ID,station=station,res.start=res.start,
                          residences=residences,singles=singles)
     }
     else {sc2<-sc1}
@@ -578,10 +578,10 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
     res.end<-autofield(type=type,field="res.end")
   }
   if (residences=="auto"){
-    residences<-autofield(type=type,field="residences")
+    residences<-autofield(type=type,field="residences",data=data)
   }
   if (units=="auto"){
-    units<-autofield(type=type,field="units")
+    units<-autofield(type=type,field="units",data=data)
   }
 
   if (!is(data[[res.start]],"POSIXt")){
@@ -609,7 +609,7 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
   if (!is.null(ddd)){
     if (is.null(drift.cutoff)){
       print("Applying drift")
-      data<-drift(data=data,ID=ID,station=station,
+      data<-drift(data=data,type=type,ID=ID,station=station,
                   res.start=res.start,res.end=res.end,residences=residences,
                   units=units,
                   ddd=ddd,from.station=from.station,to.station=to.station)
@@ -617,13 +617,13 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
     }
     else {
       print("Applying drift with cutoff")
-      data<-drift(data=data,ID=ID,station=station,
+      data<-drift(data=data,type=type,ID=ID,station=station,
                   res.start=res.start,res.end=res.end,residences=residences,
                   units=units,
                   ddd=ddd,from.station=from.station,to.station=to.station,
                   cutoff=drift.cutoff,cutoff.units=drift.units)
       print("Applying drift (no cutoff)")
-      data.morts<-drift(data=data,ID=ID,station=station,
+      data.morts<-drift(data=data,type=type,ID=ID,station=station,
                      res.start=res.start,res.end=res.end,residences=residences,
                      units=units,
                      ddd=ddd,from.station=from.station,to.station=to.station)
@@ -684,7 +684,8 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
           }
         }
         else {
-          res.temp.drift<-drift(data=res.temp[j:nrow(res.temp),],ID=ID,station=station,
+          res.temp.drift<-drift(data=res.temp[j:nrow(res.temp),],
+                                type=type,ID=ID,station=station,
                           res.start=res.start,res.end=res.end,
                           residences=residences,units=units,ddd=ddd,
                           from.station=from.station,to.station=to.station,
@@ -741,7 +742,7 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
           else if (nrow(res.temp.drift)==1){
             if (backwards==TRUE&j>1){
               # Run drift on whole dataset
-              res.temp<-drift(data=res.temp,ID=ID,station=station,
+              res.temp<-drift(data=res.temp,type=type,ID=ID,station=station,
                               res.start=res.start,res.end=res.end,
                               residences=residences,units=units,ddd=ddd,
                               from.station=from.station,to.station=to.station,
@@ -832,7 +833,7 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
         }
         else {
           if (nrow(res.temp)>0){
-            res.temp.drift<-drift(data=res.temp,ID=ID,station=station,
+            res.temp.drift<-drift(data=res.temp,type=type,ID=ID,station=station,
                                   res.start=res.start,res.end=res.end,
                                   residences=residences,units=units,ddd=ddd,
                                   from.station=from.station,to.station=to.station,

@@ -401,7 +401,9 @@ season<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
 
   for (i in 1:length(season.start)){
     print(paste("season/period",i,"of",length(season.start)))
-    pb<-txtProgressBar(1,length(tag),style=3)
+    if (length(tag)>1){
+      pb<-txtProgressBar(1,length(tag),style=3)
+    }
     for (j in 1:length(tag)){
       data.temp<-data[0,]
       # Four scenarios:
@@ -441,7 +443,9 @@ season<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
         data.temp[[res.start]][k]<-data.temp[[res.start]][k-1]+1
       }
       data.season<-rbind(data.season,data.temp)
-      setTxtProgressBar(pb,j)
+      if (length(tag)>1){
+        setTxtProgressBar(pb,j)
+      }
     }
   }
 

@@ -27,7 +27,7 @@
 #' @param interactive option to generate an interactive plot.
 #' @param residences an optional character string with the name of the column
 #' in `data` that holds the duration of the residence events. Required if
-#' generating an interactive plot.
+#' generating an interactive plot or applying season.
 #' @param units units of the duration of the residence events in `data`.
 #' Required if applying season.
 #' @param season.start the start date/time(s) of the period of interest. If the
@@ -143,7 +143,7 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
       units<-autofield(type=type,field="units",data=data)
     }
     print("Extracting data from the period/season(s) of interest")
-    data<-season(data=data,ID=ID,station=station,res.start=res.start,res.end=res.end,
+    data<-season(data=data,type=type,ID=ID,station=station,res.start=res.start,res.end=res.end,
                  residences=residences,units=units,season.start=season.start,
                  season.end=season.end,overlap=FALSE)
     data<-data[data[[station]]!="Break",]

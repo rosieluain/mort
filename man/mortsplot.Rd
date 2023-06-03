@@ -57,7 +57,7 @@ and should not obscure or impact the visualization of other residence events.}
 
 \item{residences}{an optional character string with the name of the column
 in \code{data} that holds the duration of the residence events. Required if
-generating an interactive plot.}
+generating an interactive plot or applying season.}
 
 \item{units}{units of the duration of the residence events in \code{data}.
 Required if applying season.}

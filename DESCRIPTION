@@ -21,4 +21,7 @@ Imports:
     rlang
 Suggests: 
     ggplot2,
-    plotly
+    knitr,
+    plotly,
+    rmarkdown
+VignetteBuilder: knitr
