@@ -3,8 +3,5 @@ pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   data-prep: data-prep.html
-last_built: 2023-06-03T21:25Z
-urls:
-  reference: https://rosieluain.github.io/mort/reference
-  article: https://rosieluain.github.io/mort/articles
+last_built: 2023-06-03T21:29Z
 
