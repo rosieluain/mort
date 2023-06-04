@@ -1,8 +1,8 @@
 ---
-title: "Preparing your data"
+title: "Formatting your data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Preparing your data}
+  %\VignetteIndexEntry{Formatting your data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -13,7 +13,78 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
+All mort functions rely on residence events. Residence events are similar to detection data, but include a start time, an end time, and duration. Before proceeding to explore your data and flag potential mortalities in mort, detection data must be converted into residence events. This can be done within mort using the `residences()` function, functions from other packages for acoustic telemetry data, or manually. 
 
-```{r setup}
-library(mort)
+### mort format
+Residence events are generated in morts by the `residences()` function. A residence event either ends when the animal is detected at a new station or when the animal has not been detected longer than a user-defined cutoff. 
+
+```{r residences, eval=FALSE}
+residences(data=data,ID="ID",station="Station.Name",datetime="DateTimeUTC",cutoff=1,units="days")
 ```
+
+Note that `units` specifies the units of the cutoff (in the example above, the cutoff is 1 day). These units will also be used to calculate the residence duration. 
+
+Dates and times must be of class POSIXt, or must be in the format "YYYY-mm-dd HH:MM:SS". Note that mort assumes that dates are in UTC. If your datetimes are in POSIXt, mort will convert them to UTC. If your dates are in local time, it is recommended that you convert your datetime column to class POSIXt and that you change the time zone to UTC:
+
+```{r POSIXt_UTC,eval=FALSE}
+data$DateTimeUTC<-as.POSIXct(data$DateTimeLocal,format="%Y-%m-%d %H:%M:%S",
+                             tz="America/Edmonton")
+attributes(data$DateTimeUTC)$tzone<-"UTC"
+```
+
+### Other formats
+mort functions support the output from other packages for acoustic telemetry data. Note that the following information will be most useful if referenced while exploring the other mort functions. 
+
+#### actel
+Residence events are called "movement events" in actel, and are generated using the `explore()` function. 
+
+Actel provides residence duration in the format HH:MM:SS. mort converts the duration to a numeric vector, with units of seconds. 
+
+Dates in actel are in local time and will be converted to UTC by mort. Users will receive a warning when this happens, including a reminder to verify that the time zone in the actel output is correct.
+
+```{r actel_tz_warning, echo=FALSE}
+warning("If actel date/times are in local time, they will be converted to UTC. Verify that time zone in actel output is correct.",call.=FALSE)
+```
+
+#### glatos
+Residence events are called "detection events" in glatos, and are generated using the `detection_events()` function. 
+
+glatos uses seconds for the units of residence duration and UTC as the timezone for datetimes. 
+
+#### VTrack
+Residence events are called "residences" in VTrack, and are generated using the `RunResidenceExtraction()` function. 
+
+As of VTrack version 2.10, it looks as though VTrack assigns the local time of the user's computer to datetimes. As detection data are typically downloaded in UTC, mort assumes that the datetimes output by VTrack are actually in UTC, rather than local time. Users will receive a warning when using VTrack residence events: 
+
+```{r VT_tz_warning,echo=FALSE}
+warning("Assuming that VTrack date/times are in UTC. If they are in local
+            time, please convert to UTC before running",
+            call. = FALSE)
+```
+
+Also as of VTrack version 2.10, VTrack calculates the duration of residence events from single detections differently, depending on whether the end of the residence event was due to a station change or the gap in detections exceeded the time threshold. mort recalculates the duration of VTrack residence events, with units of seconds. Users will receive a warning as a reminder that the duration in mort outputs may not match the duration in VTrack: 
+
+```{r VT_duration_warning,echo=FALSE}
+warning("When the duration of an event is 0 s (a single detection) and
+            the reason for ending the event (ENDREASON) is 'timeout', Vtrack
+            gives DURATION as the time between the current event and the next, not
+            the duration of the current event. DURATION was recalculated as
+            the duration of the events themselves, to better align with other
+            packages.",
+            call. = FALSE)
+```
+
+
+#### Other packages?
+If we have missed any other packages that generate residence events, please let us know and start a new issue. We will work to incorporate other formats if feasible. To support other formats in mort, the residence events must have, at minimum, four columns: animal ID, station/location name, residence start time, and residence end time. The column names can vary from those used in mort, but must be consistent within the generating package. If the residence events include duration, the units must either be specified or invariant. 
+
+### Manual formatting
+All mort functions will accept manual formatting (using the argument `type="manual"`). Manual formatting must be used if you have your own method for generating residence events. Manual formatting must also be used if you have used `residences()` or a function from another supported package to generate residence events, and then either modified the format (e.g., converted an actel list to a dataframe) or renamed the columns. 
+
+There are five mandatory columns for manually formatted data:
+
+#. Animal ID - either character or numeric
+#. Station/location - either character or numeric
+#. Residence start - must be POSIXt or a character in the format "YYYY-mm-dd HH:MM:SS". mort assumes that all dates and times are UTC. If your data are in a local time zone, residence start should be in class POSIXt and the time zone should be specified. 
+#. Residence end - must be formatted as for residence start
+#. Residence duration - the difference in time between residence end and residence start. May be either numeric or difftime class. The units of residence duration must also be known and specified for many mort functions. 

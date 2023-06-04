@@ -137,14 +137,14 @@ extractres<-function(data,type){
     }
     data.unlisted$Time.in.array.s<-period_to_seconds(hms(data.unlisted$Time.in.array))
     warning("If actel date/times are in local time, they will be converted to
-            UTC. Verify that time zone in actel output is valid.",
+            UTC. Verify that time zone in actel output is correct.",
             call. = FALSE)
     attributes(data.unlisted$First.time)$tzone<-"UTC"
     attributes(data.unlisted$Last.time)$tzone<-"UTC"
   }
   else if (type=="vtrack"){
     data.unlisted<-data$residences
-    warning("Assuming that Vtrack date/times are in UTC. If they are in local
+    warning("Assuming that VTrack date/times are in UTC. If they are in local
             time, please convert to UTC before running",
             call. = FALSE)
     warning("When the duration of an event is 0 s (a single detection) and

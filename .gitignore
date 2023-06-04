@@ -2,6 +2,7 @@
 .Rproj
 .Rhistory
 .Rmd
+.RData
 working/
 pkgdown/
 inst/doc
