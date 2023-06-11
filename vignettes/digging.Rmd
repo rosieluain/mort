@@ -1,8 +1,8 @@
 ---
-title: "digging"
+title: "Digging into your data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{digging}
+  %\VignetteIndexEntry{Digging into your data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,6 +14,51 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup,echo=FALSE}
 library(mort)
 ```
+All the functionality of the morts package is accessible with the `residences()`, `morts()`, `infrequent()`, `mortsplot()`, and `review()` functions, addressed in the other vignettes. Many of these functions rely on output from additional functions. As you are exploring your data, you may want to run these additional functions to better dig through and understand your data. The `drift()` and `season()` functions are respectively addressed in the "Drift" and "Seasonality" vignettes. Here, we address the `stationchange()`, `resmax()`, and `resmaxcml()` functions. 
+
+## `stationchange()` function
+The thresholds in `morts()` rely on identifying the most recent station or location change of each animal, because it is assumed that the animal was alive before this most recent movement. To explore the most recent station changes for each animal, the user can can call `stationchange()` directly. The arguments are used in the same manner as for `morts()`. Drift may also be applied with the argument `drift=TRUE`. See the "Drift" vignette for more information on the other drift arguments.
+
+```{r stnchange,eval=FALSE}
+station_change<-stationchange(data=data,type="mort",ID="ID",station="Station.Name",
+                              drift=TRUE,ddd=ddd,units="days",from.station="From",to.station="To")
+```
+<!-- table that is the header of the stationchange output -->
+
+## `resmax()` function
+The threshold for `morts()` when `method` is "last", "any", or "all" is determined by identifying the longest residence event that occurred before a station change. If there are some animals with very long resident events that are not identified as potential mortalities by `morts()`, you may want to look at the longest living residence events to explore how the threshold is being identified. This can be done by calling the `resmax()` function directly. 
+
+Note that `stationchange()` must be run beforehand, and the output provided in the argument `stnchange`.
+
+If drift was applied in generating the residence events, the `drift` argument specifies whether drift events should be included in `resmax()`. If drift was not applied or if `drift="morts"` in `morts()`, then you should include `drift=FALSE`. If `drift="threshold"` or `drift="both"` in `morts()`, then you should include `drift=TRUE`. 
+
+```{r rm_example,eval=FALSE}
+resmax_example<-resmax(data=data,ID="ID",station="Station.Name",
+                       res.start="ResidenceStart",residences="ResidenceLength.days",
+                       stnchange=station_change,drift=FALSE)
+```
+
+
+## `resmaxcml()` function
+The threshold for `morts()` when the `method` is "cumulative" or "any" is determined by finding the longest cumulative residence event that occurred before a station change. Cumulative residence events are the length of time between when an animal was first detected at a station and when it was last detected at the same station, ignoring any gaps in detection. You may wish to explore the cumulative residence events that contribute to determining this threshold. This can be done by calling the `resmaxcml()` function directly. 
+
+Note that `stationchange()` must be run beforehand, and the output provided in the argument `stnchange`. 
+
+If you have applied drift by using `drift="threshold"` or `drift="both"` in `morts()`, then you should apply drift using the `drift()` function and use the output as the input for the `data` argument in `resmaxcml()`. See the "Drift" vignette for more information on applying drift. 
+
+```{r rmcml_example,eval=FALSE}
+resmaxcml_example<-resmaxcml(data=data,ID="ID",station="Station.Name",
+                             res.start="ResidenceStart",res.end="ResidenceEnd",
+                             residences="ResidenceLength.days",units="days",
+                             stnchange=station_change)
+```
+<!-- Table with header of output  -->
+
+Note that the output includes one row for each cumulative residence event, instead of one row for the longest event per animal (as in `resmax()`).
+
+
+
+

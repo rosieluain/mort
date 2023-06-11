@@ -1,8 +1,8 @@
 ---
-title: "season"
+title: "Seasonality"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{season}
+  %\VignetteIndexEntry{Seasonality}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,6 +14,74 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup, echo=FALSE}
 library(mort)
 ```
+
+Some species may exhibit seasonal patterns in movement. For example, there may be reduced movement in winter, with associated long residence events. In summer, when movement activity increases, residence events may also increase in number and frequency. 
+
+<!-- Plot of example winter and summer movements - from presentation  -->
+```{r moveplot,eval=FALSE,echo=FALSE}
+plot<-mortsplot(data=data,type="mort",ID="ID",station="Station.Name")
+plot
+```
+
+If this is the case, the long residence events will likely increase thresholds for `morts()`. Animals that do not move during the summer months, and are likely mortalities, may then not exceed the threshold. For this reason, there is the option to define seasons or periods of interest in `morts()`. If seasonality is applied, then both thresholds and mortalities are identified only using data or residence events from the specified periods. 
+
+## Applying seasonality
+To apply seasonality, the arguments `season.start` and `season.end` must be specified. There are two ways that the start and end can be specified. If the study takes place over multiple years and the season or period of interest is the same in all years, start and end can be specified as a day and month using a character string in format dd-mm.
+
+```{r ddmm, eval=FALSE}
+day_month<-morts(data=data,type="mort",ID="ID",station="Station.Name",
+                 season.start="01-06", season.end="31-10")
+```
+
+Alternatively, if there are multiple periods of interest within a year, and/or the periods change from year to year, start and end can be specified. Start and end can be specified either as POSIXt date and times, or as character strings in the format YYYY-mm-dd HH:MM:SS. 
+
+```{r fulldate, eval=FALSE}
+full_date<-morts(data=data,type="mort",ID="ID",station="Station.Name",
+                 season.start="2020-06-01", season.end="2020-10-31")
+```
+
+```{r fulldate_mult, eval=FALSE}
+full_date<-morts(data=data,type="mort",ID="ID",station="Station.Name",
+                 season.start=c("2020-06-01","2021-06-05"),
+                 season.end=c("2020-10-31","2021-10-15"))
+```
+
+See below for an example of identifying mortalities with and without drift. 
+```{r all_ex,eval=FALSE}
+no_season_ex<-morts(data=data,type="mort",type="ID",station="Station.Name",method="all")
+
+mortsplot(data=data,type="mort",ID="ID",station="Station.Name",morts=no_season_ex)
+```
+
+```{r season_ex,eval=FALSE}
+season_ex<-morts(data=data,type="mort",type="ID",station="Station.Name",method="all",
+                 season.start="2020-06-01", season.end="2020-10-31")
+
+mortsplot(data=data,type="mort",ID="ID",station="Station.Name",morts=season_ex)
+```
+
+## `overlap` argument
+There is an optional argument when applying seasonality. The `overlap` argument specifies whether residence events that overlap (i.e., start before and end after) the season start or end are included in full, or if the overlapping residence events are truncated at the specified start and/or end. The default is `overlap=TRUE`, which keeps the full residence events, as in the examples above. To truncate the residence events, use `overlap=FALSE`. 
+
+```{r no_overlap, eval=FALSE}
+no_overlap<-morts(data=data,type="mort",ID="ID",station="Station.Name",
+                 season.start="2020-06-01", season.end="2020-10-31",
+                 overlap=FALSE)
+```
+
+```{r plotno_ov, eval=FALSE,echo=FALSE}
+plot<-mortsplot(data=no_overlap,type="mort",ID="ID",station="Station.Name")
+plot
+```
+
+## `season()` function
+If you are interested in exploring residence events after applying seasonality, the `season()` function, which is called by `morts()`, is also available as a standalone function. The arguments for `season()` are the same as those for the other functions.
+
+```{r season_standalone,eval=FALSE}
+season.data<-season(data=data,type="mort",ID="ID",station="Station.Name",
+                    season.start="2020-06-01", season.end="2020-10-31")
+```
+

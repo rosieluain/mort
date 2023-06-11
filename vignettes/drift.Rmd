@@ -1,8 +1,8 @@
 ---
-title: "drift"
+title: "Dead and drifting"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{drift}
+  %\VignetteIndexEntry{Dead and drifting}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,6 +14,93 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup,echo=FALSE}
 library(mort)
 ```
+
+There may be situations where a tag that was expelled or from a dead animal may appear to move among stations or locations. This apparent movement could be due to the tag drifting with currents or tides. If a tag is located within range of two overlapping recievers, simultaneous or near-simultaneous detections at the two receivers may be assigned to different residence events. Left unaddressed, these residence events at different stations would be considered by mort to be station changes.
+
+## Specifying drift stations 
+Drift stations must be specified by the user. These can be determined by common sense (e.g., Station 5 is upstream of Station 4, so drift can occur from Station 5 to Station 4). Potential drift stations can also be determined by plotting and exploring residence events (see "Plotting" vignette). A series of long residences at one station that are followed by a series of long residences at another station may indicate drift from unmapped currents in the study area. Brief residence events with numerous station changes between two stations may indicate stations that overlap under certain environmental conditions. 
+
+To apply drift, the user must specify the drift stations in a dataframe. The dataframe must have two columns: the station where the tag is drifting from, and the station where the tag is drifting to. The station names must match those in the `station` argument in all mort functions. Each row will specify one possible drift movement. The movement is directional, so if two stations overlap, both directions must be specified. The drift dataframe is later called with the argument `ddd` - "ddd" for "dead drift direction", as a reminder that drift is applied directionally. 
+
+The table below shows an example drift dataframe. Note that drift between Stations 2 and 3 can be bidirectional, so both drift from Station 2 to Station 3 and drift from Station 3 to Station 2 are included. 
+
+<!-- Example drift table  -->
+
+When drift is applied within `morts()` or `infrequent()`, residence events that could be due to drift are combined to form drift residence events. 
+
+Residence events before applying drift: 
+```{r before_drift,eval=FALSE,echo=FALSE}
+plot<-mortsplot(data=data,type="mort",ID="ID",station="Station.Name")
+plot
+```
+
+Residence events, including drift residence events: 
+<!-- How does this plot? Which station is used for the colour  -->
+```{r after_drift,eval=FALSE,echo=FALSE}
+drift.data<-drift(data=data,type="mort",ID="ID",station="Station.Name",
+                  ddd=drift.dataframe,from.station="From",to.station="To",
+                  cutoff=1,cutoff.units="days",progress.bar=FALSE)
+plot<-mortsplot(data=data,type="mort",ID="ID",station="Station.Name")
+plot
+```
+
+## Applying drift 
+Drift is applied in `morts()` and `infrequent()` by including five arguments: 
+
+#. `ddd` - the drift dataframe (see above for preparing a drift dataframe)
+
+#. `from.station` - a character string of the column name in `ddd` with the station names where a tag could be drifting from
+
+#. `to.station` - a character string of the column name in `ddd` with the station names where a tag could be drifting to
+
+#. `drift.cutoff` - the maximum allowable time difference between detections to be considered a single residence event. This is usually the same cutoff that was used to gernerate the residence events from detection data. 
+
+#. `drift.units` - the units of `drift.cutoff`
+
+```{r drift_ex_inf, eval=FALSE}
+drift_ex<-infrequent(data=data,type="mort",ID="ID",station="Station.Name",
+                     ddd=drift.dataframe,
+                     from.station="From",to.station="To",
+                     drift.cutoff=1,drift.units="days")
+```
+
+For `morts()`, there is a sixth argument `drift` that specifies when drift should be applied. Drift can be applied to identifying mortalities only `drift="morts"`, identifying thresholds only `drift="threshold"`, or both identifying mortalities and thresholds `drift="both"`.
+
+Applying drift to thresholds `drift="threshold"` will increase the threshold, and fewer tags may be flagged as mortalities. There are few cases where this will be desirable, but it may be useful for arrays with two or more overlapping receivers. A single drift residence event would be generated for a tag located within range of two receivers, and this drift residence event would be included in identifying thresholds. 
+
+The most conservative option is `drift="morts"`. This is because drift residences are removed from identifying thresholds, and thresholds will likely be shorter than if drift residences were included. Including drift residences in identifying mortalities will likely lengthen residence events, making it easier for an event to exceed the threshold. See below for an example of identifying mortalities with and without applying drift. 
+
+<!-- Evaluate and plot when test dataset is ready -->
+```{r no_drift, eval=FALSE}
+no_drift<-morts(data=data,type="mort",ID="ID",station="Station.Name",method="all")
+
+plot<-mortsplot(data=data,type="mort",ID="ID",station="Station.Name",
+                morts=no_drift)
+plot
+```
+
+```{r drift_ex_morts, eval=FALSE}
+drift_ex<-morts(data=data,type="mort",ID="ID",station="Station.Name",method="all",
+                drift="morts",ddd=drift.dataframe,
+                from.station="From",to.station="To",
+                drift.cutoff=1,drift.units="days")
+
+plot<-mortsplot(data=data,type="mort",ID="ID",station="Station.Name",morts=drift_ex)
+plot
+```
+
+## `drift()` function
+If you are interested in exploring how drift residences are applied, the `drift()` function that is called by `morts()` and `infrequent()` is also available as a standalone function. The arguments for `drift()` are the same as those for the other functions. 
+
+```{r df, eval=FALSE}
+drift.data<-drift(data=data,type="mort",ID="ID",station="Station.Name",
+                  ddd=drift.dataframe,from.station="From",to.station="To",
+                  cutoff=1,cutoff.units="days")
+```
+
+
+
+

@@ -128,8 +128,8 @@ backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
 #' \dontrun{drift(data=data,format="manual",ID="TagID",station="Receiver",
 #' res.start="ResidenceStart",res.end="ResidenceEnd",ddd=driftstations,
 #' from.station="FrStation",to.station="ToStation")}
-drift<-function(data,type,ID,station,res.start,res.end,
-                residences,units,ddd,from.station,to.station,
+drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
+                residences="auto",units="auto",ddd,from.station,to.station,
                 cutoff=NULL,cutoff.units=NULL,progress.bar=TRUE){
 
   if (type %in% c("actel","vtrack")){

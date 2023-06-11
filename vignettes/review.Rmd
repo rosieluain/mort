@@ -1,8 +1,8 @@
 ---
-title: "review"
+title: "Review new data"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{review}
+  %\VignetteIndexEntry{Review new data}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -14,6 +14,57 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
+```{r setup,echo=FALSE}
 library(mort)
 ```
+
+morts is a conservative method to flag potential mortalities. This means that it can overestimate potential mortalities and some flagged mortalities may actually be alive. If new data are available - such as from receivers that were not previously available or an additional year in multiyear studies - movement of incorrectly flagged mortalities may be apparent. 
+
+<!-- plot with mortality and then fish that gets up and swims away - could be from seasonality  -->
+```{r alive_ex,eval=FALSE,echo=FALSE}
+plot<-mortsplot(data=data,type="mort",ID="ID",station="Station.Name",morts=morts)
+plot
+```
+
+The `review()` function examines new data to determine if any animals move that were previously flagged as potential mortalities.
+
+## Using `review()` 
+
+Two input dataframes are mandatory for `review()`: 
+
+#. `new.data` - a dataframe with residence events generated from the new dataset
+
+#. `morts` - a dataframe of previously flagged mortalities
+
+The new residence events in `new.data` must be generated using the same method as the original dataset, or must be manipulated to match the format of the original dataset. The format of `new.data` must also match the format of `morts`. 
+
+The other four required arguments, `type`, `ID`, `station`, and `res.start`, are specified in the same way as for `morts()` and `infrequent()`. See the "Identifying potential mortalities" information for more information about these arguments. 
+
+```{r rev_ex,eval=FALSE}
+review_example<-review(morts=morts,new.data=new.data,type="morts",
+                       ID="ID",station="Station.Name")
+```
+
+If there are no station changes between the flagged mortalities and `new.data`, or among the residence events within `new.data`, then nothing is returned. If a station change is found, the residence event with the station change will be returned.
+
+<!-- Example table of one that was returned  -->
+
+The user can then review the station change to ensure it is valid before removing the animal from `morts` and including the animal in further analyses. 
+
+## Including previous data
+
+An optional input is `old.data`, which is the original dataset or a subset of the original dataset that includes any residence events that may have occurred between the flagged potential mortality and the beginning of `new.data`. It is strongly recommended to include `old.data` if `backwards=TRUE` when the mortalities were previously identified and/or if drift was applied (see "Drift" vignette for more information on applying drift). 
+
+<!-- Example of fish that does not have a station change but seems that way with no old data - can show station change that becomes a drift residence, then beginning is identified as a mortality, then drift does not show the jump -->
+
+## Applying drift
+
+There is the option to apply drift when using `review()`. If applying drift, the arguments `ddd`, `from.station`, and `to.station` must be provided. See "Drift" vignette for more information on these arguments. In addition, the arguments `res.end`, `residences`, and `units` must be provided. These arguments are not necessary for identifying station changes with no drift, but are called by the function when drift is applied. 
+
+```{r rev_drift,eval=FALSE}
+drift_review<-review(morts=morts,new.data=new.data,old.data=old.data,
+                     type="morts",ID="ID",station="Station.Name",
+                     res.end="auto",residences="auto",units="auto",
+                     ddd=ddd,from.station="From",to.station="To")
+```
+
