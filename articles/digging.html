@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>digging • mort</title>
+<title>Digging into your data • mort</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="digging">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Digging into your data">
 <meta property="og:description" content="mort">
 <meta property="og:image" content="/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -60,22 +60,22 @@
       <a href="../articles/data-prep.html">Formatting your data</a>
     </li>
     <li>
-      <a href="../articles/digging.html">digging</a>
+      <a href="../articles/digging.html">Digging into your data</a>
     </li>
     <li>
-      <a href="../articles/drift.html">drift</a>
+      <a href="../articles/drift.html">Dead and drifting</a>
     </li>
     <li>
-      <a href="../articles/morts.html">morts</a>
+      <a href="../articles/morts.html">Identifying potential mortalities</a>
     </li>
     <li>
-      <a href="../articles/plots.html">plots</a>
+      <a href="../articles/plots.html">Plotting your data</a>
     </li>
     <li>
-      <a href="../articles/review.html">review</a>
+      <a href="../articles/review.html">Review new data</a>
     </li>
     <li>
-      <a href="../articles/season.html">season</a>
+      <a href="../articles/season.html">Seasonality</a>
     </li>
   </ul>
 </li>
@@ -100,7 +100,7 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>digging</h1>
+      <h1 data-toc-skip>Digging into your data</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/rosieluain/mort/blob/HEAD/vignettes/digging.Rmd" class="external-link"><code>vignettes/digging.Rmd</code></a></small>
@@ -110,13 +110,96 @@
 
     
     
+<p>All the functionality of the morts package is accessible with the
+<code><a href="../reference/residences.html">residences()</a></code>, <code><a href="../reference/morts.html">morts()</a></code>,
+<code><a href="../reference/infrequent.html">infrequent()</a></code>, <code><a href="../reference/mortsplot.html">mortsplot()</a></code>, and
+<code><a href="../reference/review.html">review()</a></code> functions, addressed in the other vignettes. Many
+of these functions rely on output from additional functions. As you are
+exploring your data, you may want to run these additional functions to
+better dig through and understand your data. The <code><a href="../reference/drift.html">drift()</a></code>
+and <code><a href="../reference/season.html">season()</a></code> functions are respectively addressed in the
+“Drift” and “Seasonality” vignettes. Here, we address the
+<code><a href="../reference/stationchange.html">stationchange()</a></code>, <code><a href="../reference/resmax.html">resmax()</a></code>, and
+<code><a href="../reference/resmaxcml.html">resmaxcml()</a></code> functions.</p>
+<div class="section level2">
+<h2 id="stationchange-function">
+<code>stationchange()</code> function<a class="anchor" aria-label="anchor" href="#stationchange-function"></a>
+</h2>
+<p>The thresholds in <code><a href="../reference/morts.html">morts()</a></code> rely on identifying the most
+recent station or location change of each animal, because it is assumed
+that the animal was alive before this most recent movement. To explore
+the most recent station changes for each animal, the user can can call
+<code><a href="../reference/stationchange.html">stationchange()</a></code> directly. The arguments are used in the
+same manner as for <code><a href="../reference/morts.html">morts()</a></code>. Drift may also be applied with
+the argument <code>drift=TRUE</code>. See the “Drift” vignette for more
+information on the other drift arguments.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rosieluain/mort" class="external-link">mort</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">station_change</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/stationchange.html">stationchange</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<span>                              drift<span class="op">=</span><span class="cn">TRUE</span>,ddd<span class="op">=</span><span class="va">ddd</span>,units<span class="op">=</span><span class="st">"days"</span>,from.station<span class="op">=</span><span class="st">"From"</span>,to.station<span class="op">=</span><span class="st">"To"</span><span class="op">)</span></span></code></pre></div>
+<!-- table that is the header of the stationchange output -->
+</div>
+<div class="section level2">
+<h2 id="resmax-function">
+<code>resmax()</code> function<a class="anchor" aria-label="anchor" href="#resmax-function"></a>
+</h2>
+<p>The threshold for <code><a href="../reference/morts.html">morts()</a></code> when <code>method</code> is
+“last”, “any”, or “all” is determined by identifying the longest
+residence event that occurred before a station change. If there are some
+animals with very long resident events that are not identified as
+potential mortalities by <code><a href="../reference/morts.html">morts()</a></code>, you may want to look at
+the longest living residence events to explore how the threshold is
+being identified. This can be done by calling the <code><a href="../reference/resmax.html">resmax()</a></code>
+function directly.</p>
+<p>Note that <code><a href="../reference/stationchange.html">stationchange()</a></code> must be run beforehand, and
+the output provided in the argument <code>stnchange</code>.</p>
+<p>If drift was applied in generating the residence events, the
+<code>drift</code> argument specifies whether drift events should be
+included in <code><a href="../reference/resmax.html">resmax()</a></code>. If drift was not applied or if
+<code>drift="morts"</code> in <code><a href="../reference/morts.html">morts()</a></code>, then you should
+include <code>drift=FALSE</code>. If <code>drift="threshold"</code> or
+<code>drift="both"</code> in <code><a href="../reference/morts.html">morts()</a></code>, then you should
+include <code>drift=TRUE</code>.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">resmax_example</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/resmax.html">resmax</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<span>                       res.start<span class="op">=</span><span class="st">"ResidenceStart"</span>,residences<span class="op">=</span><span class="st">"ResidenceLength.days"</span>,</span>
+<span>                       stnchange<span class="op">=</span><span class="va">station_change</span>,drift<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="resmaxcml-function">
+<code>resmaxcml()</code> function<a class="anchor" aria-label="anchor" href="#resmaxcml-function"></a>
+</h2>
+<p>The threshold for <code><a href="../reference/morts.html">morts()</a></code> when the <code>method</code>
+is “cumulative” or “any” is determined by finding the longest cumulative
+residence event that occurred before a station change. Cumulative
+residence events are the length of time between when an animal was first
+detected at a station and when it was last detected at the same station,
+ignoring any gaps in detection. You may wish to explore the cumulative
+residence events that contribute to determining this threshold. This can
+be done by calling the <code><a href="../reference/resmaxcml.html">resmaxcml()</a></code> function directly.</p>
+<p>Note that <code><a href="../reference/stationchange.html">stationchange()</a></code> must be run beforehand, and
+the output provided in the argument <code>stnchange</code>.</p>
+<p>If you have applied drift by using <code>drift="threshold"</code> or
+<code>drift="both"</code> in <code><a href="../reference/morts.html">morts()</a></code>, then you should apply
+drift using the <code><a href="../reference/drift.html">drift()</a></code> function and use the output as the
+input for the <code>data</code> argument in <code><a href="../reference/resmaxcml.html">resmaxcml()</a></code>.
+See the “Drift” vignette for more information on applying drift.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">resmaxcml_example</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/resmaxcml.html">resmaxcml</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<span>                             res.start<span class="op">=</span><span class="st">"ResidenceStart"</span>,res.end<span class="op">=</span><span class="st">"ResidenceEnd"</span>,</span>
+<span>                             residences<span class="op">=</span><span class="st">"ResidenceLength.days"</span>,units<span class="op">=</span><span class="st">"days"</span>,</span>
+<span>                             stnchange<span class="op">=</span><span class="va">station_change</span><span class="op">)</span></span></code></pre></div>
+<!-- Table with header of output  -->
+<p>Note that the output includes one row for each cumulative residence
+event, instead of one row for the longest event per animal (as in
+<code><a href="../reference/resmax.html">resmax()</a></code>).</p>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 

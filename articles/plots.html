@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>plots • mort</title>
+<title>Plotting your data • mort</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="plots">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Plotting your data">
 <meta property="og:description" content="mort">
 <meta property="og:image" content="/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -60,22 +60,22 @@
       <a href="../articles/data-prep.html">Formatting your data</a>
     </li>
     <li>
-      <a href="../articles/digging.html">digging</a>
+      <a href="../articles/digging.html">Digging into your data</a>
     </li>
     <li>
-      <a href="../articles/drift.html">drift</a>
+      <a href="../articles/drift.html">Dead and drifting</a>
     </li>
     <li>
-      <a href="../articles/morts.html">morts</a>
+      <a href="../articles/morts.html">Identifying potential mortalities</a>
     </li>
     <li>
-      <a href="../articles/plots.html">plots</a>
+      <a href="../articles/plots.html">Plotting your data</a>
     </li>
     <li>
-      <a href="../articles/review.html">review</a>
+      <a href="../articles/review.html">Review new data</a>
     </li>
     <li>
-      <a href="../articles/season.html">season</a>
+      <a href="../articles/season.html">Seasonality</a>
     </li>
   </ul>
 </li>
@@ -100,7 +100,7 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>plots</h1>
+      <h1 data-toc-skip>Plotting your data</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/rosieluain/mort/blob/HEAD/vignettes/plots.Rmd" class="external-link"><code>vignettes/plots.Rmd</code></a></small>
@@ -110,13 +110,145 @@
 
     
     
+<p>Plotting your data is invaluable in exploring and understanding your
+data. The <code><a href="../reference/mortsplot.html">mortsplot()</a></code> function plots your data using
+<code>ggplot2</code>, as well as some automatically calculated presets
+that should generate useful and functional plots for most datasets.
+<code>ggplot2</code> is suggested by morts, but is not required for
+installation. To use <code><a href="../reference/mortsplot.html">mortsplot()</a></code>, it is the responsibility
+of the user to install <code>ggplot2</code>.</p>
+<div class="section level2">
+<h2 id="basic-plotting-of-residence-events">Basic plotting of residence events<a class="anchor" aria-label="anchor" href="#basic-plotting-of-residence-events"></a>
+</h2>
+<p>A basic plot can be quickly generated using a dataframe with
+residence events, and the same arguments that are used in other morts
+functions:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rosieluain/mort" class="external-link">mort</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">plot</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"morts"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span><span class="op">)</span></span>
+<span><span class="va">plot</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="customizing">Customizing<a class="anchor" aria-label="anchor" href="#customizing"></a>
+</h2>
+<p>Because <code><a href="../reference/mortsplot.html">mortsplot()</a></code> calls <code>ggplot()</code>, the
+plot can be customized by adding additional arguments as you would with
+any other <code>ggplot2</code> object. For example, you can remove the
+legend by calling:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">plot</span><span class="op">&lt;-</span><span class="va">plot</span><span class="op">+</span></span>
+<span>  <span class="fu">theme</span><span class="op">(</span>legend.position<span class="op">=</span><span class="st">"none"</span><span class="op">)</span></span></code></pre></div>
+<p>If <code><a href="../reference/mortsplot.html">mortsplot()</a></code>, adding additional arguments as above,
+and the options below do not provide practical plots for your dataset,
+but you want to use some aspects of the plot, please access the source
+code at github.com/rosieluain/mort or entering the following into the
+console:</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/View.html" class="external-link">View</a></span><span class="op">(</span><span class="va">mortsplot</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="interactive-plots">Interactive plots<a class="anchor" aria-label="anchor" href="#interactive-plots"></a>
+</h2>
+<p>Interactive plots can be generated easily with the
+<code>interactive</code> argument in <code><a href="../reference/mortsplot.html">mortsplot()</a></code>:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">plot</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"morts"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,interactive<span class="op">=</span><span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">plot</span></span></code></pre></div>
+<p>Zooming and scrolling around the interactive plot are possible, as
+well as changing the visibility of stations. Information about each
+residence event appears when the cursor is moved over the beginning or
+end of a residence event.</p>
+<!-- Include a screenshot of this  -->
+<p>When <code>interactive=TRUE</code>, <code><a href="../reference/mortsplot.html">mortsplot()</a></code> calls
+<code>ggplotly()</code> from <code>plotly</code>. The same result can be
+achieved by building a non-interactive plot with
+<code><a href="../reference/mortsplot.html">mortsplot()</a></code> and calling <code>ggplotly()</code>
+directly:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">interactive_plot</span><span class="op">&lt;-</span><span class="fu">ggplotly</span><span class="op">(</span><span class="va">plot</span><span class="op">)</span></span>
+<span><span class="va">interactive_plot</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="options">Options<a class="anchor" aria-label="anchor" href="#options"></a>
+</h2>
+<p>There are several options to customize <code><a href="../reference/mortsplot.html">mortsplot()</a></code>
+plots:</p>
+<div class="section level3">
+<h3 id="add-flagged-mortalities">Add flagged mortalities<a class="anchor" aria-label="anchor" href="#add-flagged-mortalities"></a>
+</h3>
+<p>After potential mortalities have been identified, they can be added
+to the plot with the <code>morts</code> argument:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">plot</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"morts"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,morts<span class="op">=</span><span class="va">morts</span><span class="op">)</span></span>
+<span><span class="va">plot</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="seasonality">Seasonality<a class="anchor" aria-label="anchor" href="#seasonality"></a>
+</h3>
+<p>To plot specific seasons or periods of interest, seasonality can be
+applied using the arguments <code>season.start</code> and
+<code>season.end</code>. These arguments are used in the same way as for
+<code><a href="../reference/season.html">season()</a></code> (see the “Seasonality” vignette) or when
+seasonality is applied in <code><a href="../reference/morts.html">morts()</a></code> (see the “Identifying
+potential mortalities” vignette).</p>
+<p>The arguments <code>residences</code> and <code>units</code> must
+also be provided, in the same manner as they are in other morts
+functions.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">plot</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"morts"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<span>                residences<span class="op">=</span><span class="st">"auto"</span>,units<span class="op">=</span><span class="st">"auto"</span>,</span>
+<span>                season.start<span class="op">=</span><span class="st">"2020-06-01"</span>,season.end<span class="op">=</span><span class="st">"2020-10-31"</span><span class="op">)</span></span>
+<span><span class="va">plot</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="facetting">Facetting<a class="anchor" aria-label="anchor" href="#facetting"></a>
+</h3>
+<p>Depending on the duration of your dataset, the number of animals, and
+if seasonality is applied, it may be desirable to facet the plot by year
+or season. This is done by including the argument
+<code>facet=TRUE</code>, along with the arguments for seasonality (see
+above). The plot will automatically facet along the x axis, with each
+specified season forming a panel.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">plot</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,facet<span class="op">=</span><span class="cn">TRUE</span>,</span>
+<span>                season.start<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2020-06-01"</span>,<span class="st">"2020-10-01"</span><span class="op">)</span>,</span>
+<span>                season.end<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2020-06-30"</span>,<span class="st">"2020-10-31"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">plot</span></span></code></pre></div>
+<p>For multi-year datasets, it is also possible to facet by year instead
+of user-defined seasons.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">plot</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<span>                facet<span class="op">=</span><span class="cn">TRUE</span>,facet.by<span class="op">=</span><span class="st">"year"</span><span class="op">)</span></span>
+<span><span class="va">plot</span></span></code></pre></div>
+<p>The default is to position panels along the x axis. The facet axis
+can be changed using the <code>facet.axis</code> argument. Note that the
+y-axis can only be used if facetting by year.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">plot</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<span>                facet<span class="op">=</span><span class="cn">TRUE</span>,facet.by<span class="op">=</span><span class="st">"year"</span>,facet.axis<span class="op">=</span><span class="st">"y"</span><span class="op">)</span></span>
+<span><span class="va">plot</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="exclude-single-detections">Exclude single detections<a class="anchor" aria-label="anchor" href="#exclude-single-detections"></a>
+</h3>
+<p>In <code><a href="../reference/mortsplot.html">mortsplot()</a></code>, the argument <code>singles</code>
+specifies if single detections are plotted. The default setting is
+<code>singles=TRUE</code>, to include single detections. If single
+detections are included, they would normally not be visible in the plot
+because their duration is 0. <code><a href="../reference/mortsplot.html">mortsplot()</a></code> performs a simple
+calculation to determine a dummy duration to assign to single
+detections. The dummy duration depends on the scale of the plot, and is
+long enough to be visible but short enough that it should not interfere
+with the visibility of other residence events.</p>
+<!-- Plots with and without single detections  -->
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 

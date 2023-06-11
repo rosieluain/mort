@@ -60,22 +60,22 @@
       <a href="../articles/data-prep.html">Formatting your data</a>
     </li>
     <li>
-      <a href="../articles/digging.html">digging</a>
+      <a href="../articles/digging.html">Digging into your data</a>
     </li>
     <li>
-      <a href="../articles/drift.html">drift</a>
+      <a href="../articles/drift.html">Dead and drifting</a>
     </li>
     <li>
-      <a href="../articles/morts.html">morts</a>
+      <a href="../articles/morts.html">Identifying potential mortalities</a>
     </li>
     <li>
-      <a href="../articles/plots.html">plots</a>
+      <a href="../articles/plots.html">Plotting your data</a>
     </li>
     <li>
-      <a href="../articles/review.html">review</a>
+      <a href="../articles/review.html">Review new data</a>
     </li>
     <li>
-      <a href="../articles/season.html">season</a>
+      <a href="../articles/season.html">Seasonality</a>
     </li>
   </ul>
 </li>
@@ -117,9 +117,9 @@ mortalities in mort, detection data must be converted into residence
 events. This can be done within mort using the <code><a href="../reference/residences.html">residences()</a></code>
 function, functions from other packages for acoustic telemetry data, or
 manually.</p>
-<div class="section level3">
-<h3 id="mort-format">mort format<a class="anchor" aria-label="anchor" href="#mort-format"></a>
-</h3>
+<div class="section level2">
+<h2 id="mort-format">mort format<a class="anchor" aria-label="anchor" href="#mort-format"></a>
+</h2>
 <p>Residence events are generated in morts by the
 <code><a href="../reference/residences.html">residences()</a></code> function. A residence event either ends when
 the animal is detected at a new station or when the animal has not been
@@ -140,15 +140,15 @@ UTC:</p>
 <span>                             tz<span class="op">=</span><span class="st">"America/Edmonton"</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/attributes.html" class="external-link">attributes</a></span><span class="op">(</span><span class="va">data</span><span class="op">$</span><span class="va">DateTimeUTC</span><span class="op">)</span><span class="op">$</span><span class="va">tzone</span><span class="op">&lt;-</span><span class="st">"UTC"</span></span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="other-formats">Other formats<a class="anchor" aria-label="anchor" href="#other-formats"></a>
-</h3>
+<div class="section level2">
+<h2 id="other-formats">Other formats<a class="anchor" aria-label="anchor" href="#other-formats"></a>
+</h2>
 <p>mort functions support the output from other packages for acoustic
 telemetry data. Note that the following information will be most useful
 if referenced while exploring the other mort functions.</p>
-<div class="section level4">
-<h4 id="actel">actel<a class="anchor" aria-label="anchor" href="#actel"></a>
-</h4>
+<div class="section level3">
+<h3 id="actel">actel<a class="anchor" aria-label="anchor" href="#actel"></a>
+</h3>
 <p>Residence events are called “movement events” in actel, and are
 generated using the <code>explore()</code> function.</p>
 <p>Actel provides residence duration in the format HH:MM:SS. mort
@@ -160,17 +160,17 @@ correct.</p>
 <pre><code><span><span class="co">#&gt; Warning: If actel date/times are in local time, they will be converted to UTC.</span></span>
 <span><span class="co">#&gt; Verify that time zone in actel output is correct.</span></span></code></pre>
 </div>
-<div class="section level4">
-<h4 id="glatos">glatos<a class="anchor" aria-label="anchor" href="#glatos"></a>
-</h4>
+<div class="section level3">
+<h3 id="glatos">glatos<a class="anchor" aria-label="anchor" href="#glatos"></a>
+</h3>
 <p>Residence events are called “detection events” in glatos, and are
 generated using the <code>detection_events()</code> function.</p>
 <p>glatos uses seconds for the units of residence duration and UTC as
 the timezone for datetimes.</p>
 </div>
-<div class="section level4">
-<h4 id="vtrack">VTrack<a class="anchor" aria-label="anchor" href="#vtrack"></a>
-</h4>
+<div class="section level3">
+<h3 id="vtrack">VTrack<a class="anchor" aria-label="anchor" href="#vtrack"></a>
+</h3>
 <p>Residence events are called “residences” in VTrack, and are generated
 using the <code>RunResidenceExtraction()</code> function.</p>
 <p>As of VTrack version 2.10, it looks as though VTrack assigns the
@@ -194,9 +194,9 @@ not match the duration in VTrack:</p>
 <span><span class="co">#&gt;             the duration of the events themselves, to better align with other</span></span>
 <span><span class="co">#&gt;             packages.</span></span></code></pre>
 </div>
-<div class="section level4">
-<h4 id="other-packages">Other packages?<a class="anchor" aria-label="anchor" href="#other-packages"></a>
-</h4>
+<div class="section level3">
+<h3 id="other-packages">Other packages?<a class="anchor" aria-label="anchor" href="#other-packages"></a>
+</h3>
 <p>If we have missed any other packages that generate residence events,
 please let us know and start a new issue. We will work to incorporate
 other formats if feasible. To support other formats in mort, the
@@ -207,9 +207,9 @@ within the generating package. If the residence events include duration,
 the units must either be specified or invariant.</p>
 </div>
 </div>
-<div class="section level3">
-<h3 id="manual-formatting">Manual formatting<a class="anchor" aria-label="anchor" href="#manual-formatting"></a>
-</h3>
+<div class="section level2">
+<h2 id="manual-formatting">Manual formatting<a class="anchor" aria-label="anchor" href="#manual-formatting"></a>
+</h2>
 <p>All mort functions will accept manual formatting (using the argument
 <code>type="manual"</code>). Manual formatting must be used if you have
 your own method for generating residence events. Manual formatting must
@@ -236,7 +236,9 @@ functions.</li>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 
