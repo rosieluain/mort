@@ -155,9 +155,11 @@ prev_ex<-morts(data=data,type="mort",ID="ID",station="Station.Name",morts.prev=r
 ```
 
 ### Look backwards 
-For both `morts()` and `infrequent()`, there is the option to look backwards (i.e., earlier) in the dataset. If the most recent station change occurred before the flagged mortality (i.e., the animal was detected earlier than the flagged mortality, at the same station, and with no detections elsewhere), the start date and time of the flagged mortality are shifted earlier. The default is `backwards=FALSE`; however, it is more conservative to set `backwards=TRUE`.
+For both `morts()` and `infrequent()`, there is the option to look backwards (i.e., earlier) in the dataset. If the most recent station change occurred before the flagged mortality (i.e., the animal was detected earlier than the flagged mortality, at the same station, and with no detections elsewhere), the start dates and times of the flagged mortalities are shifted earlier. The default is `backwards=FALSE`; however, it is more conservative to set `backwards=TRUE`.
 
 Note, when `method="cumulative"` and there is no seasonality, cumulative residence events will cover all consecutive detections at a given station, and `backwards` is unnecessary. 
+
+<!-- Should give example  -->
 
 ### Drift and season
 In some systems, an expelled tag or a tag from a dead animal may seem to move, due to currents or tides, or if the tag is located within range of two overlapping receivers. Both `morts()` and `infrequent()` include an option to specify stations or locations where drift may occur and to consider drift in identifying mortalities. For more information, see the "Drift" vignette. 

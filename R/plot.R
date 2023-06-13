@@ -136,10 +136,16 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
 
   if (!is.null(season.start)|
       !is.null(season.end)){
-    if (is.null(residences)|residences=="auto"){
+    if (is.null(residences)){
       residences<-autofield(type=type,field="residences",data=data)
     }
-    if (is.null(units)|units=="auto"){
+    if (residences=="auto"){
+      residences<-autofield(type=type,field="residences",data=data)
+    }
+    if (is.null(units)){
+      units<-autofield(type=type,field="units",data=data)
+    }
+    if (units=="auto"){
       units<-autofield(type=type,field="units",data=data)
     }
     print("Extracting data from the period/season(s) of interest")
@@ -362,12 +368,13 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
   }
 
   if (interactive==TRUE){
-    plot<-plot+ggplot2::aes(text=paste("ID:",.data[[ID]],
-                              "</br></br>Start:",ResStart,
-                              "</br>End:",ResEnd,
-                              "</br>Duration:",.data[[residences]],
-                              "</br>Station:",.data[[station]]))
-    plot.int<-plotly::ggplotly(plot,tooltip="text")
+    # plot<-plot+ggplot2::aes(text=paste("ID:",.data[[ID]],
+    #                           "</br></br>Start:",ResStart,
+    #                           "</br>End:",ResEnd,
+    #                           "</br>Duration:",.data[[residences]],
+    #                           "</br>Station:",.data[[station]]))
+    # plot.int<-plotly::ggplotly(plot,tooltip="text")
+    plot.int<-ggplotly(plot)
     plot.int
   }
   else {
@@ -375,18 +382,4 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
   }
 
 }
-
-# For season, it should depend on if the seasons are portions of the same year
-# Or different years
-
-
-
-# And add in a facet (as an add-in)
-
-
-
-
-
-
-
 

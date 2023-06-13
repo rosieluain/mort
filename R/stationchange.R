@@ -207,7 +207,7 @@ stationchange<-function(data,type="mort",ID,station,res.start="auto",
 #' @param stnchange a dataframe with the start time and location of the most
 #' recent station or location change. Must use the same column names as `data`.
 #' @param drift indicates if drift residence events should be included in
-#' determining the the maximum residence duration
+#' determining the maximum residence duration
 #'
 #' @return a dataframe with the residence information for the longest residence
 #' for each tag ID that occurred before the most recent station/location change.

@@ -164,10 +164,10 @@ drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
     res.end<-autofield(type=type,field="res.end")
   }
   if (residences=="auto"){
-    residences<-autofield(type=type,field="residences")
+    residences<-autofield(type=type,field="residences",data=data)
   }
   if (units=="auto"){
-    units<-autofield(type=type,field="units")
+    units<-autofield(type=type,field="units",data=data)
   }
 
   # Could make this check be a function
@@ -331,10 +331,10 @@ season<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     res.end<-autofield(type=type,field="res.end")
   }
   if (residences=="auto"){
-    residences<-autofield(type=type,field="residences")
+    residences<-autofield(type=type,field="residences",data=data)
   }
   if (units=="auto"){
-    units<-autofield(type=type,field="units")
+    units<-autofield(type=type,field="units",data=data)
   }
 
   if (!is(data[[res.start]],"POSIXt")){
