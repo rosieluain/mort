@@ -3,11 +3,11 @@ pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   data-prep: data-prep.html
-  digging: digging.html
-  drift: drift.html
   morts: morts.html
-  plots: plots.html
-  review: review.html
+  drift: drift.html
   season: season.html
+  plots: plots.html
+  digging: digging.html
+  review: review.html
 last_built: 2023-06-04T01:00Z
 
