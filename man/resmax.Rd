@@ -27,7 +27,7 @@ that holds the duration of the residence events.}
 recent station or location change. Must use the same column names as \code{data}.}
 
 \item{drift}{indicates if drift residence events should be included in
-determining the the maximum residence duration}
+determining the maximum residence duration}
 }
 \value{
 a dataframe with the residence information for the longest residence

@@ -368,13 +368,20 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
   }
 
   if (interactive==TRUE){
-    # plot<-plot+ggplot2::aes(text=paste("ID:",.data[[ID]],
-    #                           "</br></br>Start:",ResStart,
-    #                           "</br>End:",ResEnd,
-    #                           "</br>Duration:",.data[[residences]],
-    #                           "</br>Station:",.data[[station]]))
-    # plot.int<-plotly::ggplotly(plot,tooltip="text")
-    plot.int<-ggplotly(plot)
+    if (is.null(residences)){
+      plot<-plot+ggplot2::aes(text=paste("ID:",.data[[ID]],"</br>",
+                                         "</br>Start:",ResStart,
+                                         "</br>End:",ResEnd,
+                                         "</br>Station:",.data[[station]]))
+    }
+    else {
+      plot<-plot+ggplot2::aes(text=paste("ID:",.data[[ID]],"</br>",
+                                         "</br>Start:",ResStart,
+                                         "</br>End:",ResEnd,
+                                         "</br>Duration:",.data[[residences]],
+                                         "</br>Station:",.data[[station]]))
+    }
+    plot.int<-plotly::ggplotly(plot,tooltip="text")
     plot.int
   }
   else {
