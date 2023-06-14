@@ -1,5 +1,5 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
+<!-- README.md is generated from README.Rmd. Please edit the .Rmd file -->
 
 # mort <img src="man/figures/logo.png" align="right" height="139" />
 
@@ -38,6 +38,11 @@ devtools::install_github("rosieluain/mort")
 
 Please see the package vignettes for more details, as well as guidelines
 and tips for the following functions.
+
+**Note:** vignettes are under development! We are currently developing a
+sample dataset, so there are some obvious gaps where there should be
+figures, tables, etc. These will be completed as soon as the sample
+dataset is done.
 
 #### Data preparation and visualization
 

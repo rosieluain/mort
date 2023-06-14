@@ -17,6 +17,9 @@ knitr::opts_chunk$set(
 ```{r setup,echo=FALSE}
 library(mort)
 ```
+**Note:** vignettes are under development! We are currently developing a sample dataset, so there are some obvious gaps where there should be figures, tables, etc. These will be completed as soon as the sample dataset is done. 
+<br>
+<br>
 
 Note that potential mortalities or potential cases of tag expulsion are referred to here as "mortalities" or "potential mortalities" for simplicity. 
 

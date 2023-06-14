@@ -19,6 +19,9 @@ library(mort)
 library(ggplot2)
 library(plotly)
 ```
+**Note:** vignettes are under development! We are currently developing a sample dataset, so there are some obvious gaps where there should be figures, tables, etc. These will be completed as soon as the sample dataset is done. 
+<br>
+<br>
 
 Plotting your data is invaluable in exploring and understanding your data. The `mortsplot()` function plots your data using `ggplot2`, as well as some automatically calculated presets that should generate useful and functional plots for most datasets. `ggplot2` is suggested by morts, but is not required for installation. To use `mortsplot()`, it is the responsibility of the user to install `ggplot2`. 
 

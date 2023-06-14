@@ -17,6 +17,10 @@ knitr::opts_chunk$set(
 ```{r setup,echo=FALSE}
 library(mort)
 ```
+**Note:** vignettes are under development! We are currently developing a sample dataset, so there are some obvious gaps where there should be figures, tables, etc. These will be completed as soon as the sample dataset is done. 
+<br>
+<br>
+
 All the functionality of the morts package is accessible with the `residences()`, `morts()`, `infrequent()`, `mortsplot()`, and `review()` functions, addressed in the other vignettes. Many of these functions rely on output from additional functions. As you are exploring your data, you may want to run these additional functions to better dig through and understand your data. The `drift()` and `season()` functions are respectively addressed in the "Drift" and "Seasonality" vignettes. Here, we address the `stationchange()`, `resmax()`, and `resmaxcml()` functions. 
 
 ## `stationchange()` function

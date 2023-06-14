@@ -17,6 +17,9 @@ knitr::opts_chunk$set(
 ```{r setup,echo=FALSE}
 library(mort)
 ```
+**Note:** vignettes are under development! We are currently developing a sample dataset, so there are some obvious gaps where there should be figures, tables, etc. These will be completed as soon as the sample dataset is done. 
+<br>
+<br>
 
 There may be situations where a tag that was expelled or from a dead animal may appear to move among stations or locations. This apparent movement could be due to the tag drifting with currents or tides. If a tag is located within range of two overlapping recievers, simultaneous or near-simultaneous detections at the two receivers may be assigned to different residence events. Left unaddressed, these residence events at different stations would be considered by mort to be station changes.
 

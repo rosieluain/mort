@@ -2,10 +2,13 @@ url: https://rosieluain.github.io/mort/
 template:
   bootstrap: 5
 articles:
-  data-prep: data-prep.html
-  morts: morts.html
-  drift: drift.html
-  season: season.html
-  plots: plots.html
-  digging: digging.html
-  review: review.html
+- title: Articles
+  navbar: ~
+  contents:
+  - data-prep: data-prep.html
+  - morts: morts.html
+  - drift: drift.html
+  - season: season.html
+  - plots: plots.html
+  - digging: digging.html
+  - review: review.html
