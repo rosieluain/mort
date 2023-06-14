@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>review • mort</title>
+<title>Review new data • mort</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="../favicon-16x16.png">
 <link rel="icon" type="image/png" sizes="32x32" href="../favicon-32x32.png">
 <link rel="apple-touch-icon" type="image/png" sizes="180x180" href="../apple-touch-icon.png">
@@ -17,7 +17,7 @@
 <script src="../bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/v4-shims.min.css" integrity="sha256-wZjR52fzng1pJHwx4aV2AO3yyTOXrcDW7jBpJtTwVxw=" crossorigin="anonymous">
 <!-- clipboard.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.6/clipboard.min.js" integrity="sha256-inc5kl9MA1hkeYUt+EC3BhlIgyp/2jDIyBLS6k3UxPI=" crossorigin="anonymous"></script><!-- headroom.js --><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/headroom.min.js" integrity="sha256-AsUX4SJE1+yuDu5+mAVzJbuYNPHj/WroHuZ8Ir/CkE0=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.11.0/jQuery.headroom.min.js" integrity="sha256-ZX/yNShbjqsohH1k95liqY9Gd8uOiE1S4vZc+9KQ1K4=" crossorigin="anonymous"></script><!-- pkgdown --><link href="../pkgdown.css" rel="stylesheet">
-<script src="../pkgdown.js"></script><meta property="og:title" content="review">
+<script src="../pkgdown.js"></script><meta property="og:title" content="Review new data">
 <meta property="og:description" content="mort">
 <meta property="og:image" content="/logo.png">
 <!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -60,22 +60,22 @@
       <a href="../articles/data-prep.html">Formatting your data</a>
     </li>
     <li>
-      <a href="../articles/digging.html">digging</a>
+      <a href="../articles/digging.html">Digging into your data</a>
     </li>
     <li>
-      <a href="../articles/drift.html">drift</a>
+      <a href="../articles/drift.html">Dead and drifting</a>
     </li>
     <li>
-      <a href="../articles/morts.html">morts</a>
+      <a href="../articles/morts.html">Identifying potential mortalities</a>
     </li>
     <li>
-      <a href="../articles/plots.html">plots</a>
+      <a href="../articles/plots.html">Plotting your data</a>
     </li>
     <li>
-      <a href="../articles/review.html">review</a>
+      <a href="../articles/review.html">Review new data</a>
     </li>
     <li>
-      <a href="../articles/season.html">season</a>
+      <a href="../articles/season.html">Seasonality</a>
     </li>
   </ul>
 </li>
@@ -100,7 +100,7 @@
       </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
-      <h1 data-toc-skip>review</h1>
+      <h1 data-toc-skip>Review new data</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/rosieluain/mort/blob/HEAD/vignettes/review.Rmd" class="external-link"><code>vignettes/review.Rmd</code></a></small>
@@ -110,13 +110,88 @@
 
     
     
+<p><strong>Note:</strong> vignettes are under development! We are
+currently developing a sample dataset, so there are some obvious gaps
+where there should be figures, tables, etc. These will be completed as
+soon as the sample dataset is done. <br><br></p>
+<p>morts is a conservative method to flag potential mortalities. This
+means that it can overestimate potential mortalities and some flagged
+mortalities may actually be alive. If new data are available - such as
+from receivers that were not previously available or an additional year
+in multiyear studies - movement of incorrectly flagged mortalities may
+be apparent.</p>
+<!-- plot with mortality and then fish that gets up and swims away - could be from seasonality  -->
+<p>The <code><a href="../reference/review.html">review()</a></code> function examines new data to determine if
+any animals move that were previously flagged as potential
+mortalities.</p>
+<div class="section level2">
+<h2 id="using-review">Using <code>review()</code><a class="anchor" aria-label="anchor" href="#using-review"></a>
+</h2>
+<p>Two input dataframes are mandatory for <code><a href="../reference/review.html">review()</a></code>:</p>
+<ol>
+<li><p><code>new.data</code> - a dataframe with residence events
+generated from the new dataset</p></li>
+<li><p><code>morts</code> - a dataframe of previously flagged
+mortalities</p></li>
+</ol>
+<p>The new residence events in <code>new.data</code> must be generated
+using the same method as the original dataset, or must be manipulated to
+match the format of the original dataset. The format of
+<code>new.data</code> must also match the format of
+<code>morts</code>.</p>
+<p>The other four required arguments, <code>type</code>,
+<code>ID</code>, <code>station</code>, and <code>res.start</code>, are
+specified in the same way as for <code><a href="../reference/morts.html">morts()</a></code> and
+<code><a href="../reference/infrequent.html">infrequent()</a></code>. See the “Identifying potential mortalities”
+information for more information about these arguments.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/rosieluain/mort" class="external-link">mort</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">review_example</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/review.html">review</a></span><span class="op">(</span>morts<span class="op">=</span><span class="va">morts</span>,new.data<span class="op">=</span><span class="va">new.data</span>,type<span class="op">=</span><span class="st">"morts"</span>,</span>
+<span>                       ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span><span class="op">)</span></span></code></pre></div>
+<p>If there are no station changes between the flagged mortalities and
+<code>new.data</code>, or among the residence events within
+<code>new.data</code>, then nothing is returned. If a station change is
+found, the residence event with the station change will be returned.</p>
+<!-- Example table of one that was returned  -->
+<p>The user can then review the station change to ensure it is valid
+before removing the animal from <code>morts</code> and including the
+animal in further analyses.</p>
+</div>
+<div class="section level2">
+<h2 id="including-previous-data">Including previous data<a class="anchor" aria-label="anchor" href="#including-previous-data"></a>
+</h2>
+<p>An optional input is <code>old.data</code>, which is the original
+dataset or a subset of the original dataset that includes any residence
+events that may have occurred between the flagged potential mortality
+and the beginning of <code>new.data</code>. It is strongly recommended
+to include <code>old.data</code> if <code>backwards=TRUE</code> when the
+mortalities were previously identified and/or if drift was applied (see
+“Drift” vignette for more information on applying drift).</p>
+<!-- Example of fish that does not have a station change but seems that way with no old data - can show station change that becomes a drift residence, then beginning is identified as a mortality, then drift does not show the jump -->
+</div>
+<div class="section level2">
+<h2 id="applying-drift">Applying drift<a class="anchor" aria-label="anchor" href="#applying-drift"></a>
+</h2>
+<p>There is the option to apply drift when using <code><a href="../reference/review.html">review()</a></code>.
+If applying drift, the arguments <code>ddd</code>,
+<code>from.station</code>, and <code>to.station</code> must be provided.
+See “Drift” vignette for more information on these arguments. In
+addition, the arguments <code>res.end</code>, <code>residences</code>,
+and <code>units</code> must be provided. These arguments are not
+necessary for identifying station changes with no drift, but are called
+by the function when drift is applied.</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">drift_review</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/review.html">review</a></span><span class="op">(</span>morts<span class="op">=</span><span class="va">morts</span>,new.data<span class="op">=</span><span class="va">new.data</span>,old.data<span class="op">=</span><span class="va">old.data</span>,</span>
+<span>                     type<span class="op">=</span><span class="st">"morts"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<span>                     res.end<span class="op">=</span><span class="st">"auto"</span>,residences<span class="op">=</span><span class="st">"auto"</span>,units<span class="op">=</span><span class="st">"auto"</span>,</span>
+<span>                     ddd<span class="op">=</span><span class="va">ddd</span>,from.station<span class="op">=</span><span class="st">"From"</span>,to.station<span class="op">=</span><span class="st">"To"</span><span class="op">)</span></span></code></pre></div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
 
-      </div>
+        <nav id="toc" data-toggle="toc"><h2 data-toc-skip>Contents</h2>
+    </nav>
+</div>
 
 </div>
 
