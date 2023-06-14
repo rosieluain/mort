@@ -19,4 +19,4 @@ navbar:
     - text: Digging into your data
       href: digging.html
     - text: Review new data
-      href:: review.html
+      href: review.html
