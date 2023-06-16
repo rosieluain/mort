@@ -1,6 +1,17 @@
 url: https://rosieluain.github.io/mort/
 template:
   bootstrap: 5
+articles:
+- title: All vignettes
+  desc: null
+  contents:
+  - '`data-prep`'
+  - '`morts`'
+  - '`drift`'
+  - '`season`'
+  - '`plots`'
+  - '`digging`'
+  - '`review`'
 navbar:
   components:
     articles:
