@@ -2,12 +2,12 @@ pandoc: 2.19.2
 pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
-  data-prep: data-prep.html
-  digging: digging.html
-  drift: drift.html
-  morts: morts.html
-  plots: plots.html
-  review: review.html
-  season: season.html
-last_built: 2023-06-16T17:50Z
+  a1_data-prep: a1_data-prep.html
+  a2_morts: a2_morts.html
+  a3_drift: a3_drift.html
+  a4_season: a4_season.html
+  a5_plots: a5_plots.html
+  a6_digging: a6_digging.html
+  a7_review: a7_review.html
+last_built: 2023-06-16T18:42Z
 
