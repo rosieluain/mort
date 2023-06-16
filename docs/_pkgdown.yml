@@ -4,19 +4,19 @@ template:
 navbar:
   components:
     articles:
-    text: Articles
-    menu:
-    - text: Formatting your data
-      href: data-prep.html
-    - text: Identifying potential mortalities
-      href: morts.html
-    - text: Dead and drifting
-      href: drift.html
-    - text: Seasonality
-      href: season.html
-    - text: Plotting your data
-      href: plots.html
-    - text: Digging into your data
-      href: digging.html
-    - text: Review new data
-      href: review.html
+      text: Articles
+      menu:
+      - text: Formatting your data
+        href: articles/data-prep.html
+      - text: Identifying potential mortalities
+        href: articles/morts.html
+      - text: Dead and drifting
+        href: articles/drift.html
+      - text: Seasonality
+        href: articles/season.html
+      - text: Plotting your data
+        href: articles/plots.html
+      - text: Digging into your data
+        href: articles/digging.html
+      - text: Review new data
+        href: articles/review.html
