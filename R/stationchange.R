@@ -33,6 +33,8 @@
 #' @param to.station a string of the name of the column in `ddd` that contains
 #' the station/location names where drifting detections may move to. Must
 #' be identical to the station/location names in `data`.
+#' @param progressbar option to display progress bar as function is run. Default
+#' is TRUE.
 #'
 #' @return a dataframe with one row for each tag ID, including the date/time of
 #' the residence start at the most recent station or location, the date/time of
@@ -47,7 +49,7 @@
 stationchange<-function(data,type="mort",ID,station,res.start="auto",
                         res.end="auto",residences="auto",
                         singles=TRUE,drift=FALSE,ddd=NULL,units=NULL,from.station=NULL,
-                        to.station=NULL){
+                        to.station=NULL,progressbar=TRUE){
 
   if (type %in% c("actel","vtrack")&is(data,"list")){
     data<-extractres(data=data,type=type)
@@ -91,7 +93,9 @@ stationchange<-function(data,type="mort",ID,station,res.start="auto",
 
   if (drift==FALSE&
       !is(data[[station]],"list")){
-    pb<-txtProgressBar(1,length(tag),style=3)
+    if (progressbar==TRUE){
+      pb<-txtProgressBar(1,length(tag),style=3)
+    }
     for (i in 1:length(tag)){
       res.temp<-data[data[[ID]]==tag[i],]
       # Order by time
@@ -130,7 +134,9 @@ stationchange<-function(data,type="mort",ID,station,res.start="auto",
       else if (nrow(res.temp)==1){
         stn.change[nrow(stn.change)+1,]<-res.temp[1,]
       }
-      setTxtProgressBar(pb,i)
+      if (progressbar==TRUE){
+        setTxtProgressBar(pb,i)
+      }
     }
   }
 
@@ -208,6 +214,8 @@ stationchange<-function(data,type="mort",ID,station,res.start="auto",
 #' recent station or location change. Must use the same column names as `data`.
 #' @param drift indicates if drift residence events should be included in
 #' determining the maximum residence duration
+#' @param progressbar option to display progress bar as function is run. Default
+#' is TRUE.
 #'
 #' @return a dataframe with the residence information for the longest residence
 #' for each tag ID that occurred before the most recent station/location change.
@@ -217,10 +225,12 @@ stationchange<-function(data,type="mort",ID,station,res.start="auto",
 #' \dontrun{resmax(data=res.events,ID="TagID",station="Receiver",
 #' res.start="StartUTC",residences="ResidencesLength.days",stnchange=station.change)}
 resmax<-function(data,ID,station,res.start,
-                 residences,stnchange,drift=FALSE){
+                 residences,stnchange,drift=FALSE,progressbar=TRUE){
   res.max<-data[0,]
 
-  pb<-txtProgressBar(1,nrow(stnchange),style=3)
+  if (progressbar==TRUE){
+    pb<-txtProgressBar(1,nrow(stnchange),style=3)
+  }
   for (i in 1:nrow(stnchange)){
     # Subset residences for ID i, where res.start < res.start of stnchange
     res.temp<-data[data[[ID]]==stnchange[[ID]][i]&
@@ -245,7 +255,9 @@ resmax<-function(data,ID,station,res.start,
         }
       }
     }
-    setTxtProgressBar(pb,i)
+    if (progressbar==TRUE){
+      setTxtProgressBar(pb,i)
+    }
   }
 
   res.max

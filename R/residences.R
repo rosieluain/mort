@@ -23,8 +23,8 @@
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #'
 #' @examples
-#' \dontrun{residences(data=data,ID="TagID",station="Receiver",
-#'# datetime="DateTimeUTC",cutoff=1,units="days")}
+#' \dontrun{residences(data=detections,ID="TagID",station="Receiver",
+#' datetime="DateTimeUTC",cutoff=1,units="days")}
 
 residences<-function(data,ID,station,datetime,cutoff,units){
   # Create list of unique IDs
