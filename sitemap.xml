@@ -40,7 +40,16 @@
     <loc>/reference/backwards.html</loc>
   </url>
   <url>
+    <loc>/reference/ddd.html</loc>
+  </url>
+  <url>
+    <loc>/reference/detections.html</loc>
+  </url>
+  <url>
     <loc>/reference/drift.html</loc>
+  </url>
+  <url>
+    <loc>/reference/events.html</loc>
   </url>
   <url>
     <loc>/reference/index.html</loc>
@@ -68,6 +77,9 @@
   </url>
   <url>
     <loc>/reference/season.html</loc>
+  </url>
+  <url>
+    <loc>/reference/seasons.html</loc>
   </url>
   <url>
     <loc>/reference/stationchange.html</loc>
