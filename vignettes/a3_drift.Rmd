@@ -39,8 +39,9 @@ When drift is applied within `morts()` or `infrequent()`, residence events that 
 drift.data<-drift(data=events,type="mort",ID="ID",station="Station.Name",
                   ddd=ddd,from.station="From",to.station="To",
                   cutoff=1,cutoff.units="days",progress.bar=FALSE)
-row.names(drift.data)<-NULL
-knitr::kable(drift.data[c(6,66),],align="c")
+drift.subset<-drift.data[c(6,66),]
+row.names(drift.subset)<-NULL
+knitr::kable(drift.subset,align="c")
 ```
 
 Residence events before applying drift: 
@@ -64,6 +65,7 @@ plot<-plot+
                       values=c("#F8766D","#A3A500","#00B0F6","#E76BF3","#00BF7D"))
 plot
 ```
+
 Note that, when using the `mortsplot()` function, the legend entry for the station name of a drift residence event begins with "Drift", followed by an alphabetical list of all station names involved in the residence event. 
 
 ## Applying drift 

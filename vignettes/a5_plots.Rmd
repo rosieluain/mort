@@ -55,7 +55,7 @@ plot
 
 Zooming and scrolling around the interactive plot are possible (using the toolbar at the top right corner), as well as changing the visibility of stations (by clicking on the station names). Information about each residence event appears when the cursor is moved over the beginning or end of a residence event.
 
-![](../docs/interactive_plot_ex.png){width=100%}
+<img src="man/figures/interactive_plot_ex.png"/>
 
 When `interactive=TRUE`, `mortsplot()` calls `ggplotly()` from `plotly`. The same result can be achieved by building a non-interactive plot with `mortsplot()` and calling `ggplotly()` directly: 
 
@@ -72,22 +72,27 @@ After potential mortalities have been identified, they can be added to the plot 
 ```{r morts_ex,include=FALSE}
 morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",method="all")
 ```
-```{r basic_withmorts,fig.width=7}
+```{r basic_withmorts}
 plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",morts=morts)
+```
+````{r basic_withmorts_plot,echo=FALSE,fig.width=7}
+
 plot<-plot+
   theme(legend.position="none")
 plot
-```
+`````
 
 ### Seasonality
 To plot specific seasons or periods of interest, seasonality can be applied using the arguments `season.start` and `season.end`. These arguments are used in the same way as for `season()` (see the [Seasonality](https://rosieluain.github.io/mort/articles/a4_season.html) vignette) or when seasonality is applied in `morts()` (see the [Identifying potential mortalities](https://rosieluain.github.io/mort/articles/a2_morts.html) vignette). 
 
 To apply seasonality, the arguments `residences` and `units` must also be provided, in the same manner as they are in other morts functions. 
 
-```{r basic_ssn,results=FALSE,fig.width=7}
+```{r basic_ssn,results=FALSE}
 plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",
                 residences="auto",units="auto",
                 season.start="2004-06-01",season.end="2004-10-31")
+```
+```{r basic_ssn_plot,echo=FALSE,fig.width=7}
 plot<-plot+
   theme(legend.position="none")
 plot

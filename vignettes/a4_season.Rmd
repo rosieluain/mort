@@ -49,6 +49,7 @@ full_date<-morts(data=events,type="mort",ID="ID",station="Station.Name",
 ```
 
 Here is how mortalities would be identified, using `method="all"` and no seasonality. The black points indicate the time of a potential mortality.
+
 ```{r all_ex,echo=FALSE,results=FALSE,fig.width=7}
 no_season_ex<-morts(data=events,type="mort",ID="ID",station="Station.Name",method="all")
 
@@ -59,6 +60,7 @@ plot
 ```
 
 And here is when seasonality is included: 
+
 ```{r season_ex,results=FALSE,echo=FALSE,fig.width=7}
 season_ex<-morts(data=events,type="mort",ID="ID",station="Station.Name",method="all",
                  season.start=seasons$Start, season.end=seasons$End)
@@ -67,6 +69,7 @@ plot<-plot+
   theme(legend.position="none")
 plot
 ```
+
 Note that animal I is not flagged as a potential mortality when seasonality is applied. However, animal I would likely be flagged if the `infrequent()` function was used in addition to `morts()`. 
 
 ## `overlap` argument
