@@ -14,13 +14,10 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup,echo=FALSE}
+```{r setup,echo=FALSE,warning=FALSE,message=FALSE}
 library(mort)
+library(ggplot2)
 ```
-**Note:** vignettes are under development! We are currently developing a sample dataset, so there are some obvious gaps where there should be figures, tables, etc. These will be completed as soon as the sample dataset is done. 
-<br>
-<br>
-
 There may be situations where a tag that was expelled or from a dead animal may appear to move among stations or locations. This apparent movement could be due to the tag drifting with currents or tides. If a tag is located within range of two overlapping recievers, simultaneous or near-simultaneous detections at the two receivers may be assigned to different residence events. Left unaddressed, these residence events at different stations would be considered by mort to be station changes.
 
 ## Specifying drift stations 
@@ -28,27 +25,46 @@ Drift stations must be specified by the user. These can be determined by common 
 
 To apply drift, the user must specify the drift stations in a dataframe. The dataframe must have two columns: the station where the tag is drifting from, and the station where the tag is drifting to. The station names must match those in the `station` argument in all mort functions. Each row will specify one possible drift movement. The movement is directional, so if two stations overlap, both directions must be specified. The drift dataframe is later called with the argument `ddd` - "ddd" for "dead drift direction", as a reminder that drift is applied directionally. 
 
-The table below shows an example drift dataframe. Note that drift between Stations 2 and 3 can be bidirectional, so both drift from Station 2 to Station 3 and drift from Station 3 to Station 2 are included. 
+The table below is a subset from the sample drift dataframe. Note that drift between Stations 2 and 3 can be bidirectional, so both drift from Station 2 to Station 3 and drift from Station 3 to Station 2 are included. 
 
-<!-- Example drift table  -->
+```{r ddd_table,echo=FALSE}
+ddd_ex<-ddd[(nrow(ddd)-5):nrow(ddd),]
+row.names(ddd_ex)<-NULL
+knitr::kable(ddd_ex,align="c")
+```
 
-When drift is applied within `morts()` or `infrequent()`, residence events that could be due to drift are combined to form drift residence events. 
+When drift is applied within `morts()` or `infrequent()`, residence events that could be due to drift are combined to form drift residence events. The station name of each drift residence event is a list of the stations involved in the drift event, in the same order that the tag was detected. In the example below, tag A drifted from station 14 to station 8 to station 2. Tag C was likely within range of both receiver 14 and receiver 8, and was detected by both receivers. 
+
+```{r drift_table,echo=FALSE}
+drift.data<-drift(data=events,type="mort",ID="ID",station="Station.Name",
+                  ddd=ddd,from.station="From",to.station="To",
+                  cutoff=1,cutoff.units="days",progress.bar=FALSE)
+row.names(drift.data)<-NULL
+knitr::kable(drift.data[c(6,66),],align="c")
+```
 
 Residence events before applying drift: 
-```{r before_drift,eval=FALSE,echo=FALSE}
-plot<-mortsplot(data=data,type="mort",ID="ID",station="Station.Name")
+```{r before_drift,echo=FALSE,results=FALSE,fig.width=7}
+plot<-mortsplot(data=events[events$ID %in% c("L","K"),],
+                type="mort",ID="ID",station="Station.Name",
+                season.start="2003-09-26",season.end="2004-03-08")
+plot<-plot+
+  scale_colour_manual(name="Station Name",
+                      values=c("#F8766D","#A3A500","#00B0F6","#E76BF3"))
 plot
 ```
 
 Residence events, including drift residence events: 
-<!-- How does this plot? Which station is used for the colour  -->
-```{r after_drift,eval=FALSE,echo=FALSE}
-drift.data<-drift(data=data,type="mort",ID="ID",station="Station.Name",
-                  ddd=drift.dataframe,from.station="From",to.station="To",
-                  cutoff=1,cutoff.units="days",progress.bar=FALSE)
-plot<-mortsplot(data=data,type="mort",ID="ID",station="Station.Name")
+```{r after_drift,echo=FALSE,results=FALSE,fig.width=7}
+plot<-mortsplot(data=drift.data[drift.data$ID %in% c("L","K"),],
+                type="mort",ID="ID",station="Station.Name",
+                season.start="2003-09-26",season.end="2004-03-08")
+plot<-plot+
+  scale_colour_manual(name="Station Name",
+                      values=c("#F8766D","#A3A500","#00B0F6","#E76BF3","#00BF7D"))
 plot
 ```
+Note that, when using the `mortsplot()` function, the legend entry for the station name of a drift residence event begins with "Drift", followed by an alphabetical list of all station names involved in the residence event. 
 
 ## Applying drift 
 Drift is applied in `morts()` and `infrequent()` by including five arguments: 
@@ -64,9 +80,8 @@ Drift is applied in `morts()` and `infrequent()` by including five arguments:
 #. `drift.units` - the units of `drift.cutoff`
 
 ```{r drift_ex_inf, eval=FALSE}
-drift_ex<-infrequent(data=data,type="mort",ID="ID",station="Station.Name",
-                     ddd=drift.dataframe,
-                     from.station="From",to.station="To",
+drift_ex<-infrequent(data=events,type="mort",ID="ID",station="Station.Name",
+                     ddd=ddd,from.station="From",to.station="To",
                      drift.cutoff=1,drift.units="days")
 ```
 
@@ -76,22 +91,26 @@ Applying drift to thresholds `drift="threshold"` will increase the threshold, an
 
 The most conservative option is `drift="morts"`. This is because drift residences are removed from identifying thresholds, and thresholds will likely be shorter than if drift residences were included. Including drift residences in identifying mortalities will likely lengthen residence events, making it easier for an event to exceed the threshold. See below for an example of identifying mortalities with and without applying drift. 
 
-<!-- Evaluate and plot when test dataset is ready -->
-```{r no_drift, eval=FALSE}
-no_drift<-morts(data=data,type="mort",ID="ID",station="Station.Name",method="all")
-
-plot<-mortsplot(data=data,type="mort",ID="ID",station="Station.Name",
+```{r no_drift,results=FALSE}
+no_drift<-morts(data=events,type="mort",ID="ID",station="Station.Name",method="all")
+```
+```{r no_drift_plot,echo=FALSE,fig.width=7}
+plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",
                 morts=no_drift)
+plot<-plot+
+  theme(legend.position="none")
 plot
 ```
 
-```{r drift_ex_morts, eval=FALSE}
-drift_ex<-morts(data=data,type="mort",ID="ID",station="Station.Name",method="all",
-                drift="morts",ddd=drift.dataframe,
-                from.station="From",to.station="To",
+```{r drift_ex_morts,results=FALSE}
+drift_ex<-morts(data=events,type="mort",ID="ID",station="Station.Name",method="all",
+                drift="morts",ddd=ddd,from.station="From",to.station="To",
                 drift.cutoff=1,drift.units="days")
-
-plot<-mortsplot(data=data,type="mort",ID="ID",station="Station.Name",morts=drift_ex)
+```
+```{r drift_ex_morts_plot,echo=FALSE,fig.width=7}
+plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",morts=drift_ex)
+plot<-plot+
+  theme(legend.position="none")
 plot
 ```
 
@@ -99,7 +118,7 @@ plot
 If you are interested in exploring how drift residences are applied, the `drift()` function that is called by `morts()` and `infrequent()` is also available as a standalone function. The arguments for `drift()` are the same as those for the other functions. 
 
 ```{r df, eval=FALSE}
-drift.data<-drift(data=data,type="mort",ID="ID",station="Station.Name",
+drift.data<-drift(data=events,type="mort",ID="ID",station="Station.Name",
                   ddd=drift.dataframe,from.station="From",to.station="To",
                   cutoff=1,cutoff.units="days")
 ```

@@ -288,6 +288,8 @@ resmax<-function(data,ID,station,res.start,
 #' @param units units of the duration of the residence events in `data`.
 #' @param stnchange a dataframe with the start time and location of the most
 #' recent station or location change. Must use the same column names as `data`.
+#' @param progressbar option to display progress bar as function is run. Default
+#' is TRUE.
 #'
 #' @return a dataframe with the cumulative residence information for each
 #' period where an animal was consecutively detected at a single station/location.
@@ -300,10 +302,12 @@ resmax<-function(data,ID,station,res.start,
 #' res.start="StartUTC",res.end="EndUTC",residences="ResidencesLength.days",
 #' units="days",stnchange=station.change)}
 resmaxcml<-function(data,ID,station,res.start,res.end,
-                    residences,units,stnchange){
+                    residences,units,stnchange,progressbar=TRUE){
   res.maxcml<-data[0,]
 
-  pb<-txtProgressBar(1,nrow(stnchange),style=3)
+  if (progressbar==TRUE){
+    pb<-txtProgressBar(1,nrow(stnchange),style=3)
+  }
   for (i in 1:nrow(stnchange)){
     # Subset residences for ID i, where res.start < res.start of stnchange
     res.temp<-data[data[[ID]]==stnchange[[ID]][i]&
@@ -388,7 +392,9 @@ resmaxcml<-function(data,ID,station,res.start,res.end,
         else {break}
       }
     }
-    setTxtProgressBar(pb,i)
+    if (progressbar==TRUE){
+      setTxtProgressBar(pb,i)
+    }
   }
 
   res.maxcml[[residences]]<-difftime(res.maxcml[[res.end]],

@@ -218,12 +218,12 @@ drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
       else {
         for (k in 1:length(j)){
           if ((res.temp[[station]][j[k]+1] %in%
-               ddd[[to.station]][ddd[[from.station]]==res.temp[[station]][j[k]]])&
+               ddd[[to.station]][ddd[[from.station]]==res.temp[[station]][[j[k]]][length(res.temp[[station]][[j[k]]])]])&
               difftime(res.temp[[res.start]][j[k]+1],
                        res.temp[[res.end]][j[k]],
                        units=cutoff.units)<cutoff){
             res.temp[[res.start]][j[k]+1]<-res.temp[[res.start]][j[k]]
-            res.temp[[station]][j[k]+1]<-res.temp[[station]][j[k]]
+            res.temp[[station]][[j[k]+1]]<-append(res.temp[[station]][[j[k]]],res.temp[[station]][[j[k]+1]])
             del<-c(del,j[k])
           }
         }
@@ -286,6 +286,8 @@ drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
 #' residence events that is within the period of interest will be retained,
 #' and `residences` will be recalculated, using specified `units`.
 #' Default is `TRUE`.
+#' @param progressbar option to display progress bar as function is run. Default
+#' is TRUE.
 #'
 #' @return a dataframe in the same format as the input data, with residence
 #' events limited to the period(s) of interest.
@@ -297,7 +299,7 @@ drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
 #' season.end="31-10")}
 season<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
                  residences="auto",units="auto",season.start,
-                 season.end,overlap=TRUE){
+                 season.end,overlap=TRUE,progressbar=TRUE){
 
   if (type %in% c("actel","vtrack")){
     data<-extractres(data=data,type=type)
@@ -400,9 +402,13 @@ season<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
   data.season<-data[0,]
 
   for (i in 1:length(season.start)){
-    print(paste("season/period",i,"of",length(season.start)))
+    if (progressbar==TRUE){
+      print(paste("season/period",i,"of",length(season.start)))
+    }
     if (length(tag)>1){
-      pb<-txtProgressBar(1,length(tag),style=3)
+      if (progressbar==TRUE){
+        pb<-txtProgressBar(1,length(tag),style=3)
+      }
     }
     for (j in 1:length(tag)){
       data.temp<-data[0,]
@@ -444,7 +450,9 @@ season<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
       }
       data.season<-rbind(data.season,data.temp)
       if (length(tag)>1){
-        setTxtProgressBar(pb,j)
+        if (progressbar==TRUE){
+          setTxtProgressBar(pb,j)
+        }
       }
     }
   }

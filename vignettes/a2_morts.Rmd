@@ -14,54 +14,91 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup,echo=FALSE}
+```{r setup,echo=FALSE,warning=FALSE,message=FALSE}
 library(mort)
+library(ggplot2)
 ```
-**Note:** vignettes are under development! We are currently developing a sample dataset, so there are some obvious gaps where there should be figures, tables, etc. These will be completed as soon as the sample dataset is done. 
-<br>
-<br>
-
 Note that potential mortalities or potential cases of tag expulsion are referred to here as "mortalities" or "potential mortalities" for simplicity. 
-
+<br>
+<br>
+<br>
 There are two functions for identifying potential mortalities: `morts()` and `infrequent()`. 
 
 ## `morts()` function
 The `morts()` function uses thresholds derived from the dataset to identify potential mortalities. There are four options for identifying thresholds and mortalities, specified with the `method` argument in `morts()`. The options "last" and "any" use a threshold derived from the duration of residence events. The option "cumulative" uses a threshold derived from cumulative residence events (defined below). The option "all" applies both "any" and "cumulative" ("last" is not called directly, as the results are also captured by "any"). 
 
-All options rely on identifying the most recent station or location change for each animal that was detected by the array. The station change marks the last time the animal moved, and it is assumed that the animal was alive before this point. See `stationchange()` and the vignette "Digging" for more information on how mort identifies station changes. 
+All options rely on identifying the most recent station or location change for each animal that was detected by the array. The station change marks the last time the animal moved, and it is assumed that the animal was alive before this point. 
 
-<!-- Use a figure from the test dataset (when available) to demonstrate this -->
+The black points in the plot below show examples of the most recent station changes. See `stationchange()` and the [Digging](https://rosieluain.github.io/mort/articles/a6_digging.html) vignette for more information on how mort identifies station changes. 
+
+```{r stnchange_plot,echo=FALSE,fig.width=7}
+stn.change<-stationchange(data=events[events$ID %in% c("G","K"),],type="mort",ID="ID",station="Station.Name",progressbar=FALSE)
+plot<-mortsplot(data=events[events$ID %in% c("G","K"),],
+                type="mort",ID="ID",station="Station.Name",
+                season.start="2004-06-22",season.end="2004-07-01",
+                progressbar=FALSE)
+plot<-plot+
+  geom_point(data=stn.change,aes(x=ResidenceStart,y=ID))+
+  scale_colour_discrete(name="Station Name")+
+  guides(colour=guide_legend(nrow=1,byrow=TRUE))+
+  theme(legend.position="bottom")
+plot
+```
 
 ### Duration of residence events
 After identifying the most recent station change, the longest single residence event that occurred before the station change is identified for each animal. 
 
-<!-- Use a figure from the test dataset to demonstrate this -->
+These long residences can be explored by the user using the `resmax()` function (see the [Digging](https://rosieluain.github.io/mort/articles/a6_digging.html) vignette for more information). The output will look like this: 
 
-These long residences can be explored by the user using the `resmax()` function (see the vignette "Digging" for more information). The output will look like this: 
-<!-- Make a table with results of resmax from test dataset  -->
+```{r resmax_ex,echo=FALSE}
+stn.change<-stationchange(data=events,type="mort",ID="ID",station="Station.Name",
+                          progressbar=FALSE)
+rm_example<-resmax(data=events,ID="ID",station="Station.Name",
+                   res.start="ResidenceStart",residences="ResidenceLength.days",
+                   stnchange=stn.change,progressbar=FALSE)
+rm_example<-rm_example[order(rm_example$ResidenceLength.days,decreasing=TRUE),]
+row.names(rm_example)<-NULL
+knitr::kable(head(rm_example),align="c")
+```
 
-The longest residence event (highlighted in red in the table above) is used as the threshold. 
+The longest residence event (60 days in the table above) is used as the threshold. 
 
 There are two options for how to apply the threshold: 
 
 #### 1. last
 The threshold is applied to the last (most recent) residence event of each animal. Any residence events that are longer than the threshold are flagged as potential mortalities. 
 
-<!-- Actually evaluate this when dataset is ready -->
 ```{r morts_last_ex,eval=FALSE}
-last_ex<-morts(data=data,type="mort",ID="ID",station="Station.Name",method="last")
+last_ex<-morts(data=events,type="mort",ID="ID",station="Station.Name",method="last")
+```
+```{r morts_last_ex_run,include=FALSE}
+last_ex<-morts(data=events,type="mort",ID="ID",station="Station.Name",method="last")
+```
 
-mortsplot(data=data,type="mort",ID="ID",station="Station.Name",morts=last_ex)
+The black points in the plot below indicate the beginning of residence events that were longer than the threshold, and were therefore flagged in `last_ex` as run above. 
+
+```{r last_ex_plot,echo=FALSE,fig.width=7}
+plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",
+                morts=last_ex)
+plot<-plot+
+  theme(legend.position="none")
+plot
 ```
 
 #### 2. any
 The threshold is applied to any residence event that occurred after the most recent station change for each animal. 
 
-<!-- Actually evaluate when dataset is ready  -->
 ```{r morts_any_ex,eval=FALSE}
-any_ex<-morts(data=data,type="mort",ID="ID",station="Station.Name",method="any")
-
-mortsplot(data=data,type="mort",ID="ID",station="Station.Name",morts=any_ex)
+any_ex<-morts(data=events,type="mort",ID="ID",station="Station.Name",method="any")
+```
+```{r morts_any_ex_run,include=FALSE}
+any_ex<-morts(data=events,type="mort",ID="ID",station="Station.Name",method="any")
+```
+```{r morts_any_plot,echo=FALSE,fig.width=7}
+plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",morts=any_ex)
+plot<-plot+
+  theme(legend.position="none")
+plot
 ```
 
 Note in the examples above that ID and station were specified for `type="mort"`. For other supported input types, there is no default for ID and station, but they can both be specified as "auto" and will be identified automatically by mort: 
@@ -78,58 +115,142 @@ manual_ex<-morts(data=data,type="manual",ID="ID",station="Station.Name",
 ```
 
 ### Cumulative residence events
-Cumulative residence events are the length of time between when an animal was first detected at a station and when it was last detected at the same station, ignoring any gaps in detection (or `cutoff` in `residences()`). The threshold for cumulative residence events is identified similarly to that for single residence events. The threshold is then applied to cumulative residence events that occurred after the last station change to flag potential mortalities. 
+Cumulative residence events are the length of time between when an animal was first detected at a station and when it was last detected at the same station, ignoring any gaps in detection (or `cutoff` in `residences()`). The black points in the plot below indicate the start and end of the longest cumulative residence events, before a station change, for each fish. 
 
-<!-- Plots of examples from dataset when ready -->
+```{r sc_cmlres_plot,echo=FALSE,fig.width=7}
+cml_res<-data.frame(ID=c("C","L"),
+                   Start=as.POSIXct(c("2004-03-26 13:39:43",
+                                      "2004-04-20 15:21:35")),
+                   End=as.POSIXct(c("2004-06-08 23:21:49",
+                                    "2004-06-09 22:20:20")))
+plot<-mortsplot(data=events[events$ID %in% c("C","L"),],
+                type="mort",ID="ID",station="Station.Name",
+                season.start="2004-03-26",season.end="2004-06-23",
+                progressbar=FALSE)
+plot<-plot+
+  geom_point(data=cml_res,aes(x=Start,y=ID))+
+  geom_point(data=cml_res,aes(x=End,y=ID))+
+  scale_colour_discrete(name="Station Name")+
+  theme(legend.position="bottom")
+plot
+```
 
+The threshold for cumulative residence events is identified similarly to that for single residence events. The cumulative residence events can be explored by the user using the `resmaxcml()` function (see the [Digging](https://rosieluain.github.io/mort/articles/a6_digging.html) vignette for more information). The output will look like this: 
+
+```{r resmaxcml_ex,echo=FALSE}
+stn.change<-stationchange(data=events,type="mort",ID="ID",station="Station.Name",
+                          progressbar=FALSE)
+rmc_example<-resmaxcml(data=events,ID="ID",station="Station.Name",
+                   res.start="ResidenceStart",
+                   res.end="ResidenceEnd",
+                   residences="ResidenceLength.days",
+                   units="days",
+                   stnchange=stn.change,progressbar=FALSE)
+rmc_example<-rmc_example[order(rmc_example$ResidenceLength.days,
+                               decreasing=TRUE),]
+row.names(rmc_example)<-NULL
+knitr::kable(head(rmc_example),align="c")
+```
+
+Note that the threshold in the example above is extremely large (1139 days). In this example, the large threshold is due to the drift and can be corrected by applying drift within `morts()`. See the [Drift](https://rosieluain.github.io/mort/articles/a3_drift.html) vignette for more information. 
+
+The threshold is then applied to cumulative residence events that occurred after the last station change to flag potential mortalities. 
 ```{r cumulative_ex,eval=FALSE}
-cumulative_ex<-morts(data=data,type="mort",type="ID",station="Station.Name",method="cumulative")
-
-mortsplot(data=data,type="mort",ID="ID",station="Station.Name",morts=cumulative_ex)
+cumulative_ex<-morts(data=events,type="mort",ID="ID",station="Station.Name",method="cumulative")
+```
+```{r clm_ex_run,include=FALSE}
+cumulative_ex<-morts(data=events,type="mort",ID="ID",station="Station.Name",method="cumulative")
+```
+```{r clm_ex_plot,echo=FALSE,fig.width=7}
+plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",morts=cumulative_ex)
+plot<-plot+
+  theme(legend.position="none")
+plot
 ```
 
 ### Notes on selecting a method
 The methods outlined above may not all be relevant for all species and acoustic arrays. Choosing an appropriate method is the responsibility of the user. It is recommended to at least run all methods and explore the results. The thresholds for cumulative residence events are typically much longer than those for single residence events. Running `method="last"` will identify potential mortalities that may have occurred recently, before reaching the cumulative threshold. Conversely, `method="cumulative"` may identify potential mortalities from multiple short residence events, which each on their own would not be long enough to be identified by `method="any"`. In this way, running `method="all"` is the most conservative method. 
 
-<!-- Actually run when dataset is ready -->
 ```{r all_ex,eval=FALSE}
-all_ex<-morts(data=data,type="mort",type="ID",station="Station.Name",method="all")
-
-mortsplot(data=data,type="mort",ID="ID",station="Station.Name",morts=all_ex)
+all_ex<-morts(data=events,type="mort",ID="ID",station="Station.Name",method="all")
+```
+```{r all_ex_run,include=FALSE}
+all_ex<-morts(data=events,type="mort",ID="ID",station="Station.Name",method="all")
+```
+```{r all_ex_plot,echo=FALSE,fig.width=7}
+plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",morts=all_ex)
+plot<-plot+
+  theme(legend.position="none")
+plot
 ```
 
+### Output
 The output of `morts()` is a dataframe, where each row is the residence event where a flagged mortality was identified: 
 
-<!-- Make a table from all_ex -->
+```{r all_ex_table,echo=FALSE}
+row.names(all_ex)<-NULL
+knitr::kable(head(all_ex),align="c")
+```
 
-<!-- Make some sort of break here?  -->
+<br>
+<br>
 
 ## `infrequent()` function
-The `infrequent()` function is used to identify potential mortalities or expelled tags that may be located just outside the usual range of a receiver, and are therefore detected briefly and intermittently when conditions allow. For this function, the thresholds are user-defined. The user has two options for defining the thresholds: 
+The `infrequent()` function is used to identify potential mortalities or expelled tags that may be located just outside the usual range of a receiver, and are therefore detected briefly and intermittently when conditions allow. 
+
+```{r inf_plot,echo=FALSE,fig.width=7}
+plot<-mortsplot(data=events[events$ID %in% c("M","I"),],
+                type="mort",ID="ID",station="Station.Name",
+                season.start="2005-09-25",season.end="2006-09-25",
+                progressbar=FALSE)
+plot<-plot+
+  theme(legend.position="none")
+plot
+```
+
+For this function, the thresholds are user-defined. The user has two options for defining the thresholds: 
 
 #### 1. recent
 For `method="recent"`, the timeframe for assessing infrequent residence events begins with the most recent residence event, and extends back in time for the `recent.period`. If the sum of the duration of all residence events in this timeframe is less than the `threshold`, the animal is flagged as a potential mortality. In the following example, animals are flagged if they were detected for less than 60 minutes within one year (52 weeks) preceding their most recent residence event. 
 
 ```{r recent_ex,eval=FALSE}
-recent_ex<-infrequent(data=data,type="mort",ID="ID",station="Station.Name",
+recent_ex<-infrequent(data=events,type="mort",ID="ID",station="Station.Name",
                       method="recent",threshold=60,threshold.units="mins",
                       recent.period=52,recent.units="weeks")
-
-mortsplot(data=data,type="mort",ID="ID",station="Station.Name",morts=recent_ex)
+```
+```{r recent_ex_run,include=FALSE}
+recent_ex<-infrequent(data=events,type="mort",ID="ID",station="Station.Name",
+                      method="recent",threshold=60,threshold.units="mins",
+                      recent.period=52,recent.units="weeks")
+```
+```{r rec_plot,echo=FALSE,fig.width=7}
+plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",morts=recent_ex)
+plot<-plot+
+  theme(legend.position="none")
+plot
 ```
 
 #### 2. defined
 For `method="defined"`, the timeframe for assessing infrequent residence events is specified (defined) by the user with the `start` and `end` arguments. In the following example, an animal is flagged as potential mortality if the sum of the duration of all residence events between 15 June and 15 October 2022 is less than 60 minutes. 
 
-```{r defined_ex,eval=FALSE}
-defined_ex<-infrequent(data=data,type="mort",ID="ID",station="Station.Name",
-                      method="recent",threshold=60,threshold.units="mins",
-                      start="2022-06-15",end="2022-10-15")
-
-mortsplot(data=data,type="mort",ID="ID",station="Station.Name",morts=defined_ex)
+```{r defined_ex, eval=FALSE}
+defined_ex<-infrequent(data=events,type="mort",ID="ID",station="Station.Name",
+                       method="defined",threshold=60,threshold.units="mins",
+                      start="2006-06-15",end="2006-10-15")
+```
+```{r defined_ex_run,include=FALSE}
+defined_ex<-infrequent(data=events,type="mort",ID="ID",station="Station.Name",
+                       method="defined",threshold=60,threshold.units="mins",
+                      start="2006-06-15",end="2006-10-15")
+```
+```{r def_plot,echo=FALSE,fig.width=7}
+plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",morts=defined_ex)
+plot<-plot+
+  theme(legend.position="none")
+plot
 ```
 
-Note that mort will assign the UTC timezone to `start` and `end`. If you want to define the period of interest using local times, it is recommended to convert local datetimes to POSIXt and then convert the timezone to UTC. 
+Note that mort will assign the UTC timezone to `start` and `end`. If you want to define the period of interest using local times, it is recommended to convert local datetimes to POSIXt and then convert the timezone to UTC:
 
 ```{r datetime_ex}
 start=as.POSIXct("2022-06-15",tz="America/Edmonton")
@@ -138,9 +259,10 @@ attributes(start)$tzone<-"UTC"
 start
 ```
 
-The output of `infrequent()` is in the same format as the output of `morts()` (see above). The two output from one method can be added to the output from the other, using the `morts.prev` argument. See below for more information on using `morts.prev`.  
+The output of `infrequent()` is in the same format as the output of `morts()` (see above). The output from one method can be added to the output from the other, using the `morts.prev` argument. See below for more information on using `morts.prev`.  
 
-<!-- Make some sort of break here?  -->
+<br>
+<br>
 
 ## Options 
 Within `morts()` and `infrequent()`, there are several optional arguments to customize the process:
@@ -151,21 +273,36 @@ In `morts()`, the argument `singles` specifies if single detections are included
 Note there is no `singles` argument for `infrequent()`, because the duration of residence events from single detections is 0, and therefore does not contribute to meeting the threshold. 
 
 ### Previously identified mortalities
-The `morts.prev` argument in both `morts()` and `infrequent()` specifies a dataframe of previously flagged mortalities. The input dataframe to `morts.prev` must have been previoulsy generated by mort, or have the same column names, column types, and in the same order as `data`. When new mortalities are identified, animal IDs that were already included in `morts.prev` are skipped. This option can be useful and make processing more efficient when new detection data and residence events are added to the dataset, whether from new animals that were tagged or new detections from previously tagged animals. It can also be useful when running multiple methods of identifying mortalities, since animal IDs identified in one method are skipped when running subsequent methods. 
+The `morts.prev` argument in both `morts()` and `infrequent()` specifies a dataframe of previously flagged mortalities. The input dataframe to `morts.prev` must have been previously generated by mort, or have the same column names, column types, and in the same order as `data`. When new mortalities are identified, animal IDs that were already included in `morts.prev` are skipped. This option can be useful and make processing more efficient when new detection data and residence events are added to the dataset, whether from new animals that were tagged or new detections from previously tagged animals. It can also be useful when running multiple methods of identifying mortalities, since animal IDs identified in one method are skipped when running subsequent methods. 
 
 ```{r mortsprev_ex,eval=FALSE}
-prev_ex<-morts(data=data,type="mort",ID="ID",station="Station.Name",morts.prev=recent_ex)
+prev_ex<-morts(data=events,type="mort",ID="ID",station="Station.Name",morts.prev=recent_ex)
 ```
 
 ### Look backwards 
 For both `morts()` and `infrequent()`, there is the option to look backwards (i.e., earlier) in the dataset. If the most recent station change occurred before the flagged mortality (i.e., the animal was detected earlier than the flagged mortality, at the same station, and with no detections elsewhere), the start dates and times of the flagged mortalities are shifted earlier. The default is `backwards=FALSE`; however, it is more conservative to set `backwards=TRUE`.
 
+In the plot below, the black points show the flagged mortalities with `backwards=FALSE`, and the blue points show the flagged mortalities with `backwards=TRUE`:
+```{r backwards,include=FALSE}
+morts.all<-morts(data=events,type="mort",ID="ID",station="Station.Name",
+                 method="any")
+morts.all.bw<-morts(data=events,type="mort",ID="ID",station="Station.Name",
+                 method="any",backwards=TRUE)
+```
+```{r backwards_plot,echo=FALSE,fig.width=7}
+plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name")
+plot<-plot+
+  geom_point(data=morts.all,aes(x=ResidenceStart,y=ID),colour="black")+
+  geom_point(data=morts.all.bw,aes(x=ResidenceStart,y=ID),colour="blue")
+plot<-plot+
+  theme(legend.position="none")
+plot
+```
+
 Note, when `method="cumulative"` and there is no seasonality, cumulative residence events will cover all consecutive detections at a given station, and `backwards` is unnecessary. 
 
-<!-- Should give example  -->
-
 ### Drift and season
-In some systems, an expelled tag or a tag from a dead animal may seem to move, due to currents or tides, or if the tag is located within range of two overlapping receivers. Both `morts()` and `infrequent()` include an option to specify stations or locations where drift may occur and to consider drift in identifying mortalities. For more information, see the "Drift" vignette. 
+In some systems, an expelled tag or a tag from a dead animal may seem to move, due to currents or tides, or if the tag is located within range of two overlapping receivers. Both `morts()` and `infrequent()` include an option to specify stations or locations where drift may occur and to consider drift in identifying mortalities. For more information, see the [Drift](https://rosieluain.github.io/mort/articles/a3_drift.html) vignette. 
 
-For some species or systems with seasonal patterns in movement or residency, it may be desirable to only consider specific seasons or periods of time when identifying mortalities. `morts()` includes an option to specify dates to calculate thresholds and flag mortalities. For more information, see the "Seasonality" vignette. Note there is no option to apply season to `infrequent()`, but the season or period of interest could be used as the defined period with `method="defined"`, as well as `start` and `end` arguments. 
+For some species or systems with seasonal patterns in movement or residency, it may be desirable to only consider specific seasons or periods of time when identifying mortalities. `morts()` includes an option to specify dates to calculate thresholds and flag mortalities. For more information, see the [Seasonality](https://rosieluain.github.io/mort/articles/a4_season.html) vignette. Note there is no option to apply season to `infrequent()`, but the season or period of interest could be used as the defined period with `method="defined"`, as well as `start` and `end` arguments. 
 

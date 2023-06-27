@@ -20,7 +20,8 @@ mortsplot(
   season.end = NULL,
   facet = FALSE,
   facet.axis = "x",
-  facet.by = "season"
+  facet.by = "season",
+  progressbar = TRUE
 )
 }
 \arguments{
@@ -81,6 +82,9 @@ and \code{season.end} must be provided.}
 
 \item{facet.by}{option to facet by "season" (as defined with \code{season.start}
 and \code{season.end}) or "year". Default is "season".}
+
+\item{progressbar}{option to display progress bar as function is run. Default
+is TRUE.}
 }
 \value{
 a ggplot2 plot. Additional arguments (e.g., formatting axes,

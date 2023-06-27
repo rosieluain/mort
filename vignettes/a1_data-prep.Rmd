@@ -13,18 +13,35 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 ```
-**Note:** vignettes are under development! We are currently developing a sample dataset, so there are some obvious gaps where there should be figures, tables, etc. These will be completed as soon as the sample dataset is done. 
-<br>
-<br>
 
+```{r setup,echo=FALSE}
+library(mort)
+```
 All mort functions rely on residence events. Residence events are similar to detection data, but include a start time, an end time, and duration. Before proceeding to explore your data and flag potential mortalities in mort, detection data must be converted into residence events. This can be done within mort using the `residences()` function, functions from other packages for acoustic telemetry data, or manually. 
 
 ## mort format
-Residence events are generated in morts by the `residences()` function. A residence event either ends when the animal is detected at a new station or when the animal has not been detected longer than a user-defined cutoff. 
+Residence events are generated in morts from detection data, using the `residences()` function. 
 
-```{r residences, eval=FALSE}
-residences(data=data,ID="ID",station="Station.Name",datetime="DateTimeUTC",cutoff=1,units="days")
+Detection data can be in any format and have any number of columns, provided they have a datetime column, a location column, and an animal ID column: 
+
+```{r detection_table, echo=FALSE}
+data(detections)
+knitr::kable(head(detections),align="c")
 ```
+
+A residence event either ends when the animal is detected at a new station or when the animal has not been detected longer than a user-defined cutoff (defined with the arguments `cutoff` and `units`): 
+
+```{r residences,eval=FALSE}
+res.events<-residences(data=detections,ID="ID",station="Station.Name",datetime="DateTimeUTC",
+                       cutoff=1,units="days")
+```
+```{r events_table,echo=FALSE}
+knitr::kable(head(events),align="c")
+```
+
+`ID` is defined by the user. ID could be the tag transmitter ID, the tag serial number, or a unique ID associated with the detections by the user. If the latter, `residences()` and the other functions in mort can accommodate multiple tag deployments (i.e., a tag is returned and re-deployed on another animal), because the ID is unique to the animal. 
+
+`station` is also definied by the user. It could be the receiver serial number (if the same receiver is always deployed at the same location), a unique location name, or a cluster of receivers (similar to Array in the actel package).
 
 Note that `units` specifies the units of the cutoff (in the example above, the cutoff is 1 day). These units will also be used to calculate the residence duration. 
 

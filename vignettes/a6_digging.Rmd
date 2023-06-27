@@ -14,54 +14,63 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup,echo=FALSE}
+```{r setup,echo=FALSE,message=FALSE,warning=FALSE}
 library(mort)
 ```
-**Note:** vignettes are under development! We are currently developing a sample dataset, so there are some obvious gaps where there should be figures, tables, etc. These will be completed as soon as the sample dataset is done. 
-<br>
-<br>
-
-All the functionality of the morts package is accessible with the `residences()`, `morts()`, `infrequent()`, `mortsplot()`, and `review()` functions, addressed in the other vignettes. Many of these functions rely on output from additional functions. As you are exploring your data, you may want to run these additional functions to better dig through and understand your data. The `drift()` and `season()` functions are respectively addressed in the "Drift" and "Seasonality" vignettes. Here, we address the `stationchange()`, `resmax()`, and `resmaxcml()` functions. 
+All the functionality of the morts package is accessible with the `residences()`, `morts()`, `infrequent()`, `mortsplot()`, and `review()` functions, addressed in the other vignettes. Many of these functions rely on output from additional functions. As you are exploring your data, you may want to run these additional functions to better dig through and understand your data. The `drift()` and `season()` functions are respectively addressed in the [Drift](https://rosieluain.github.io/mort/articles/a3_drift.html) and [Seasonality](https://rosieluain.github.io/mort/articles/a4_season.html) vignettes. Here, we address the `stationchange()`, `resmax()`, and `resmaxcml()` functions. 
 
 ## `stationchange()` function
-The thresholds in `morts()` rely on identifying the most recent station or location change of each animal, because it is assumed that the animal was alive before this most recent movement. To explore the most recent station changes for each animal, the user can can call `stationchange()` directly. The arguments are used in the same manner as for `morts()`. Drift may also be applied with the argument `drift=TRUE`. See the "Drift" vignette for more information on the other drift arguments.
+The thresholds in `morts()` rely on identifying the most recent station or location change of each animal, because it is assumed that the animal was alive before this most recent movement. To explore the most recent station changes for each animal, the user can can call `stationchange()` directly. The arguments are used in the same manner as for `morts()`. Drift may also be applied with the argument `drift=TRUE`. See the [Drift](https://rosieluain.github.io/mort/articles/a3_drift.html) vignette for more information on the other drift arguments.
 
-```{r stnchange,eval=FALSE}
-station_change<-stationchange(data=data,type="mort",ID="ID",station="Station.Name",
+```{r stnchange,results=FALSE}
+station_change<-stationchange(data=events,type="mort",ID="ID",station="Station.Name",
                               drift=TRUE,ddd=ddd,units="days",from.station="From",to.station="To")
 ```
-<!-- table that is the header of the stationchange output -->
+
+The output of `stationchange()` is a dataframe with one row for each animal ID. The residence event information (start, end, duration) is for the event that marks the most recent station change (i.e., the start is when the movement occurred).
+```{r stnchange_table,echo=FALSE}
+row.names(station_change)<-NULL
+knitr::kable(head(station_change),align="c")
+```
 
 ## `resmax()` function
 The threshold for `morts()` when `method` is "last", "any", or "all" is determined by identifying the longest residence event that occurred before a station change. If there are some animals with very long resident events that are not identified as potential mortalities by `morts()`, you may want to look at the longest living residence events to explore how the threshold is being identified. This can be done by calling the `resmax()` function directly. 
 
 Note that `stationchange()` must be run beforehand, and the output provided in the argument `stnchange`.
 
-If drift was applied in generating the residence events, the `drift` argument specifies whether drift events should be included in `resmax()`. If drift was not applied or if `drift="morts"` in `morts()`, then you should include `drift=FALSE`. If `drift="threshold"` or `drift="both"` in `morts()`, then you should include `drift=TRUE`. 
+If drift was applied in generating the residence events, the `drift` argument specifies whether drift events should be included in `resmax()`. If drift was not applied or if `drift="morts"` in `morts()`, then you should include `drift=FALSE`. If `drift="threshold"` or `drift="both"` in `morts()`, then you should include `drift=TRUE`. See the [Drift](https://rosieluain.github.io/mort/articles/a3_drift.html) vignette for more information on applying drift. 
 
-```{r rm_example,eval=FALSE}
-resmax_example<-resmax(data=data,ID="ID",station="Station.Name",
+The output of `resmax()` is a dataframe with one row for each animal ID. The residence event information is for the event that has the longest duration and occurred before the most recent station change for that animal. 
+```{r rm_example,results=FALSE}
+resmax_example<-resmax(data=events,ID="ID",station="Station.Name",
                        res.start="ResidenceStart",residences="ResidenceLength.days",
                        stnchange=station_change,drift=FALSE)
 ```
-
+```{r rm_example_table,echo=FALSE}
+row.names(resmax_example)<-NULL
+knitr::kable(head(resmax_example),align="c")
+```
 
 ## `resmaxcml()` function
 The threshold for `morts()` when the `method` is "cumulative" or "any" is determined by finding the longest cumulative residence event that occurred before a station change. Cumulative residence events are the length of time between when an animal was first detected at a station and when it was last detected at the same station, ignoring any gaps in detection. You may wish to explore the cumulative residence events that contribute to determining this threshold. This can be done by calling the `resmaxcml()` function directly. 
 
 Note that `stationchange()` must be run beforehand, and the output provided in the argument `stnchange`. 
 
-If you have applied drift by using `drift="threshold"` or `drift="both"` in `morts()`, then you should apply drift using the `drift()` function and use the output as the input for the `data` argument in `resmaxcml()`. See the "Drift" vignette for more information on applying drift. 
+If you have applied drift by using `drift="threshold"` or `drift="both"` in `morts()`, then you should apply drift using the `drift()` function and use the output as the input for the `data` argument in `resmaxcml()`. See the [Drift](https://rosieluain.github.io/mort/articles/a3_drift.html) vignette for more information on applying drift. 
 
-```{r rmcml_example,eval=FALSE}
-resmaxcml_example<-resmaxcml(data=data,ID="ID",station="Station.Name",
+```{r rmcml_example,results=FALSE}
+resmaxcml_example<-resmaxcml(data=events,ID="ID",station="Station.Name",
                              res.start="ResidenceStart",res.end="ResidenceEnd",
                              residences="ResidenceLength.days",units="days",
                              stnchange=station_change)
 ```
-<!-- Table with header of output  -->
 
-Note that the output includes one row for each cumulative residence event, instead of one row for the longest event per animal (as in `resmax()`).
+The output of `resmaxcml()` is similar to that from `resmax()`, except there is one row for each cumulative residence event (not just the longest event). This means that there may be more than one row for each animal ID. 
+```{r rmcml_example_plot,echo=FALSE}
+row.names(resmaxcml_example)<-NULL
+knitr::kable(head(resmaxcml_example),align="c")
+```
+
 
 
 

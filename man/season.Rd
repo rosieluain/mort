@@ -15,7 +15,8 @@ season(
   units = "auto",
   season.start,
   season.end,
-  overlap = TRUE
+  overlap = TRUE,
+  progressbar = TRUE
 )
 }
 \arguments{
@@ -62,6 +63,9 @@ residence events will be retained. If \code{FALSE}, only the portion of the
 residence events that is within the period of interest will be retained,
 and \code{residences} will be recalculated, using specified \code{units}.
 Default is \code{TRUE}.}
+
+\item{progressbar}{option to display progress bar as function is run. Default
+is TRUE.}
 }
 \value{
 a dataframe in the same format as the input data, with residence

@@ -14,18 +14,23 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup,echo=FALSE}
+```{r setup,echo=FALSE,message=FALSE,warning=FALSE}
 library(mort)
+library(ggplot2)
 ```
-**Note:** vignettes are under development! We are currently developing a sample dataset, so there are some obvious gaps where there should be figures, tables, etc. These will be completed as soon as the sample dataset is done. 
-<br>
-<br>
+morts is a conservative framework to flag potential mortalities. This means that it can overestimate potential mortalities and some flagged mortalities may actually be alive. If new data are available - such as from receivers that were not previously available or an additional year in multiyear studies - movement of incorrectly flagged mortalities may be apparent.
 
-morts is a conservative method to flag potential mortalities. This means that it can overestimate potential mortalities and some flagged mortalities may actually be alive. If new data are available - such as from receivers that were not previously available or an additional year in multiyear studies - movement of incorrectly flagged mortalities may be apparent. 
+In the example below, the data used to flag potential mortalities is to the left of the dashed line, and the new data are to the right of the dashed line. There is no station change evident for Fish G in the new data, so this fish is still considered a mortality. There is, however, a station change for Fish F, indicating this fish is still alive. 
 
-<!-- plot with mortality and then fish that gets up and swims away - could be from seasonality  -->
-```{r alive_ex,eval=FALSE,echo=FALSE}
-plot<-mortsplot(data=data,type="mort",ID="ID",station="Station.Name",morts=morts)
+```{r alive_ex,echo=FALSE,results=FALSE,fig.width=7}
+new.events<-rbind(events,new.data)
+morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",
+             method="all")
+plot<-mortsplot(data=new.events,type="mort",ID="ID",station="Station.Name",
+                morts=morts)
+plot<-plot+
+  geom_vline(aes(xintercept=as.POSIXct("2006-10-25")),linetype="dashed")+
+  theme(legend.position="none")
 plot
 ```
 
@@ -41,28 +46,35 @@ Two input dataframes are mandatory for `review()`:
 
 The new residence events in `new.data` must be generated using the same method as the original dataset, or must be manipulated to match the format of the original dataset. The format of `new.data` must also match the format of `morts`. 
 
-The other four required arguments, `type`, `ID`, `station`, and `res.start`, are specified in the same way as for `morts()` and `infrequent()`. See the "Identifying potential mortalities" information for more information about these arguments. 
+The other four required arguments, `type`, `ID`, `station`, and `res.start`, are specified in the same way as for `morts()` and `infrequent()`. See the [Identifyig potential mortalities](https://rosieluain.github.io/mort/articles/a2_morts.html) vignette for more information about these arguments. 
 
-```{r rev_ex,eval=FALSE}
-review_example<-review(morts=morts,new.data=new.data,type="morts",
+```{r rev_ex,results=FALSE}
+review_example<-review(morts=morts,new.data=new.data,type="mort",
                        ID="ID",station="Station.Name")
 ```
 
 If there are no station changes between the flagged mortalities and `new.data`, or among the residence events within `new.data`, then nothing is returned. If a station change is found, the residence event with the station change will be returned.
 
-<!-- Example table of one that was returned  -->
+Using the example in the first figure, Fish G is not included in the output of `review()`, because it did not move since it was flagged as a mortality. Fish F is included in the output, because a station change was detected. 
+
+```{r rev_ex_table,echo=FALSE}
+row.names(review_example)<-NULL
+knitr::kable(review_example,align="c")
+```
 
 The user can then review the station change to ensure it is valid before removing the animal from `morts` and including the animal in further analyses. 
 
 ## Including previous data
 
-An optional input is `old.data`, which is the original dataset or a subset of the original dataset that includes any residence events that may have occurred between the flagged potential mortality and the beginning of `new.data`. It is strongly recommended to include `old.data` if `backwards=TRUE` when the mortalities were previously identified and/or if drift was applied (see "Drift" vignette for more information on applying drift). 
-
-<!-- Example of fish that does not have a station change but seems that way with no old data - can show station change that becomes a drift residence, then beginning is identified as a mortality, then drift does not show the jump -->
+An optional input is `old.data`, which is the original dataset or a subset of the original dataset that includes any residence events that may have occurred between the flagged potential mortality and the beginning of `new.data`. It is strongly recommended to include `old.data` if `backwards=TRUE` when the mortalities were previously identified and/or if drift was applied (see [Drift](https://rosieluain.github.io/mort/articles/a3_drift.html) vignette for more information on applying drift). 
+```{r old_data,eval=FALSE}
+review_example<-review(morts=morts,new.data=new.data,old.data=events,
+                       type="mort",ID="ID",station="Station.Name")
+```
 
 ## Applying drift
 
-There is the option to apply drift when using `review()`. If applying drift, the arguments `ddd`, `from.station`, and `to.station` must be provided. See "Drift" vignette for more information on these arguments. In addition, the arguments `res.end`, `residences`, and `units` must be provided. These arguments are not necessary for identifying station changes with no drift, but are called by the function when drift is applied. 
+There is the option to apply drift when using `review()`. If applying drift, the arguments `ddd`, `from.station`, and `to.station` must be provided. See [Drift](https://rosieluain.github.io/mort/articles/a3_drift.html) vignette for more information on these arguments. In addition, the arguments `res.end`, `residences`, and `units` must be provided. These arguments are not necessary for identifying station changes with no drift, but are called by the function when drift is applied. 
 
 ```{r rev_drift,eval=FALSE}
 drift_review<-review(morts=morts,new.data=new.data,old.data=old.data,

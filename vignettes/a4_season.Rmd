@@ -14,18 +14,19 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup, echo=FALSE}
+```{r setup, echo=FALSE,warning=FALSE,message=FALSE}
 library(mort)
+library(ggplot2)
 ```
-**Note:** vignettes are under development! We are currently developing a sample dataset, so there are some obvious gaps where there should be figures, tables, etc. These will be completed as soon as the sample dataset is done. 
-<br>
-<br>
+Some species may exhibit seasonal patterns in movement. For example, in the plot below, there is reduced movement during the ice-covered season (before the dashed line), with associated long residence events. In summer (after the dashed line), when movement activity increases, residence events may also increase in number and frequency. 
 
-Some species may exhibit seasonal patterns in movement. For example, there may be reduced movement in winter, with associated long residence events. In summer, when movement activity increases, residence events may also increase in number and frequency. 
-
-<!-- Plot of example winter and summer movements - from presentation  -->
-```{r moveplot,eval=FALSE,echo=FALSE}
-plot<-mortsplot(data=data,type="mort",ID="ID",station="Station.Name")
+```{r moveplot,echo=FALSE,results=FALSE,fig.width=7}
+plot<-mortsplot(data=events[events$ID %in% c("C","K","L"),],
+                type="mort",ID="ID",station="Station.Name",
+                season.start="2004-02-01",season.end="2004-06-26")
+plot<-plot+
+  geom_vline(aes(xintercept=as.POSIXct("2004-06-11")),linetype="dashed")+
+  guides(colour="none")
 plot
 ```
 
@@ -35,48 +36,73 @@ If this is the case, the long residence events will likely increase thresholds f
 To apply seasonality, the arguments `season.start` and `season.end` must be specified. There are two ways that the start and end can be specified. If the study takes place over multiple years and the season or period of interest is the same in all years, start and end can be specified as a day and month using a character string in format dd-mm.
 
 ```{r ddmm, eval=FALSE}
-day_month<-morts(data=data,type="mort",ID="ID",station="Station.Name",
+day_month<-morts(data=events,type="mort",ID="ID",station="Station.Name",
                  season.start="01-06", season.end="31-10")
 ```
 
 Alternatively, if there are multiple periods of interest within a year, and/or the periods change from year to year, start and end can be specified. Start and end can be specified either as POSIXt date and times, or as character strings in the format YYYY-mm-dd HH:MM:SS. 
 
-```{r fulldate, eval=FALSE}
-full_date<-morts(data=data,type="mort",ID="ID",station="Station.Name",
-                 season.start="2020-06-01", season.end="2020-10-31")
-```
-
 ```{r fulldate_mult, eval=FALSE}
-full_date<-morts(data=data,type="mort",ID="ID",station="Station.Name",
-                 season.start=c("2020-06-01","2021-06-05"),
-                 season.end=c("2020-10-31","2021-10-15"))
+full_date<-morts(data=events,type="mort",ID="ID",station="Station.Name",
+                 season.start=c("2003-06-01","2004-06-05"),
+                 season.end=c("2003-10-31","2004-10-15"))
 ```
 
-See below for an example of identifying mortalities with and without drift. 
-```{r all_ex,eval=FALSE}
-no_season_ex<-morts(data=data,type="mort",type="ID",station="Station.Name",method="all")
+Here is how mortalities would be identified, using `method="all"` and no seasonality. The black points indicate the time of a potential mortality.
+```{r all_ex,echo=FALSE,results=FALSE,fig.width=7}
+no_season_ex<-morts(data=events,type="mort",ID="ID",station="Station.Name",method="all")
 
-mortsplot(data=data,type="mort",ID="ID",station="Station.Name",morts=no_season_ex)
+plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",morts=no_season_ex)
+plot<-plot+
+  theme(legend.position="none")
+plot
 ```
 
-```{r season_ex,eval=FALSE}
-season_ex<-morts(data=data,type="mort",type="ID",station="Station.Name",method="all",
-                 season.start="2020-06-01", season.end="2020-10-31")
-
-mortsplot(data=data,type="mort",ID="ID",station="Station.Name",morts=season_ex)
+And here is when seasonality is included: 
+```{r season_ex,results=FALSE,echo=FALSE,fig.width=7}
+season_ex<-morts(data=events,type="mort",ID="ID",station="Station.Name",method="all",
+                 season.start=seasons$Start, season.end=seasons$End)
+plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",morts=season_ex)
+plot<-plot+
+  theme(legend.position="none")
+plot
 ```
+Note that animal I is not flagged as a potential mortality when seasonality is applied. However, animal I would likely be flagged if the `infrequent()` function was used in addition to `morts()`. 
 
 ## `overlap` argument
 There is an optional argument when applying seasonality. The `overlap` argument specifies whether residence events that overlap (i.e., start before and end after) the season start or end are included in full, or if the overlapping residence events are truncated at the specified start and/or end. The default is `overlap=TRUE`, which keeps the full residence events, as in the examples above. To truncate the residence events, use `overlap=FALSE`. 
 
-```{r no_overlap, eval=FALSE}
-no_overlap<-morts(data=data,type="mort",ID="ID",station="Station.Name",
-                 season.start="2020-06-01", season.end="2020-10-31",
-                 overlap=FALSE)
+```{r no_overlap,eval=FALSE}
+no_overlap<-morts(data=events,type="mort",ID="ID",station="Station.Name",
+                 season.start="2003-06-01", season.end="2003-10-31",
+                 season.overlap=FALSE)
 ```
 
-```{r plotno_ov, eval=FALSE,echo=FALSE}
-plot<-mortsplot(data=no_overlap,type="mort",ID="ID",station="Station.Name")
+Here is an example of residence events with overlap (`overlap=TRUE`):
+```{r overlap_plot,echo=FALSE,results=FALSE,fig.width=7}
+season.data<-season(data=events,type="mort",ID="ID",station="Station.Name",
+                    season.start="2003-06-01", season.end="2003-10-31")
+season.data<-season.data[season.data$Station.Name!="Break",]
+plot<-mortsplot(data=season.data[season.data$ID=="K",],type="mort",ID="ID",station="Station.Name")
+plot<-plot+
+  geom_vline(aes(xintercept=as.POSIXct("2003-10-31")),linetype="dashed")+
+  theme(legend.position="none")
+plot
+```
+
+Here is an example of residence events without overlap (`overlap=FALSE`):
+```{r no_overlap_plot,echo=FALSE,results=FALSE,fig.width=7}
+plot<-mortsplot(data=events[events$ID=="K",],type="mort",ID="ID",station="Station.Name",
+                season.start="2003-06-01", season.end="2003-10-31")
+plot<-plot+
+  geom_vline(aes(xintercept=as.POSIXct("2003-10-31")),linetype="dashed")+
+  theme(legend.position="none")
+plot
+```
+```{r plotno_ov,echo=FALSE,fig.width=7,eval=FALSE}
+plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",morts=no_overlap)
+plot<-plot+
+  theme(legend.position="none")
 plot
 ```
 
@@ -84,7 +110,7 @@ plot
 If you are interested in exploring residence events after applying seasonality, the `season()` function, which is called by `morts()`, is also available as a standalone function. The arguments for `season()` are the same as those for the other functions.
 
 ```{r season_standalone,eval=FALSE}
-season.data<-season(data=data,type="mort",ID="ID",station="Station.Name",
-                    season.start="2020-06-01", season.end="2020-10-31")
+season.data<-season(data=events,type="mort",ID="ID",station="Station.Name",
+                    season.start="2003-06-01", season.end="2003-10-31")
 ```
 

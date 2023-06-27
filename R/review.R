@@ -72,8 +72,10 @@ review<-function(morts,new.data,old.data=NULL,type,ID,station,res.start="auto",
     stop("ID and station must be specified (i.e., cannot be 'auto') for format='mort'")
   }
 
-  if (!(type %in% c("manual","actel"))&units!="auto"){
-    unitcheck(type=type,units=units,data=data)
+  if (!is.null(ddd)){
+    if (!(type %in% c("manual","actel"))&units!="auto"){
+      unitcheck(type=type,units=units,data=data)
+    }
   }
 
   # Fill in auto fields

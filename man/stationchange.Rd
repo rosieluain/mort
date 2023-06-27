@@ -17,7 +17,8 @@ stationchange(
   ddd = NULL,
   units = NULL,
   from.station = NULL,
-  to.station = NULL
+  to.station = NULL,
+  progressbar = TRUE
 )
 }
 \arguments{
@@ -64,6 +65,9 @@ be identical to the station/location names in \code{data}.}
 \item{to.station}{a string of the name of the column in \code{ddd} that contains
 the station/location names where drifting detections may move to. Must
 be identical to the station/location names in \code{data}.}
+
+\item{progressbar}{option to display progress bar as function is run. Default
+is TRUE.}
 }
 \value{
 a dataframe with one row for each tag ID, including the date/time of

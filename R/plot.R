@@ -45,6 +45,8 @@
 #' `facet.by="year"`.
 #' @param facet.by option to facet by "season" (as defined with `season.start`
 #' and `season.end`) or "year". Default is "season".
+#' @param progressbar option to display progress bar as function is run. Default
+#' is TRUE.
 #'
 #' @return a ggplot2 plot. Additional arguments (e.g., formatting axes,
 #' legend, aes, manual colour scales) can be added as for any ggplot2 plot.
@@ -60,7 +62,8 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
                     morts=NULL,singles=TRUE,interactive=FALSE,residences=NULL,
                     units=NULL,
                     season.start=NULL,season.end=NULL,facet=FALSE,
-                    facet.axis="x",facet.by="season"){
+                    facet.axis="x",facet.by="season",
+                    progressbar=TRUE){
 
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package \"ggplot2\" must be installed to use this function.",
@@ -134,8 +137,26 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
     }
   }
 
+  if (is(data[[station]],"list")){
+    data$station2<-as.character(NA)
+    for (i in 1:nrow(data)){
+      if (length(data[[station]][[i]])==1){
+        data$station2[i]<-data[[station]][[i]][1]
+      }
+      else {
+        stn.temp<-unique(data[[station]][[i]])
+        stn.temp<-stn.temp[order(stn.temp)]
+        stn.temp<-paste("Drift",paste(stn.temp,collapse=" "))
+        stn.temp<-gsub(" ","-",stn.temp)
+        data$station2[i]<-stn.temp
+      }
+    }
+    station<-"station2"
+  }
+
   if (!is.null(season.start)|
-      !is.null(season.end)){
+      !is.null(season.end)|
+      facet.by=="year"){
     if (is.null(residences)){
       residences<-autofield(type=type,field="residences",data=data)
     }
@@ -148,10 +169,16 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
     if (units=="auto"){
       units<-autofield(type=type,field="units",data=data)
     }
-    print("Extracting data from the period/season(s) of interest")
+    if (progressbar==TRUE){
+      print("Extracting data from the period/season(s) of interest")
+    }
+    if (is.null(season.start)&is.null(season.end)&facet.by=="year"){
+      season.start<-"01-01"
+      season.end<-"31-12"
+    }
     data<-season(data=data,type=type,ID=ID,station=station,res.start=res.start,res.end=res.end,
                  residences=residences,units=units,season.start=season.start,
-                 season.end=season.end,overlap=FALSE)
+                 season.end=season.end,overlap=FALSE,progressbar=FALSE)
     data<-data[data[[station]]!="Break",]
     if (!is(season.start,"POSIXt")){
       try(season.start<-as.POSIXct(season.start,tz="UTC"),silent=TRUE)
@@ -349,11 +376,13 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
   if (facet==TRUE){
     if (!is.null(data$Year)&facet.axis=="y"){
       plot<-plot+
-        ggplot2::facet_grid(Year~.,scales="free",space="free_y")
+        ggplot2::facet_grid(Year~.,scales="free",space="free_y")+
+        scale_x_datetime(date_labels = "%b %d")
     }
     else if (!is.null(data$Year)&facet.axis=="x"){
       plot<-plot+
-        ggplot2::facet_grid(.~Year,scales="free",space="free_x")
+        ggplot2::facet_grid(.~Year,scales="free",space="free_x")+
+        scale_x_datetime(date_labels = "%b %d")
     }
     else if (!is.null(data$Season)){
       plot<-plot+

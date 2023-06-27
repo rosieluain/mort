@@ -351,8 +351,8 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
             morts[nrow(morts)+1,]<-res.temp[j[k],]
           }
         }
+        setTxtProgressBar(pb,i)
       }
-      setTxtProgressBar(pb,i)
     }
   }
 
@@ -367,47 +367,49 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     for (i in 1:nrow(sc2)){
       res.temp<-data.morts[data.morts[[ID]]==sc2[[ID]][i],]
       res.temp<-res.temp[order(res.temp[[res.start]]),]
-      repeat {
-        if (res.temp[[station]][nrow(res.temp)]=="Break"){
-          res.temp<-res.temp[-nrow(res.temp),]
-        }
-        else {break}
-      }
-      if (any(res.temp[[station]]=="Break")){
-        # Need two values, and determine which is lower
-        # Value 1: difftime between end of most recent residence and station change (sc2)
-        dt1<-difftime(res.temp[[res.end]][nrow(res.temp)],
-                      sc2[[res.start]][i],
-                      units=units)
-        # Value 2: difftime between end of most recent residence and most recent break
-        k<-(which(res.temp[[res.start]]==max(res.temp[[res.start]][res.temp[[station]]=="Break"])))+1
-        dt2<-difftime(res.temp[[res.end]][nrow(res.temp)],
-                      res.temp[[res.start]][k],
-                      units=units)
-        comp<-min(dt1,dt2)
-      }
-      else {
-        comp<-difftime(res.temp[[res.end]][nrow(res.temp)],
-                           sc2[[res.start]][i],
-                           units=units)
-      }
-      # If the cumulative residence at the most recent station is longer than the
-      # threshold of max.rescml
-      if (comp>max.rescml){
-        # If the ID is already in morts
-        if (sc2[[ID]][i] %in% morts[[ID]]){
-          # Identify which row
-          j<-which(morts[[ID]]==sc2[[ID]][i])
-          # If the residence currently in res.morts ocurred later
-          # than the cumulative residence period
-          if (morts[[res.start]][j]>sc2[[res.start]][i]){
-            # Adjust the start time to the earlier date
-            morts[j,]<-sc2[i,]
+      if (nrow(res.temp)>0){
+        repeat {
+          if (res.temp[[station]][nrow(res.temp)]=="Break"){
+            res.temp<-res.temp[-nrow(res.temp),]
           }
+          else {break}
         }
-        # If the ID is not yet in morts
+        if (any(res.temp[[station]]=="Break")){
+          # Need two values, and determine which is lower
+          # Value 1: difftime between end of most recent residence and station change (sc2)
+          dt1<-difftime(res.temp[[res.end]][nrow(res.temp)],
+                        sc2[[res.start]][i],
+                        units=units)
+          # Value 2: difftime between end of most recent residence and most recent break
+          k<-(which(res.temp[[res.start]]==max(res.temp[[res.start]][res.temp[[station]]=="Break"])))+1
+          dt2<-difftime(res.temp[[res.end]][nrow(res.temp)],
+                        res.temp[[res.start]][k],
+                        units=units)
+          comp<-min(dt1,dt2)
+        }
         else {
-          morts[nrow(morts)+1,]<-sc2[i,]
+          comp<-difftime(res.temp[[res.end]][nrow(res.temp)],
+                         sc2[[res.start]][i],
+                         units=units)
+        }
+        # If the cumulative residence at the most recent station is longer than the
+        # threshold of max.rescml
+        if (comp>max.rescml){
+          # If the ID is already in morts
+          if (sc2[[ID]][i] %in% morts[[ID]]){
+            # Identify which row
+            j<-which(morts[[ID]]==sc2[[ID]][i])
+            # If the residence currently in res.morts ocurred later
+            # than the cumulative residence period
+            if (morts[[res.start]][j]>sc2[[res.start]][i]){
+              # Adjust the start time to the earlier date
+              morts[j,]<-sc2[i,]
+            }
+          }
+          # If the ID is not yet in morts
+          else {
+            morts[nrow(morts)+1,]<-sc2[i,]
+          }
         }
       }
       setTxtProgressBar(pb,i)
@@ -679,7 +681,7 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
               }
             }
             else {
-              inf.morts[nrow(inf.morts)+1,]<-res.temp[1,]
+              inf.morts[nrow(inf.morts)+1,]<-res.temp[j,]
             }
           }
         }

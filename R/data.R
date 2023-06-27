@@ -102,3 +102,27 @@ NULL
 #'@usage data(seasons)
 #'@format A data frame with 5 rows (years) and 2 variables.
 NULL
+
+#'Example of new acoustic telemetry detection data
+#'
+#'These are fabricated detection data to demonstrate the use of the review
+#'function.
+#'
+#'The variables are as follows:
+#'
+#'\itemize{
+#'\item ResidenceStart. The start time of the residence events, in POSIXct.
+#'\item Station.Name. Name of the receiver location.
+#'\item ID. Unique ID of the fish.
+#'\item ResidenceEnd. The end time of the residence events, in POSIXct.
+#'\item ResidenceLength.days. The duration of the residence events. The units are
+#'days, as indicated by the variable name (which is automatically generated
+#'by mort::residences())
+#'}
+#'
+#'@docType data
+#'@keywords datasets
+#'@name new.data
+#'@usage data(new.data)
+#'@format A data frame with 35 rows (observations) and 3 variables.
+NULL

@@ -4,7 +4,17 @@
 \alias{resmaxcml}
 \title{Maximum cumulative residence duration}
 \usage{
-resmaxcml(data, ID, station, res.start, res.end, residences, units, stnchange)
+resmaxcml(
+  data,
+  ID,
+  station,
+  res.start,
+  res.end,
+  residences,
+  units,
+  stnchange,
+  progressbar = TRUE
+)
 }
 \arguments{
 \item{data}{a dataframe of residence events. Residence events must include
@@ -30,6 +40,9 @@ that holds the duration of the residence events.}
 
 \item{stnchange}{a dataframe with the start time and location of the most
 recent station or location change. Must use the same column names as \code{data}.}
+
+\item{progressbar}{option to display progress bar as function is run. Default
+is TRUE.}
 }
 \value{
 a dataframe with the cumulative residence information for each
