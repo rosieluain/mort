@@ -110,15 +110,12 @@
 
     
     
-<p><strong>Note:</strong> vignettes are under development! We are
-currently developing a sample dataset, so there are some obvious gaps
-where there should be figures, tables, etc. These will be completed as
-soon as the sample dataset is done. <br><br></p>
 <p>Some species may exhibit seasonal patterns in movement. For example,
-there may be reduced movement in winter, with associated long residence
-events. In summer, when movement activity increases, residence events
-may also increase in number and frequency.</p>
-<!-- Plot of example winter and summer movements - from presentation  -->
+in the plot below, there is reduced movement during the ice-covered
+season (before the dashed line), with associated long residence events.
+In summer (after the dashed line), when movement activity increases,
+residence events may also increase in number and frequency.</p>
+<p><img src="a4_season_files/figure-html/moveplot-1.png" width="672"></p>
 <p>If this is the case, the long residence events will likely increase
 thresholds for <code><a href="../reference/morts.html">morts()</a></code>. Animals that do not move during the
 summer months, and are likely mortalities, may then not exceed the
@@ -136,30 +133,26 @@ years and the season or period of interest is the same in all years,
 start and end can be specified as a day and month using a character
 string in format dd-mm.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">day_month</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<code class="sourceCode R"><span><span class="va">day_month</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
 <span>                 season.start<span class="op">=</span><span class="st">"01-06"</span>, season.end<span class="op">=</span><span class="st">"31-10"</span><span class="op">)</span></span></code></pre></div>
 <p>Alternatively, if there are multiple periods of interest within a
 year, and/or the periods change from year to year, start and end can be
 specified. Start and end can be specified either as POSIXt date and
 times, or as character strings in the format YYYY-mm-dd HH:MM:SS.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">full_date</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
-<span>                 season.start<span class="op">=</span><span class="st">"2020-06-01"</span>, season.end<span class="op">=</span><span class="st">"2020-10-31"</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">full_date</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
-<span>                 season.start<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2020-06-01"</span>,<span class="st">"2021-06-05"</span><span class="op">)</span>,</span>
-<span>                 season.end<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2020-10-31"</span>,<span class="st">"2021-10-15"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p>See below for an example of identifying mortalities with and without
-drift.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">no_season_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,type<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"all"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,morts<span class="op">=</span><span class="va">no_season_ex</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">season_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,type<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"all"</span>,</span>
-<span>                 season.start<span class="op">=</span><span class="st">"2020-06-01"</span>, season.end<span class="op">=</span><span class="st">"2020-10-31"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,morts<span class="op">=</span><span class="va">season_ex</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">full_date</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<span>                 season.start<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2003-06-01"</span>,<span class="st">"2004-06-05"</span><span class="op">)</span>,</span>
+<span>                 season.end<span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"2003-10-31"</span>,<span class="st">"2004-10-15"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p>Here is how mortalities would be identified, using
+<code>method="all"</code> and no seasonality. The black points indicate
+the time of a potential mortality.
+<img src="a4_season_files/figure-html/all_ex-1.png" width="672"></p>
+<p>And here is when seasonality is included:
+<img src="a4_season_files/figure-html/season_ex-1.png" width="672">
+Note that animal I is not flagged as a potential mortality when
+seasonality is applied. However, animal I would likely be flagged if the
+<code><a href="../reference/infrequent.html">infrequent()</a></code> function was used in addition to
+<code><a href="../reference/morts.html">morts()</a></code>.</p>
 </div>
 <div class="section level2">
 <h2 id="overlap-argument">
@@ -173,10 +166,16 @@ at the specified start and/or end. The default is
 <code>overlap=TRUE</code>, which keeps the full residence events, as in
 the examples above. To truncate the residence events, use
 <code>overlap=FALSE</code>.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">no_overlap</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
-<span>                 season.start<span class="op">=</span><span class="st">"2020-06-01"</span>, season.end<span class="op">=</span><span class="st">"2020-10-31"</span>,</span>
-<span>                 overlap<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">no_overlap</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<span>                 season.start<span class="op">=</span><span class="st">"2003-06-01"</span>, season.end<span class="op">=</span><span class="st">"2003-10-31"</span>,</span>
+<span>                 season.overlap<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<p>Here is an example of residence events with overlap
+(<code>overlap=TRUE</code>):
+<img src="a4_season_files/figure-html/overlap_plot-1.png" width="672"></p>
+<p>Here is an example of residence events without overlap
+(<code>overlap=FALSE</code>):
+<img src="a4_season_files/figure-html/no_overlap_plot-1.png" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="season-function">
@@ -187,9 +186,9 @@ seasonality, the <code><a href="../reference/season.html">season()</a></code> fu
 <code><a href="../reference/morts.html">morts()</a></code>, is also available as a standalone function. The
 arguments for <code><a href="../reference/season.html">season()</a></code> are the same as those for the other
 functions.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">season.data</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/season.html">season</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
-<span>                    season.start<span class="op">=</span><span class="st">"2020-06-01"</span>, season.end<span class="op">=</span><span class="st">"2020-10-31"</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">season.data</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/season.html">season</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<span>                    season.start<span class="op">=</span><span class="st">"2003-06-01"</span>, season.end<span class="op">=</span><span class="st">"2003-10-31"</span><span class="op">)</span></span></code></pre></div>
 </div>
   </div>
 

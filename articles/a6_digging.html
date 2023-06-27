@@ -110,10 +110,6 @@
 
     
     
-<p><strong>Note:</strong> vignettes are under development! We are
-currently developing a sample dataset, so there are some obvious gaps
-where there should be figures, tables, etc. These will be completed as
-soon as the sample dataset is done. <br><br></p>
 <p>All the functionality of the morts package is accessible with the
 <code><a href="../reference/residences.html">residences()</a></code>, <code><a href="../reference/morts.html">morts()</a></code>,
 <code><a href="../reference/infrequent.html">infrequent()</a></code>, <code><a href="../reference/mortsplot.html">mortsplot()</a></code>, and
@@ -121,10 +117,10 @@ soon as the sample dataset is done. <br><br></p>
 of these functions rely on output from additional functions. As you are
 exploring your data, you may want to run these additional functions to
 better dig through and understand your data. The <code><a href="../reference/drift.html">drift()</a></code>
-and <code><a href="../reference/season.html">season()</a></code> functions are respectively addressed in the
-“Drift” and “Seasonality” vignettes. Here, we address the
-<code><a href="../reference/stationchange.html">stationchange()</a></code>, <code><a href="../reference/resmax.html">resmax()</a></code>, and
-<code><a href="../reference/resmaxcml.html">resmaxcml()</a></code> functions.</p>
+and <code><a href="../reference/season.html">season()</a></code> functions are respectively addressed in the <a href="https://rosieluain.github.io/mort/articles/a3_drift.html" class="external-link">Drift</a>
+and <a href="https://rosieluain.github.io/mort/articles/a4_season.html" class="external-link">Seasonality</a>
+vignettes. Here, we address the <code><a href="../reference/stationchange.html">stationchange()</a></code>,
+<code><a href="../reference/resmax.html">resmax()</a></code>, and <code><a href="../reference/resmaxcml.html">resmaxcml()</a></code> functions.</p>
 <div class="section level2">
 <h2 id="stationchange-function">
 <code>stationchange()</code> function<a class="anchor" aria-label="anchor" href="#stationchange-function"></a>
@@ -135,12 +131,75 @@ that the animal was alive before this most recent movement. To explore
 the most recent station changes for each animal, the user can can call
 <code><a href="../reference/stationchange.html">stationchange()</a></code> directly. The arguments are used in the
 same manner as for <code><a href="../reference/morts.html">morts()</a></code>. Drift may also be applied with
-the argument <code>drift=TRUE</code>. See the “Drift” vignette for more
-information on the other drift arguments.</p>
+the argument <code>drift=TRUE</code>. See the <a href="https://rosieluain.github.io/mort/articles/a3_drift.html" class="external-link">Drift</a>
+vignette for more information on the other drift arguments.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">station_change</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/stationchange.html">stationchange</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<code class="sourceCode R"><span><span class="va">station_change</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/stationchange.html">stationchange</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
 <span>                              drift<span class="op">=</span><span class="cn">TRUE</span>,ddd<span class="op">=</span><span class="va">ddd</span>,units<span class="op">=</span><span class="st">"days"</span>,from.station<span class="op">=</span><span class="st">"From"</span>,to.station<span class="op">=</span><span class="st">"To"</span><span class="op">)</span></span></code></pre></div>
-<!-- table that is the header of the stationchange output -->
+<p>The output of <code><a href="../reference/stationchange.html">stationchange()</a></code> is a dataframe with one
+row for each animal ID. The residence event information (start, end,
+duration) is for the event that marks the most recent station change
+(i.e., the start is when the movement occurred).</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="17%">
+<col width="4%">
+<col width="25%">
+<col width="26%">
+</colgroup>
+<thead><tr class="header">
+<th align="center">ResidenceStart</th>
+<th align="center">Station.Name</th>
+<th align="center">ID</th>
+<th align="center">ResidenceEnd</th>
+<th align="center">ResidenceLength.days</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center">2005-06-25 21:26:12</td>
+<td align="center">10</td>
+<td align="center">A</td>
+<td align="center">2005-06-26 09:01:17</td>
+<td align="center">0.4826968</td>
+</tr>
+<tr class="even">
+<td align="center">2005-07-01 05:28:31</td>
+<td align="center">1</td>
+<td align="center">B</td>
+<td align="center">2005-07-01 05:28:31</td>
+<td align="center">0.0000000</td>
+</tr>
+<tr class="odd">
+<td align="center">2004-06-19 15:31:47</td>
+<td align="center">9</td>
+<td align="center">C</td>
+<td align="center">2004-06-19 19:10:01</td>
+<td align="center">0.1515509</td>
+</tr>
+<tr class="even">
+<td align="center">2004-08-31 16:48:00</td>
+<td align="center">5</td>
+<td align="center">D</td>
+<td align="center">2004-08-31 17:38:18</td>
+<td align="center">0.0349306</td>
+</tr>
+<tr class="odd">
+<td align="center">2004-07-15 21:09:22</td>
+<td align="center">5</td>
+<td align="center">E</td>
+<td align="center">2004-10-12 21:44:11</td>
+<td align="center">89.0241782</td>
+</tr>
+<tr class="even">
+<td align="center">2005-06-28 21:12:58</td>
+<td align="center">1</td>
+<td align="center">F</td>
+<td align="center">2005-10-09 20:28:05</td>
+<td align="center">102.9688310</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level2">
 <h2 id="resmax-function">
@@ -162,11 +221,76 @@ included in <code><a href="../reference/resmax.html">resmax()</a></code>. If dri
 <code>drift="morts"</code> in <code><a href="../reference/morts.html">morts()</a></code>, then you should
 include <code>drift=FALSE</code>. If <code>drift="threshold"</code> or
 <code>drift="both"</code> in <code><a href="../reference/morts.html">morts()</a></code>, then you should
-include <code>drift=TRUE</code>.</p>
+include <code>drift=TRUE</code>. See the <a href="https://rosieluain.github.io/mort/articles/a3_drift.html" class="external-link">Drift</a>
+vignette for more information on applying drift.</p>
+<p>The output of <code><a href="../reference/resmax.html">resmax()</a></code> is a dataframe with one row for
+each animal ID. The residence event information is for the event that
+has the longest duration and occurred before the most recent station
+change for that animal.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">resmax_example</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/resmax.html">resmax</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<code class="sourceCode R"><span><span class="va">resmax_example</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/resmax.html">resmax</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
 <span>                       res.start<span class="op">=</span><span class="st">"ResidenceStart"</span>,residences<span class="op">=</span><span class="st">"ResidenceLength.days"</span>,</span>
 <span>                       stnchange<span class="op">=</span><span class="va">station_change</span>,drift<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="17%">
+<col width="4%">
+<col width="25%">
+<col width="26%">
+</colgroup>
+<thead><tr class="header">
+<th align="center">ResidenceStart</th>
+<th align="center">Station.Name</th>
+<th align="center">ID</th>
+<th align="center">ResidenceEnd</th>
+<th align="center">ResidenceLength.days</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center">2003-09-24 16:56:36</td>
+<td align="center">1</td>
+<td align="center">A</td>
+<td align="center">2003-10-11 17:15:47</td>
+<td align="center">17.0133218</td>
+</tr>
+<tr class="even">
+<td align="center">2003-09-13 13:25:38</td>
+<td align="center">4</td>
+<td align="center">C</td>
+<td align="center">2003-10-07 16:26:06</td>
+<td align="center">24.1253241</td>
+</tr>
+<tr class="odd">
+<td align="center">2003-08-16 22:35:23</td>
+<td align="center">1</td>
+<td align="center">G</td>
+<td align="center">2003-08-18 12:05:20</td>
+<td align="center">1.5624653</td>
+</tr>
+<tr class="even">
+<td align="center">2003-01-31 19:47:16</td>
+<td align="center">8</td>
+<td align="center">I</td>
+<td align="center">2003-02-06 18:59:34</td>
+<td align="center">5.9668750</td>
+</tr>
+<tr class="odd">
+<td align="center">2002-08-26 07:18:12</td>
+<td align="center">8</td>
+<td align="center">J</td>
+<td align="center">2002-08-26 22:01:00</td>
+<td align="center">0.6130556</td>
+</tr>
+<tr class="even">
+<td align="center">2003-01-16 18:55:12</td>
+<td align="center">8</td>
+<td align="center">K</td>
+<td align="center">2003-02-08 16:31:25</td>
+<td align="center">22.9001505</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level2">
 <h2 id="resmaxcml-function">
@@ -186,16 +310,77 @@ the output provided in the argument <code>stnchange</code>.</p>
 <code>drift="both"</code> in <code><a href="../reference/morts.html">morts()</a></code>, then you should apply
 drift using the <code><a href="../reference/drift.html">drift()</a></code> function and use the output as the
 input for the <code>data</code> argument in <code><a href="../reference/resmaxcml.html">resmaxcml()</a></code>.
-See the “Drift” vignette for more information on applying drift.</p>
+See the <a href="https://rosieluain.github.io/mort/articles/a3_drift.html" class="external-link">Drift</a>
+vignette for more information on applying drift.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">resmaxcml_example</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/resmaxcml.html">resmaxcml</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<code class="sourceCode R"><span><span class="va">resmaxcml_example</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/resmaxcml.html">resmaxcml</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
 <span>                             res.start<span class="op">=</span><span class="st">"ResidenceStart"</span>,res.end<span class="op">=</span><span class="st">"ResidenceEnd"</span>,</span>
 <span>                             residences<span class="op">=</span><span class="st">"ResidenceLength.days"</span>,units<span class="op">=</span><span class="st">"days"</span>,</span>
 <span>                             stnchange<span class="op">=</span><span class="va">station_change</span><span class="op">)</span></span></code></pre></div>
-<!-- Table with header of output  -->
-<p>Note that the output includes one row for each cumulative residence
-event, instead of one row for the longest event per animal (as in
-<code><a href="../reference/resmax.html">resmax()</a></code>).</p>
+<p>The output of <code><a href="../reference/resmaxcml.html">resmaxcml()</a></code> is similar to that from
+<code><a href="../reference/resmax.html">resmax()</a></code>, except there is one row for each cumulative
+residence event (not just the longest event). This means that there may
+be more than one row for each animal ID.</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="17%">
+<col width="4%">
+<col width="25%">
+<col width="26%">
+</colgroup>
+<thead><tr class="header">
+<th align="center">ResidenceStart</th>
+<th align="center">Station.Name</th>
+<th align="center">ID</th>
+<th align="center">ResidenceEnd</th>
+<th align="center">ResidenceLength.days</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center">2003-09-21 23:49:45</td>
+<td align="center">11</td>
+<td align="center">A</td>
+<td align="center">2003-09-22 00:08:18</td>
+<td align="center">0.0128819 days</td>
+</tr>
+<tr class="even">
+<td align="center">2003-09-22 00:20:28</td>
+<td align="center">1</td>
+<td align="center">A</td>
+<td align="center">2004-06-24 01:15:25</td>
+<td align="center">276.0381597 days</td>
+</tr>
+<tr class="odd">
+<td align="center">2004-06-24 17:30:42</td>
+<td align="center">14</td>
+<td align="center">A</td>
+<td align="center">2004-06-24 17:30:42</td>
+<td align="center">0.0000000 days</td>
+</tr>
+<tr class="even">
+<td align="center">2004-06-24 20:37:18</td>
+<td align="center">8</td>
+<td align="center">A</td>
+<td align="center">2004-06-24 21:39:34</td>
+<td align="center">0.0432407 days</td>
+</tr>
+<tr class="odd">
+<td align="center">2004-06-25 05:48:34</td>
+<td align="center">2</td>
+<td align="center">A</td>
+<td align="center">2004-06-25 06:47:40</td>
+<td align="center">0.0410417 days</td>
+</tr>
+<tr class="even">
+<td align="center">2004-06-26 04:49:31</td>
+<td align="center">10</td>
+<td align="center">A</td>
+<td align="center">2004-07-01 07:41:36</td>
+<td align="center">5.1195023 days</td>
+</tr>
+</tbody>
+</table>
 </div>
   </div>
 

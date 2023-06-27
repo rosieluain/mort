@@ -80,7 +80,16 @@ before a station change (i.e., the animal can be assumed to be alive)</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">resmax</span><span class="op">(</span><span class="va">data</span>, <span class="va">ID</span>, <span class="va">station</span>, <span class="va">res.start</span>, <span class="va">residences</span>, <span class="va">stnchange</span>, drift <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">resmax</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  <span class="va">ID</span>,</span>
+<span>  <span class="va">station</span>,</span>
+<span>  <span class="va">res.start</span>,</span>
+<span>  <span class="va">residences</span>,</span>
+<span>  <span class="va">stnchange</span>,</span>
+<span>  drift <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  progressbar <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -119,6 +128,11 @@ recent station or location change. Must use the same column names as <code>data<
 <dt>drift</dt>
 <dd><p>indicates if drift residence events should be included in
 determining the maximum residence duration</p></dd>
+
+
+<dt>progressbar</dt>
+<dd><p>option to display progress bar as function is run. Default
+is TRUE.</p></dd>
 
 </dl></div>
     <div id="value">

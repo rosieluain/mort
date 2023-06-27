@@ -110,10 +110,6 @@
 
     
     
-<p><strong>Note:</strong> vignettes are under development! We are
-currently developing a sample dataset, so there are some obvious gaps
-where there should be figures, tables, etc. These will be completed as
-soon as the sample dataset is done. <br><br></p>
 <p>All mort functions rely on residence events. Residence events are
 similar to detection data, but include a start time, an end time, and
 duration. Before proceeding to explore your data and flag potential
@@ -124,12 +120,127 @@ manually.</p>
 <div class="section level2">
 <h2 id="mort-format">mort format<a class="anchor" aria-label="anchor" href="#mort-format"></a>
 </h2>
-<p>Residence events are generated in morts by the
-<code><a href="../reference/residences.html">residences()</a></code> function. A residence event either ends when
-the animal is detected at a new station or when the animal has not been
-detected longer than a user-defined cutoff.</p>
+<p>Residence events are generated in morts from detection data, using
+the <code><a href="../reference/residences.html">residences()</a></code> function.</p>
+<p>Detection data can be in any format and have any number of columns,
+provided they have a datetime column, a location column, and an animal
+ID column:</p>
+<table class="table">
+<thead><tr class="header">
+<th align="center">DateTimeUTC</th>
+<th align="center">Station.Name</th>
+<th align="center">ID</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center">2003-09-21 23:49:45</td>
+<td align="center">11</td>
+<td align="center">A</td>
+</tr>
+<tr class="even">
+<td align="center">2003-09-21 23:51:29</td>
+<td align="center">11</td>
+<td align="center">A</td>
+</tr>
+<tr class="odd">
+<td align="center">2003-09-21 23:57:45</td>
+<td align="center">11</td>
+<td align="center">A</td>
+</tr>
+<tr class="even">
+<td align="center">2003-09-21 23:59:08</td>
+<td align="center">11</td>
+<td align="center">A</td>
+</tr>
+<tr class="odd">
+<td align="center">2003-09-22 00:08:18</td>
+<td align="center">11</td>
+<td align="center">A</td>
+</tr>
+<tr class="even">
+<td align="center">2003-09-22 00:20:28</td>
+<td align="center">1</td>
+<td align="center">A</td>
+</tr>
+</tbody>
+</table>
+<p>A residence event either ends when the animal is detected at a new
+station or when the animal has not been detected longer than a
+user-defined cutoff (defined with the arguments <code>cutoff</code> and
+<code>units</code>):</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/residences.html">residences</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,datetime<span class="op">=</span><span class="st">"DateTimeUTC"</span>,cutoff<span class="op">=</span><span class="fl">1</span>,units<span class="op">=</span><span class="st">"days"</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">res.events</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/residences.html">residences</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">detections</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,datetime<span class="op">=</span><span class="st">"DateTimeUTC"</span>,</span>
+<span>                       cutoff<span class="op">=</span><span class="fl">1</span>,units<span class="op">=</span><span class="st">"days"</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="17%">
+<col width="4%">
+<col width="25%">
+<col width="26%">
+</colgroup>
+<thead><tr class="header">
+<th align="center">ResidenceStart</th>
+<th align="center">Station.Name</th>
+<th align="center">ID</th>
+<th align="center">ResidenceEnd</th>
+<th align="center">ResidenceLength.days</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center">2003-09-21 23:49:45</td>
+<td align="center">11</td>
+<td align="center">A</td>
+<td align="center">2003-09-22 00:08:18</td>
+<td align="center">0.0128819</td>
+</tr>
+<tr class="even">
+<td align="center">2003-09-22 00:20:28</td>
+<td align="center">1</td>
+<td align="center">A</td>
+<td align="center">2003-09-22 00:50:36</td>
+<td align="center">0.0209259</td>
+</tr>
+<tr class="odd">
+<td align="center">2003-09-24 16:56:36</td>
+<td align="center">1</td>
+<td align="center">A</td>
+<td align="center">2003-10-11 17:15:47</td>
+<td align="center">17.0133218</td>
+</tr>
+<tr class="even">
+<td align="center">2003-10-25 14:27:06</td>
+<td align="center">1</td>
+<td align="center">A</td>
+<td align="center">2003-10-25 14:59:47</td>
+<td align="center">0.0226968</td>
+</tr>
+<tr class="odd">
+<td align="center">2003-10-26 16:11:13</td>
+<td align="center">1</td>
+<td align="center">A</td>
+<td align="center">2003-10-26 17:42:09</td>
+<td align="center">0.0631481</td>
+</tr>
+<tr class="even">
+<td align="center">2004-06-23 22:42:20</td>
+<td align="center">1</td>
+<td align="center">A</td>
+<td align="center">2004-06-24 01:15:25</td>
+<td align="center">0.1063079</td>
+</tr>
+</tbody>
+</table>
+<p><code>ID</code> is defined by the user. ID could be the tag
+transmitter ID, the tag serial number, or a unique ID associated with
+the detections by the user. If the latter, <code><a href="../reference/residences.html">residences()</a></code> and
+the other functions in mort can accommodate multiple tag deployments
+(i.e., a tag is returned and re-deployed on another animal), because the
+ID is unique to the animal.</p>
+<p><code>station</code> is also definied by the user. It could be the
+receiver serial number (if the same receiver is always deployed at the
+same location), a unique location name, or a cluster of receivers
+(similar to Array in the actel package).</p>
 <p>Note that <code>units</code> specifies the units of the cutoff (in
 the example above, the cutoff is 1 day). These units will also be used
 to calculate the residence duration.</p>

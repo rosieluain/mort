@@ -110,10 +110,6 @@
 
     
     
-<p><strong>Note:</strong> vignettes are under development! We are
-currently developing a sample dataset, so there are some obvious gaps
-where there should be figures, tables, etc. These will be completed as
-soon as the sample dataset is done. <br><br></p>
 <p>There may be situations where a tag that was expelled or from a dead
 animal may appear to move among stations or locations. This apparent
 movement could be due to the tag drifting with currents or tides. If a
@@ -143,17 +139,94 @@ The movement is directional, so if two stations overlap, both directions
 must be specified. The drift dataframe is later called with the argument
 <code>ddd</code> - “ddd” for “dead drift direction”, as a reminder that
 drift is applied directionally.</p>
-<p>The table below shows an example drift dataframe. Note that drift
-between Stations 2 and 3 can be bidirectional, so both drift from
-Station 2 to Station 3 and drift from Station 3 to Station 2 are
+<p>The table below is a subset from the sample drift dataframe. Note
+that drift between Stations 2 and 3 can be bidirectional, so both drift
+from Station 2 to Station 3 and drift from Station 3 to Station 2 are
 included.</p>
-<!-- Example drift table  -->
+<table class="table">
+<thead><tr class="header">
+<th align="center">From</th>
+<th align="center">To</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center">19</td>
+<td align="center">18</td>
+</tr>
+<tr class="even">
+<td align="center">2</td>
+<td align="center">3</td>
+</tr>
+<tr class="odd">
+<td align="center">3</td>
+<td align="center">2</td>
+</tr>
+<tr class="even">
+<td align="center">9</td>
+<td align="center">17</td>
+</tr>
+<tr class="odd">
+<td align="center">8</td>
+<td align="center">14</td>
+</tr>
+<tr class="even">
+<td align="center">14</td>
+<td align="center">8</td>
+</tr>
+</tbody>
+</table>
 <p>When drift is applied within <code><a href="../reference/morts.html">morts()</a></code> or
 <code><a href="../reference/infrequent.html">infrequent()</a></code>, residence events that could be due to drift
-are combined to form drift residence events.</p>
-<p>Residence events before applying drift:</p>
+are combined to form drift residence events. The station name of each
+drift residence event is a list of the stations involved in the drift
+event, in the same order that the tag was detected. In the example
+below, tag A drifted from station 14 to station 8 to station 2. Tag C
+was likely within range of both receiver 14 and receiver 8, and was
+detected by both receivers.</p>
+<table class="table">
+<colgroup>
+<col width="3%">
+<col width="22%">
+<col width="24%">
+<col width="4%">
+<col width="22%">
+<col width="23%">
+</colgroup>
+<thead><tr class="header">
+<th align="left"></th>
+<th align="center">ResidenceStart</th>
+<th align="center">Station.Name</th>
+<th align="center">ID</th>
+<th align="center">ResidenceEnd</th>
+<th align="center">ResidenceLength.days</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">6</td>
+<td align="center">2004-06-24 17:30:42</td>
+<td align="center">14, 8 , 2</td>
+<td align="center">A</td>
+<td align="center">2004-06-25 06:47:40</td>
+<td align="center">0.5534491 days</td>
+</tr>
+<tr class="even">
+<td align="left">66</td>
+<td align="center">2004-02-16 17:28:37</td>
+<td align="center">14, 8 , 14, 8 , 14, 8</td>
+<td align="center">C</td>
+<td align="center">2004-02-17 16:52:39</td>
+<td align="center">0.9750231 days</td>
+</tr>
+</tbody>
+</table>
+<p>Residence events before applying drift:
+<img src="a3_drift_files/figure-html/before_drift-1.png" width="672"></p>
 <p>Residence events, including drift residence events:
-<!-- How does this plot? Which station is used for the colour  --></p>
+<img src="a3_drift_files/figure-html/after_drift-1.png" width="672">
+Note that, when using the <code><a href="../reference/mortsplot.html">mortsplot()</a></code> function, the legend
+entry for the station name of a drift residence event begins with
+“Drift”, followed by an alphabetical list of all station names involved
+in the residence event.</p>
 </div>
 <div class="section level2">
 <h2 id="applying-drift">Applying drift<a class="anchor" aria-label="anchor" href="#applying-drift"></a>
@@ -177,9 +250,8 @@ from detection data.</p></li>
 <code>drift.cutoff</code></p></li>
 </ol>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">drift_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/infrequent.html">infrequent</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
-<span>                     ddd<span class="op">=</span><span class="va">drift.dataframe</span>,</span>
-<span>                     from.station<span class="op">=</span><span class="st">"From"</span>,to.station<span class="op">=</span><span class="st">"To"</span>,</span>
+<code class="sourceCode R"><span><span class="va">drift_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/infrequent.html">infrequent</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<span>                     ddd<span class="op">=</span><span class="va">ddd</span>,from.station<span class="op">=</span><span class="st">"From"</span>,to.station<span class="op">=</span><span class="st">"To"</span>,</span>
 <span>                     drift.cutoff<span class="op">=</span><span class="fl">1</span>,drift.units<span class="op">=</span><span class="st">"days"</span><span class="op">)</span></span></code></pre></div>
 <p>For <code><a href="../reference/morts.html">morts()</a></code>, there is a sixth argument
 <code>drift</code> that specifies when drift should be applied. Drift
@@ -201,21 +273,14 @@ included. Including drift residences in identifying mortalities will
 likely lengthen residence events, making it easier for an event to
 exceed the threshold. See below for an example of identifying
 mortalities with and without applying drift.</p>
-<!-- Evaluate and plot when test dataset is ready -->
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">no_drift</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"all"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">plot</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
-<span>                morts<span class="op">=</span><span class="va">no_drift</span><span class="op">)</span></span>
-<span><span class="va">plot</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">no_drift</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="a3_drift_files/figure-html/no_drift_plot-1.png" width="672"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">drift_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"all"</span>,</span>
-<span>                drift<span class="op">=</span><span class="st">"morts"</span>,ddd<span class="op">=</span><span class="va">drift.dataframe</span>,</span>
-<span>                from.station<span class="op">=</span><span class="st">"From"</span>,to.station<span class="op">=</span><span class="st">"To"</span>,</span>
-<span>                drift.cutoff<span class="op">=</span><span class="fl">1</span>,drift.units<span class="op">=</span><span class="st">"days"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">plot</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,morts<span class="op">=</span><span class="va">drift_ex</span><span class="op">)</span></span>
-<span><span class="va">plot</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">drift_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"all"</span>,</span>
+<span>                drift<span class="op">=</span><span class="st">"morts"</span>,ddd<span class="op">=</span><span class="va">ddd</span>,from.station<span class="op">=</span><span class="st">"From"</span>,to.station<span class="op">=</span><span class="st">"To"</span>,</span>
+<span>                drift.cutoff<span class="op">=</span><span class="fl">1</span>,drift.units<span class="op">=</span><span class="st">"days"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="a3_drift_files/figure-html/drift_ex_morts_plot-1.png" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="drift-function">
@@ -227,7 +292,7 @@ and <code><a href="../reference/infrequent.html">infrequent()</a></code> is also
 function. The arguments for <code><a href="../reference/drift.html">drift()</a></code> are the same as those
 for the other functions.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">drift.data</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/drift.html">drift</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<code class="sourceCode R"><span><span class="va">drift.data</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/drift.html">drift</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
 <span>                  ddd<span class="op">=</span><span class="va">drift.dataframe</span>,from.station<span class="op">=</span><span class="st">"From"</span>,to.station<span class="op">=</span><span class="st">"To"</span>,</span>
 <span>                  cutoff<span class="op">=</span><span class="fl">1</span>,cutoff.units<span class="op">=</span><span class="st">"days"</span><span class="op">)</span></span></code></pre></div>
 </div>

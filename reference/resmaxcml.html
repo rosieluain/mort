@@ -88,7 +88,17 @@ stations/locations.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">resmaxcml</span><span class="op">(</span><span class="va">data</span>, <span class="va">ID</span>, <span class="va">station</span>, <span class="va">res.start</span>, <span class="va">res.end</span>, <span class="va">residences</span>, <span class="va">units</span>, <span class="va">stnchange</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">resmaxcml</span><span class="op">(</span></span>
+<span>  <span class="va">data</span>,</span>
+<span>  <span class="va">ID</span>,</span>
+<span>  <span class="va">station</span>,</span>
+<span>  <span class="va">res.start</span>,</span>
+<span>  <span class="va">res.end</span>,</span>
+<span>  <span class="va">residences</span>,</span>
+<span>  <span class="va">units</span>,</span>
+<span>  <span class="va">stnchange</span>,</span>
+<span>  progressbar <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -131,6 +141,11 @@ that holds the duration of the residence events.</p></dd>
 <dt>stnchange</dt>
 <dd><p>a dataframe with the start time and location of the most
 recent station or location change. Must use the same column names as <code>data</code>.</p></dd>
+
+
+<dt>progressbar</dt>
+<dd><p>option to display progress bar as function is run. Default
+is TRUE.</p></dd>
 
 </dl></div>
     <div id="value">

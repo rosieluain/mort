@@ -110,15 +110,11 @@
 
     
     
-<p><strong>Note:</strong> vignettes are under development! We are
-currently developing a sample dataset, so there are some obvious gaps
-where there should be figures, tables, etc. These will be completed as
-soon as the sample dataset is done. <br><br></p>
 <p>Note that potential mortalities or potential cases of tag expulsion
 are referred to here as “mortalities” or “potential mortalities” for
-simplicity.</p>
-<p>There are two functions for identifying potential mortalities:
-<code><a href="../reference/morts.html">morts()</a></code> and <code><a href="../reference/infrequent.html">infrequent()</a></code>.</p>
+simplicity. <br><br><br> There are two functions for identifying
+potential mortalities: <code><a href="../reference/morts.html">morts()</a></code> and
+<code><a href="../reference/infrequent.html">infrequent()</a></code>.</p>
 <div class="section level2">
 <h2 id="morts-function">
 <code>morts()</code> function<a class="anchor" aria-label="anchor" href="#morts-function"></a>
@@ -135,23 +131,83 @@ captured by “any”).</p>
 <p>All options rely on identifying the most recent station or location
 change for each animal that was detected by the array. The station
 change marks the last time the animal moved, and it is assumed that the
-animal was alive before this point. See <code><a href="../reference/stationchange.html">stationchange()</a></code> and
-the vignette “Digging” for more information on how mort identifies
-station changes.</p>
-<!-- Use a figure from the test dataset (when available) to demonstrate this -->
+animal was alive before this point.</p>
+<p>The black points in the plot below show examples of the most recent
+station changes. See <code><a href="../reference/stationchange.html">stationchange()</a></code> and the <a href="https://rosieluain.github.io/mort/articles/a6_digging.html" class="external-link">Digging</a>
+vignette for more information on how mort identifies station
+changes.</p>
+<p><img src="a2_morts_files/figure-html/stnchange_plot-1.png" width="672"></p>
 <div class="section level3">
 <h3 id="duration-of-residence-events">Duration of residence events<a class="anchor" aria-label="anchor" href="#duration-of-residence-events"></a>
 </h3>
 <p>After identifying the most recent station change, the longest single
 residence event that occurred before the station change is identified
 for each animal.</p>
-<!-- Use a figure from the test dataset to demonstrate this -->
 <p>These long residences can be explored by the user using the
-<code><a href="../reference/resmax.html">resmax()</a></code> function (see the vignette “Digging” for more
-information). The output will look like this:
-<!-- Make a table with results of resmax from test dataset  --></p>
-<p>The longest residence event (highlighted in red in the table above)
-is used as the threshold.</p>
+<code><a href="../reference/resmax.html">resmax()</a></code> function (see the <a href="https://rosieluain.github.io/mort/articles/a6_digging.html" class="external-link">Digging</a>
+vignette for more information). The output will look like this:</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="17%">
+<col width="4%">
+<col width="25%">
+<col width="26%">
+</colgroup>
+<thead><tr class="header">
+<th align="center">ResidenceStart</th>
+<th align="center">Station.Name</th>
+<th align="center">ID</th>
+<th align="center">ResidenceEnd</th>
+<th align="center">ResidenceLength.days</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center">2003-07-22 21:48:42</td>
+<td align="center">18</td>
+<td align="center">H</td>
+<td align="center">2003-09-21 12:08:52</td>
+<td align="center">60.59734</td>
+</tr>
+<tr class="even">
+<td align="center">2005-08-14 05:01:50</td>
+<td align="center">4</td>
+<td align="center">J</td>
+<td align="center">2005-10-09 18:55:58</td>
+<td align="center">56.57926</td>
+</tr>
+<tr class="odd">
+<td align="center">2002-12-04 19:08:02</td>
+<td align="center">8</td>
+<td align="center">L</td>
+<td align="center">2003-01-17 16:40:29</td>
+<td align="center">43.89753</td>
+</tr>
+<tr class="even">
+<td align="center">2003-09-13 13:25:38</td>
+<td align="center">4</td>
+<td align="center">C</td>
+<td align="center">2003-10-07 16:26:06</td>
+<td align="center">24.12532</td>
+</tr>
+<tr class="odd">
+<td align="center">2003-01-16 18:55:12</td>
+<td align="center">8</td>
+<td align="center">K</td>
+<td align="center">2003-02-08 16:31:25</td>
+<td align="center">22.90015</td>
+</tr>
+<tr class="even">
+<td align="center">2003-09-24 16:56:36</td>
+<td align="center">1</td>
+<td align="center">A</td>
+<td align="center">2003-10-11 17:15:47</td>
+<td align="center">17.01332</td>
+</tr>
+</tbody>
+</table>
+<p>The longest residence event (60 days in the table above) is used as
+the threshold.</p>
 <p>There are two options for how to apply the threshold:</p>
 <div class="section level4">
 <h4 id="last">1. last<a class="anchor" aria-label="anchor" href="#last"></a>
@@ -159,22 +215,21 @@ is used as the threshold.</p>
 <p>The threshold is applied to the last (most recent) residence event of
 each animal. Any residence events that are longer than the threshold are
 flagged as potential mortalities.</p>
-<!-- Actually evaluate this when dataset is ready -->
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">last_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"last"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,morts<span class="op">=</span><span class="va">last_ex</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">last_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"last"</span><span class="op">)</span></span></code></pre></div>
+<p>The black points in the plot below indicate the beginning of
+residence events that were longer than the threshold, and were therefore
+flagged in <code>last_ex</code> as run above.</p>
+<p><img src="a2_morts_files/figure-html/last_ex_plot-1.png" width="672"></p>
 </div>
 <div class="section level4">
 <h4 id="any">2. any<a class="anchor" aria-label="anchor" href="#any"></a>
 </h4>
 <p>The threshold is applied to any residence event that occurred after
 the most recent station change for each animal.</p>
-<!-- Actually evaluate when dataset is ready  -->
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">any_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"any"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,morts<span class="op">=</span><span class="va">any_ex</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">any_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"any"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="a2_morts_files/figure-html/morts_any_plot-1.png" width="672"></p>
 <p>Note in the examples above that ID and station were specified for
 <code>type="mort"</code>. For other supported input types, there is no
 default for ID and station, but they can both be specified as “auto” and
@@ -195,15 +250,85 @@ directly (i.e., none can be “auto”):</p>
 <p>Cumulative residence events are the length of time between when an
 animal was first detected at a station and when it was last detected at
 the same station, ignoring any gaps in detection (or <code>cutoff</code>
-in <code><a href="../reference/residences.html">residences()</a></code>). The threshold for cumulative residence
-events is identified similarly to that for single residence events. The
-threshold is then applied to cumulative residence events that occurred
-after the last station change to flag potential mortalities.</p>
-<!-- Plots of examples from dataset when ready -->
+in <code><a href="../reference/residences.html">residences()</a></code>). The black points in the plot below
+indicate the start and end of the longest cumulative residence events,
+before a station change, for each fish.</p>
+<p><img src="a2_morts_files/figure-html/sc_cmlres_plot-1.png" width="672"></p>
+<p>The threshold for cumulative residence events is identified similarly
+to that for single residence events. The cumulative residence events can
+be explored by the user using the <code><a href="../reference/resmaxcml.html">resmaxcml()</a></code> function (see
+the <a href="https://rosieluain.github.io/mort/articles/a6_digging.html" class="external-link">Digging</a>
+vignette for more information). The output will look like this:</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="17%">
+<col width="4%">
+<col width="25%">
+<col width="26%">
+</colgroup>
+<thead><tr class="header">
+<th align="center">ResidenceStart</th>
+<th align="center">Station.Name</th>
+<th align="center">ID</th>
+<th align="center">ResidenceEnd</th>
+<th align="center">ResidenceLength.days</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center">2002-08-27 18:52:56</td>
+<td align="center">4</td>
+<td align="center">J</td>
+<td align="center">2005-10-09 18:55:58</td>
+<td align="center">1139.0021 days</td>
+</tr>
+<tr class="even">
+<td align="center">2003-09-22 00:20:28</td>
+<td align="center">1</td>
+<td align="center">A</td>
+<td align="center">2004-06-24 01:15:25</td>
+<td align="center">276.0382 days</td>
+</tr>
+<tr class="odd">
+<td align="center">2003-07-22 21:48:42</td>
+<td align="center">18</td>
+<td align="center">H</td>
+<td align="center">2004-01-27 06:48:41</td>
+<td align="center">188.3750 days</td>
+</tr>
+<tr class="even">
+<td align="center">2002-09-27 18:03:11</td>
+<td align="center">8</td>
+<td align="center">K</td>
+<td align="center">2003-02-09 19:45:13</td>
+<td align="center">135.0709 days</td>
+</tr>
+<tr class="odd">
+<td align="center">2002-10-15 19:55:49</td>
+<td align="center">8</td>
+<td align="center">L</td>
+<td align="center">2003-02-18 17:35:32</td>
+<td align="center">125.9026 days</td>
+</tr>
+<tr class="even">
+<td align="center">2004-02-16 18:10:21</td>
+<td align="center">8</td>
+<td align="center">C</td>
+<td align="center">2004-06-08 23:21:49</td>
+<td align="center">113.2163 days</td>
+</tr>
+</tbody>
+</table>
+<p>Note that the threshold in the example above is extremely large (1139
+days). In this example, the large threshold is due to the drift and can
+be corrected by applying drift within <code><a href="../reference/morts.html">morts()</a></code>. See the <a href="https://rosieluain.github.io/mort/articles/a3_drift.html" class="external-link">Drift</a>
+vignette for more information.</p>
+<p>The threshold is then applied to cumulative residence events that
+occurred after the last station change to flag potential
+mortalities.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">cumulative_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,type<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"cumulative"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,morts<span class="op">=</span><span class="va">cumulative_ex</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">cumulative_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"cumulative"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="a2_morts_files/figure-html/clm_ex_plot-1.png" width="672"></p>
 </div>
 <div class="section level3">
 <h3 id="notes-on-selecting-a-method">Notes on selecting a method<a class="anchor" aria-label="anchor" href="#notes-on-selecting-a-method"></a>
@@ -220,15 +345,69 @@ potential mortalities from multiple short residence events, which each
 on their own would not be long enough to be identified by
 <code>method="any"</code>. In this way, running
 <code>method="all"</code> is the most conservative method.</p>
-<!-- Actually run when dataset is ready -->
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">all_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,type<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"all"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,morts<span class="op">=</span><span class="va">all_ex</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">all_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="a2_morts_files/figure-html/all_ex_plot-1.png" width="672"></p>
+</div>
+<div class="section level3">
+<h3 id="output">Output<a class="anchor" aria-label="anchor" href="#output"></a>
+</h3>
 <p>The output of <code><a href="../reference/morts.html">morts()</a></code> is a dataframe, where each row is
 the residence event where a flagged mortality was identified:</p>
-<!-- Make a table from all_ex -->
-<!-- Make some sort of break here?  -->
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="17%">
+<col width="4%">
+<col width="25%">
+<col width="26%">
+</colgroup>
+<thead><tr class="header">
+<th align="center">ResidenceStart</th>
+<th align="center">Station.Name</th>
+<th align="center">ID</th>
+<th align="center">ResidenceEnd</th>
+<th align="center">ResidenceLength.days</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="center">2005-07-02 17:02:03</td>
+<td align="center">5</td>
+<td align="center">D</td>
+<td align="center">2005-10-10 21:55:45</td>
+<td align="center">100.2039583</td>
+</tr>
+<tr class="even">
+<td align="center">2004-07-15 21:09:22</td>
+<td align="center">5</td>
+<td align="center">E</td>
+<td align="center">2004-10-12 21:44:11</td>
+<td align="center">89.0241782</td>
+</tr>
+<tr class="odd">
+<td align="center">2005-06-28 21:12:58</td>
+<td align="center">1</td>
+<td align="center">F</td>
+<td align="center">2005-10-09 20:28:05</td>
+<td align="center">102.9688310</td>
+</tr>
+<tr class="even">
+<td align="center">2006-02-04 21:25:18</td>
+<td align="center">17</td>
+<td align="center">G</td>
+<td align="center">2006-05-01 06:30:02</td>
+<td align="center">85.3782870</td>
+</tr>
+<tr class="odd">
+<td align="center">2003-07-14 08:42:08</td>
+<td align="center">20</td>
+<td align="center">I</td>
+<td align="center">2003-07-14 22:21:10</td>
+<td align="center">0.5687731</td>
+</tr>
+</tbody>
+</table>
+<p><br><br></p>
 </div>
 </div>
 <div class="section level2">
@@ -238,9 +417,10 @@ the residence event where a flagged mortality was identified:</p>
 <p>The <code><a href="../reference/infrequent.html">infrequent()</a></code> function is used to identify potential
 mortalities or expelled tags that may be located just outside the usual
 range of a receiver, and are therefore detected briefly and
-intermittently when conditions allow. For this function, the thresholds
-are user-defined. The user has two options for defining the
-thresholds:</p>
+intermittently when conditions allow.</p>
+<p><img src="a2_morts_files/figure-html/inf_plot-1.png" width="672"></p>
+<p>For this function, the thresholds are user-defined. The user has two
+options for defining the thresholds:</p>
 <div class="section level4">
 <h4 id="recent">1. recent<a class="anchor" aria-label="anchor" href="#recent"></a>
 </h4>
@@ -253,11 +433,10 @@ mortality. In the following example, animals are flagged if they were
 detected for less than 60 minutes within one year (52 weeks) preceding
 their most recent residence event.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">recent_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/infrequent.html">infrequent</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<code class="sourceCode R"><span><span class="va">recent_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/infrequent.html">infrequent</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
 <span>                      method<span class="op">=</span><span class="st">"recent"</span>,threshold<span class="op">=</span><span class="fl">60</span>,threshold.units<span class="op">=</span><span class="st">"mins"</span>,</span>
-<span>                      recent.period<span class="op">=</span><span class="fl">52</span>,recent.units<span class="op">=</span><span class="st">"weeks"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,morts<span class="op">=</span><span class="va">recent_ex</span><span class="op">)</span></span></code></pre></div>
+<span>                      recent.period<span class="op">=</span><span class="fl">52</span>,recent.units<span class="op">=</span><span class="st">"weeks"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="a2_morts_files/figure-html/rec_plot-1.png" width="672"></p>
 </div>
 <div class="section level4">
 <h4 id="defined">2. defined<a class="anchor" aria-label="anchor" href="#defined"></a>
@@ -269,15 +448,14 @@ example, an animal is flagged as potential mortality if the sum of the
 duration of all residence events between 15 June and 15 October 2022 is
 less than 60 minutes.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">defined_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/infrequent.html">infrequent</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
-<span>                      method<span class="op">=</span><span class="st">"recent"</span>,threshold<span class="op">=</span><span class="fl">60</span>,threshold.units<span class="op">=</span><span class="st">"mins"</span>,</span>
-<span>                      start<span class="op">=</span><span class="st">"2022-06-15"</span>,end<span class="op">=</span><span class="st">"2022-10-15"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,morts<span class="op">=</span><span class="va">defined_ex</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">defined_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/infrequent.html">infrequent</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
+<span>                       method<span class="op">=</span><span class="st">"defined"</span>,threshold<span class="op">=</span><span class="fl">60</span>,threshold.units<span class="op">=</span><span class="st">"mins"</span>,</span>
+<span>                      start<span class="op">=</span><span class="st">"2006-06-15"</span>,end<span class="op">=</span><span class="st">"2006-10-15"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="a2_morts_files/figure-html/def_plot-1.png" width="672"></p>
 <p>Note that mort will assign the UTC timezone to <code>start</code> and
 <code>end</code>. If you want to define the period of interest using
 local times, it is recommended to convert local datetimes to POSIXt and
-then convert the timezone to UTC.</p>
+then convert the timezone to UTC:</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">start</span><span class="op">=</span><span class="fu"><a href="https://rdrr.io/r/base/as.POSIXlt.html" class="external-link">as.POSIXct</a></span><span class="op">(</span><span class="st">"2022-06-15"</span>,tz<span class="op">=</span><span class="st">"America/Edmonton"</span><span class="op">)</span></span>
 <span><span class="va">start</span></span>
@@ -286,11 +464,11 @@ then convert the timezone to UTC.</p>
 <span><span class="va">start</span></span>
 <span><span class="co">#&gt; [1] "2022-06-15 06:00:00 UTC"</span></span></code></pre></div>
 <p>The output of <code><a href="../reference/infrequent.html">infrequent()</a></code> is in the same format as the
-output of <code><a href="../reference/morts.html">morts()</a></code> (see above). The two output from one
-method can be added to the output from the other, using the
+output of <code><a href="../reference/morts.html">morts()</a></code> (see above). The output from one method
+can be added to the output from the other, using the
 <code>morts.prev</code> argument. See below for more information on
 using <code>morts.prev</code>.</p>
-<!-- Make some sort of break here?  -->
+<p><br><br></p>
 </div>
 </div>
 <div class="section level2">
@@ -315,7 +493,7 @@ threshold.</p>
 <p>The <code>morts.prev</code> argument in both <code><a href="../reference/morts.html">morts()</a></code> and
 <code><a href="../reference/infrequent.html">infrequent()</a></code> specifies a dataframe of previously flagged
 mortalities. The input dataframe to <code>morts.prev</code> must have
-been previoulsy generated by mort, or have the same column names, column
+been previously generated by mort, or have the same column names, column
 types, and in the same order as <code>data</code>. When new mortalities
 are identified, animal IDs that were already included in
 <code>morts.prev</code> are skipped. This option can be useful and make
@@ -326,7 +504,7 @@ when running multiple methods of identifying mortalities, since animal
 IDs identified in one method are skipped when running subsequent
 methods.</p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">prev_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">data</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,morts.prev<span class="op">=</span><span class="va">recent_ex</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">prev_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,morts.prev<span class="op">=</span><span class="va">recent_ex</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="look-backwards">Look backwards<a class="anchor" aria-label="anchor" href="#look-backwards"></a>
@@ -339,11 +517,14 @@ station, and with no detections elsewhere), the start dates and times of
 the flagged mortalities are shifted earlier. The default is
 <code>backwards=FALSE</code>; however, it is more conservative to set
 <code>backwards=TRUE</code>.</p>
+<p>In the plot below, the black points show the flagged mortalities with
+<code>backwards=FALSE</code>, and the blue points show the flagged
+mortalities with <code>backwards=TRUE</code>:</p>
+<p><img src="a2_morts_files/figure-html/backwards_plot-1.png" width="672"></p>
 <p>Note, when <code>method="cumulative"</code> and there is no
 seasonality, cumulative residence events will cover all consecutive
 detections at a given station, and <code>backwards</code> is
 unnecessary.</p>
-<!-- Should give example  -->
 </div>
 <div class="section level3">
 <h3 id="drift-and-season">Drift and season<a class="anchor" aria-label="anchor" href="#drift-and-season"></a>
@@ -353,16 +534,17 @@ to move, due to currents or tides, or if the tag is located within range
 of two overlapping receivers. Both <code><a href="../reference/morts.html">morts()</a></code> and
 <code><a href="../reference/infrequent.html">infrequent()</a></code> include an option to specify stations or
 locations where drift may occur and to consider drift in identifying
-mortalities. For more information, see the “Drift” vignette.</p>
+mortalities. For more information, see the <a href="https://rosieluain.github.io/mort/articles/a3_drift.html" class="external-link">Drift</a>
+vignette.</p>
 <p>For some species or systems with seasonal patterns in movement or
 residency, it may be desirable to only consider specific seasons or
 periods of time when identifying mortalities. <code><a href="../reference/morts.html">morts()</a></code>
 includes an option to specify dates to calculate thresholds and flag
-mortalities. For more information, see the “Seasonality” vignette. Note
-there is no option to apply season to <code><a href="../reference/infrequent.html">infrequent()</a></code>, but the
-season or period of interest could be used as the defined period with
-<code>method="defined"</code>, as well as <code>start</code> and
-<code>end</code> arguments.</p>
+mortalities. For more information, see the <a href="https://rosieluain.github.io/mort/articles/a4_season.html" class="external-link">Seasonality</a>
+vignette. Note there is no option to apply season to
+<code><a href="../reference/infrequent.html">infrequent()</a></code>, but the season or period of interest could be
+used as the defined period with <code>method="defined"</code>, as well
+as <code>start</code> and <code>end</code> arguments.</p>
 </div>
 </div>
   </div>
