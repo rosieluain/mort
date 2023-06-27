@@ -57,6 +57,9 @@ Zooming and scrolling around the interactive plot are possible (using the toolba
 
 <img src="https://github.com/rosieluain/mort/blob/main/man/figures/interactive_plot_ex.png"/>
 
+![](../man/figures/interactive_plot_ex.png){width=100%}
+
+![](figures/interactive_plot_ex.png){width=100%}
 
 When `interactive=TRUE`, `mortsplot()` calls `ggplotly()` from `plotly`. The same result can be achieved by building a non-interactive plot with `mortsplot()` and calling `ggplotly()` directly: 
 
@@ -76,12 +79,12 @@ morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",method="all"
 ```{r basic_withmorts}
 plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",morts=morts)
 ```
-````{r basic_withmorts_plot,echo=FALSE,fig.width=7}
+```{r basic_withmorts_plot,echo=FALSE,fig.width=7}
 
 plot<-plot+
   theme(legend.position="none")
 plot
-`````
+```
 
 ### Seasonality
 To plot specific seasons or periods of interest, seasonality can be applied using the arguments `season.start` and `season.end`. These arguments are used in the same way as for `season()` (see the [Seasonality](https://rosieluain.github.io/mort/articles/a4_season.html) vignette) or when seasonality is applied in `morts()` (see the [Identifying potential mortalities](https://rosieluain.github.io/mort/articles/a2_morts.html) vignette). 
