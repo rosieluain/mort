@@ -156,7 +156,7 @@ the toolbar at the top right corner), as well as changing the visibility
 of stations (by clicking on the station names). Information about each
 residence event appears when the cursor is moved over the beginning or
 end of a residence event.</p>
-<p><img src="../docs/interactive_plot_ex.png" style="width:100.0%"></p>
+<p><img src="reference/figures/interactive_plot_ex.png"></p>
 <p>When <code>interactive=TRUE</code>, <code><a href="../reference/mortsplot.html">mortsplot()</a></code> calls
 <code>ggplotly()</code> from <code>plotly</code>. The same result can be
 achieved by building a non-interactive plot with
@@ -177,11 +177,8 @@ plots:</p>
 <p>After potential mortalities have been identified, they can be added
 to the plot as black points with the <code>morts</code> argument:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">plot</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,morts<span class="op">=</span><span class="va">morts</span><span class="op">)</span></span>
-<span><span class="va">plot</span><span class="op">&lt;-</span><span class="va">plot</span><span class="op">+</span></span>
-<span>  <span class="fu">theme</span><span class="op">(</span>legend.position<span class="op">=</span><span class="st">"none"</span><span class="op">)</span></span>
-<span><span class="va">plot</span></span></code></pre></div>
-<p><img src="a5_plots_files/figure-html/basic_withmorts-1.png" width="672"></p>
+<code class="sourceCode R"><span><span class="va">plot</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,morts<span class="op">=</span><span class="va">morts</span><span class="op">)</span></span></code></pre></div>
+<p><img src="a5_plots_files/figure-html/basic_withmorts_plot-1.png" width="672"></p>
 </div>
 <div class="section level3">
 <h3 id="seasonality">Seasonality<a class="anchor" aria-label="anchor" href="#seasonality"></a>
@@ -199,11 +196,8 @@ in other morts functions.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">plot</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/mortsplot.html">mortsplot</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
 <span>                residences<span class="op">=</span><span class="st">"auto"</span>,units<span class="op">=</span><span class="st">"auto"</span>,</span>
-<span>                season.start<span class="op">=</span><span class="st">"2004-06-01"</span>,season.end<span class="op">=</span><span class="st">"2004-10-31"</span><span class="op">)</span></span>
-<span><span class="va">plot</span><span class="op">&lt;-</span><span class="va">plot</span><span class="op">+</span></span>
-<span>  <span class="fu">theme</span><span class="op">(</span>legend.position<span class="op">=</span><span class="st">"none"</span><span class="op">)</span></span>
-<span><span class="va">plot</span></span></code></pre></div>
-<p><img src="a5_plots_files/figure-html/basic_ssn-1.png" width="672"></p>
+<span>                season.start<span class="op">=</span><span class="st">"2004-06-01"</span>,season.end<span class="op">=</span><span class="st">"2004-10-31"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="a5_plots_files/figure-html/basic_ssn_plot-1.png" width="672"></p>
 </div>
 <div class="section level3">
 <h3 id="facetting">Facetting<a class="anchor" aria-label="anchor" href="#facetting"></a>
