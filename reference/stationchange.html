@@ -94,7 +94,7 @@ acoustic telemetry data.</p>
 <span>  units <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  from.station <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  to.station <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  progressbar <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  progress.bar <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -170,7 +170,7 @@ the station/location names where drifting detections may move to. Must
 be identical to the station/location names in <code>data</code>.</p></dd>
 
 
-<dt>progressbar</dt>
+<dt>progress.bar</dt>
 <dd><p>option to display progress bar as function is run. Default
 is TRUE.</p></dd>
 
@@ -188,8 +188,22 @@ input data) will be retained.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">stn.change</span><span class="op">&lt;-</span><span class="fu">stationchange</span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%  |                                                                              |======                                                                |   8%  |                                                                              |============                                                          |  17%  |                                                                              |==================                                                    |  25%  |                                                                              |=======================                                               |  33%  |                                                                              |=============================                                         |  42%  |                                                                              |===================================                                   |  50%  |                                                                              |=========================================                             |  58%  |                                                                              |===============================================                       |  67%  |                                                                              |====================================================                  |  75%  |                                                                              |==========================================================            |  83%  |                                                                              |================================================================      |  92%  |                                                                              |======================================================================| 100%</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">stn.change</span><span class="op">&lt;-</span><span class="fu">stationchange</span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,progress.bar<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">stn.change</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          ResidenceStart Station.Name ID        ResidenceEnd</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 35  2005-06-25 21:26:12           10  A 2005-06-26 09:01:17</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 36  2005-07-01 05:28:31            1  B 2005-07-01 05:28:31</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 91  2004-06-19 15:31:47            9  C 2004-06-19 19:10:01</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 93  2004-08-31 16:48:00            5  D 2004-08-31 17:38:18</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 101 2004-07-15 21:09:22            5  E 2004-10-12 21:44:11</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 106 2005-06-28 21:12:58            1  F 2005-10-09 20:28:05</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ResidenceLength.days</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 35            0.48269676</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 36            0.00000000</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 91            0.15155093</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 93            0.03493056</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 101          89.02417824</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 106         102.96883102</span>
 </code></pre></div>
     </div>
   </div>

@@ -78,7 +78,7 @@
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">residences</span><span class="op">(</span><span class="va">data</span>, <span class="va">ID</span>, <span class="va">station</span>, <span class="va">datetime</span>, <span class="va">cutoff</span>, <span class="va">units</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">residences</span><span class="op">(</span><span class="va">data</span>, <span class="va">ID</span>, <span class="va">station</span>, <span class="va">datetime</span>, <span class="va">cutoff</span>, <span class="va">units</span>, progress.bar <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -108,6 +108,11 @@ be considered a single residence event.</p></dd>
 <dd><p>the units of the cutoff. These will also be the units used to calculate the duration of the residence events.
 Options are "secs", "mins", "hours", "days", and "weeks".</p></dd>
 
+
+<dt>progress.bar</dt>
+<dd><p>option to display progress bar as residences are generated.
+Default is TRUE.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -128,9 +133,21 @@ depending on the size of the telemetry dataset.</p>
 
     <div id="ref-examples">
     <h2>Examples</h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">res.events</span><span class="op">&lt;-</span><span class="fu">residences</span><span class="op">(</span>data<span class="op">=</span><span class="va">detections</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span></span>
-<span class="r-in"><span>datetime<span class="op">=</span><span class="st">"DateTimeUTC"</span>,cutoff<span class="op">=</span><span class="fl">1</span>,units<span class="op">=</span><span class="st">"days"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%  |                                                                              |======                                                                |   8%  |                                                                              |============                                                          |  17%  |                                                                              |==================                                                    |  25%  |                                                                              |=======================                                               |  33%  |                                                                              |=============================                                         |  42%  |                                                                              |===================================                                   |  50%  |                                                                              |=========================================                             |  58%  |                                                                              |===============================================                       |  67%  |                                                                              |====================================================                  |  75%  |                                                                              |==========================================================            |  83%  |                                                                              |================================================================      |  92%  |                                                                              |======================================================================| 100%</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">detections</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>           DateTimeUTC Station.Name ID</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 2003-09-21 23:49:45           11  A</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 2003-09-21 23:51:29           11  A</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 2003-09-21 23:57:45           11  A</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4 2003-09-21 23:59:08           11  A</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5 2003-09-22 00:08:18           11  A</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 6 2003-09-22 00:20:28            1  A</span>
+<span class="r-in"><span><span class="va">res.events</span><span class="op">&lt;-</span><span class="fu">residences</span><span class="op">(</span>data<span class="op">=</span><span class="va">detections</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="fl">500</span>,<span class="op">]</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span></span>
+<span class="r-in"><span>datetime<span class="op">=</span><span class="st">"DateTimeUTC"</span>,cutoff<span class="op">=</span><span class="fl">1</span>,units<span class="op">=</span><span class="st">"days"</span>,progress.bar<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">res.events</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        ResidenceStart Station.Name ID        ResidenceEnd ResidenceLength.days</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 2003-09-21 23:49:45           11  A 2003-09-22 00:08:18           0.01288194</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 2003-09-22 00:20:28            1  A 2003-09-22 00:50:36           0.02092593</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3 2003-09-24 16:56:36            1  A 2003-09-25 18:01:11           1.04484954</span>
 </code></pre></div>
     </div>
   </div>

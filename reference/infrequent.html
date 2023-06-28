@@ -105,7 +105,8 @@ on a user-defined threshold and timeframe.</p>
 <span>  from.station <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  to.station <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  drift.cutoff <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  drift.units <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  drift.units <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  progress.bar <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -113,8 +114,7 @@ on a user-defined threshold and timeframe.</p>
     <h2>Arguments</h2>
     <dl><dt>data</dt>
 <dd><p>a dataframe of residence events. Residence events must include
-tag ID, location name, start time, and duration. Residence events must also
-include end time if <code>season</code> is provided.</p></dd>
+tag ID, location name, start time, end time, and duration.</p></dd>
 
 
 <dt>type</dt>
@@ -243,6 +243,11 @@ to generate residence events in <code>data</code>.</p></dd>
 "days", and "weeks". Recommended to be the same as used to generate
 residence events in <code>data</code>.</p></dd>
 
+
+<dt>progress.bar</dt>
+<dd><p>option to display progress bar as function and called functions
+are run. Default is TRUE.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>
@@ -276,16 +281,24 @@ minutes between 01 October 2019 and 01 June 2020.</p>
 <span class="r-in"><span><span class="va">inf_recent</span><span class="op">&lt;-</span><span class="fu">infrequent</span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,</span></span>
 <span class="r-in"><span>station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"recent"</span>,</span></span>
 <span class="r-in"><span>threshold<span class="op">=</span><span class="fl">0.5</span>,threshold.units<span class="op">=</span><span class="st">"hours"</span>,</span></span>
-<span class="r-in"><span>recent.period<span class="op">=</span><span class="fl">52</span>,recent.units<span class="op">=</span><span class="st">"weeks"</span><span class="op">)</span></span></span>
+<span class="r-in"><span>recent.period<span class="op">=</span><span class="fl">52</span>,recent.units<span class="op">=</span><span class="st">"weeks"</span>,</span></span>
+<span class="r-in"><span>progress.bar<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Identifying mortalities from infrequent detections"</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%  |                                                                              |======                                                                |   8%  |                                                                              |============                                                          |  17%  |                                                                              |==================                                                    |  25%  |                                                                              |=======================                                               |  33%  |                                                                              |=============================                                         |  42%  |                                                                              |===================================                                   |  50%  |                                                                              |=========================================                             |  58%  |                                                                              |===============================================                       |  67%  |                                                                              |====================================================                  |  75%  |                                                                              |==========================================================            |  83%  |                                                                              |================================================================      |  92%  |                                                                              |======================================================================| 100%</span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">inf_recent</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] ResidenceStart       Station.Name         ID                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4] ResidenceEnd         ResidenceLength.days</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;0 rows&gt; (or 0-length row.names)</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co">## User-defined example</span></span></span>
 <span class="r-in"><span><span class="va">inf_defined</span><span class="op">&lt;-</span><span class="fu">infrequent</span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,</span></span>
 <span class="r-in"><span>station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"defined"</span>,</span></span>
 <span class="r-in"><span>threshold<span class="op">=</span><span class="fl">0.5</span>,threshold.units<span class="op">=</span><span class="st">"hours"</span>,</span></span>
-<span class="r-in"><span>start<span class="op">=</span><span class="st">"2019-10-01"</span>,end<span class="op">=</span><span class="st">"2020-06-01"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%  |                                                                              |======                                                                |   8%  |                                                                              |============                                                          |  17%  |                                                                              |==================                                                    |  25%  |                                                                              |=======================                                               |  33%  |                                                                              |=============================                                         |  42%  |                                                                              |===================================                                   |  50%  |                                                                              |=========================================                             |  58%  |                                                                              |===============================================                       |  67%  |                                                                              |====================================================                  |  75%  |                                                                              |==========================================================            |  83%  |                                                                              |================================================================      |  92%  |                                                                              |======================================================================| 100%</span>
+<span class="r-in"><span>start<span class="op">=</span><span class="st">"2019-10-01"</span>,end<span class="op">=</span><span class="st">"2020-06-01"</span>,</span></span>
+<span class="r-in"><span>progress.bar<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">inf_defined</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] ResidenceStart       Station.Name         ID                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [4] ResidenceEnd         ResidenceLength.days</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> &lt;0 rows&gt; (or 0-length row.names)</span>
 </code></pre></div>
     </div>
   </div>

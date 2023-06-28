@@ -88,7 +88,7 @@ before a station change (i.e., the animal can be assumed to be alive)</p>
 <span>  <span class="va">residences</span>,</span>
 <span>  <span class="va">stnchange</span>,</span>
 <span>  drift <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  progressbar <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  progress.bar <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -96,8 +96,7 @@ before a station change (i.e., the animal can be assumed to be alive)</p>
     <h2>Arguments</h2>
     <dl><dt>data</dt>
 <dd><p>a dataframe of residence events. Residence events must include
-tag ID, location name, start time, and duration. Residence events must also
-include end time if <code>season</code> is provided.</p></dd>
+tag ID, location name, start time, and duration.</p></dd>
 
 
 <dt>ID</dt>
@@ -130,7 +129,7 @@ recent station or location change. Must use the same column names as <code>data<
 determining the maximum residence duration</p></dd>
 
 
-<dt>progressbar</dt>
+<dt>progress.bar</dt>
 <dd><p>option to display progress bar as function is run. Default
 is TRUE.</p></dd>
 
@@ -147,13 +146,26 @@ for each tag ID that occurred before the most recent station/location change.</p
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># Identify most recent station change</span></span></span>
 <span class="r-in"><span><span class="va">station.change</span><span class="op">&lt;-</span><span class="fu"><a href="stationchange.html">stationchange</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,</span></span>
-<span class="r-in"><span>station<span class="op">=</span><span class="st">"Station.Name"</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%  |                                                                              |======                                                                |   8%  |                                                                              |============                                                          |  17%  |                                                                              |==================                                                    |  25%  |                                                                              |=======================                                               |  33%  |                                                                              |=============================                                         |  42%  |                                                                              |===================================                                   |  50%  |                                                                              |=========================================                             |  58%  |                                                                              |===============================================                       |  67%  |                                                                              |====================================================                  |  75%  |                                                                              |==========================================================            |  83%  |                                                                              |================================================================      |  92%  |                                                                              |======================================================================| 100%</span>
+<span class="r-in"><span>station<span class="op">=</span><span class="st">"Station.Name"</span>,progress.bar<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">longest_res_events</span><span class="op">&lt;-</span><span class="fu">resmax</span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span></span>
 <span class="r-in"><span>res.start<span class="op">=</span><span class="st">"ResidenceStart"</span>,residences<span class="op">=</span><span class="st">"ResidenceLength.days"</span>,</span></span>
-<span class="r-in"><span>stnchange<span class="op">=</span><span class="va">station.change</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   |                                                                              |                                                                      |   0%  |                                                                              |======                                                                |   8%  |                                                                              |============                                                          |  17%  |                                                                              |==================                                                    |  25%  |                                                                              |=======================                                               |  33%  |                                                                              |=============================                                         |  42%  |                                                                              |===================================                                   |  50%  |                                                                              |=========================================                             |  58%  |                                                                              |===============================================                       |  67%  |                                                                              |====================================================                  |  75%  |                                                                              |==========================================================            |  83%  |                                                                              |================================================================      |  92%  |                                                                              |======================================================================| 100%</span>
+<span class="r-in"><span>stnchange<span class="op">=</span><span class="va">station.change</span>,progress.bar<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">longest_res_events</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>          ResidenceStart Station.Name ID        ResidenceEnd</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   2003-09-24 16:56:36            1  A 2003-10-11 17:15:47</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 68  2003-09-13 13:25:38            4  C 2003-10-07 16:26:06</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 112 2003-08-16 22:35:23            1  G 2003-08-18 12:05:20</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 229 2003-07-22 21:48:42           18  H 2003-09-21 12:08:52</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 821 2003-01-31 19:47:16            8  I 2003-02-06 18:59:34</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 847 2005-08-14 05:01:50            4  J 2005-10-09 18:55:58</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     ResidenceLength.days</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3              17.013322</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 68             24.125324</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 112             1.562465</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 229            60.597338</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 821             5.966875</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 847            56.579259</span>
 </code></pre></div>
     </div>
   </div>
