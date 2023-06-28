@@ -76,11 +76,17 @@ Identifies sequential residence events where detected movement
 between stations may be due to drifting of an expelled tag or dead animal.
 }
 \examples{
-drift.events<-drift(data=events,type="mort",ID="ID",
-station="Station.Name",ddd=ddd,from.station="From",to.station="To")
+# With no drift:
+head(events)
+
+drift.events<-drift(data=events[events$ID=="A",],type="mort",ID="ID",
+station="Station.Name",ddd=ddd,from.station="From",to.station="To",
+progress.bar=FALSE)
+head(drift.events)
 
 # With cutoff:
-drift.events<-drift(data=events,type="mort",ID="ID",
+drift.events<-drift(data=events[events$ID=="A",],type="mort",ID="ID",
 station="Station.Name",ddd=ddd,from.station="From",to.station="To",
-cutoff=1,cutoff.units="days")
+cutoff=1,cutoff.units="days",progress.bar=FALSE)
+head(drift.events)
 }

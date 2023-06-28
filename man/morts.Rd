@@ -25,13 +25,13 @@ morts(
   season.start = NULL,
   season.end = NULL,
   season.overlap = TRUE,
-  morts.prev = NULL
+  morts.prev = NULL,
+  progress.bar = TRUE
 )
 }
 \arguments{
 \item{data}{a dataframe of residence events. Residence events must include
-tag ID, location name, start time, and duration. Residence events must also
-include end time if \code{season} is provided.}
+tag ID, location name, start time, end time, and duration.}
 
 \item{type}{the method used to generate the residence events. Options are
 "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
@@ -112,6 +112,9 @@ Default is \code{TRUE}}
 \item{morts.prev}{a dataframe containing potential mortalities. The dataframe must
 have the same columns and in the same order as \code{data}.}
 
+\item{progress.bar}{option to display progress bar as function and called
+functions are run. Default is TRUE.}
+
 \item{season}{a dataframe with start and end dates of the season(s) of interest}
 }
 \value{
@@ -128,8 +131,10 @@ derived from the dataset itself.
 }
 \examples{
 morts_ex<-morts(data=events,type="mort",ID="ID",
-station="Station.Name",method="any")
+station="Station.Name",method="any",progress.bar=FALSE)
+head(morts_ex)
 
 morts_ex_bw<-morts(data=events,type="mort",ID="ID",
-station="Station.Name",method="any",backwards=TRUE)
+station="Station.Name",method="any",backwards=TRUE,progress.bar=FALSE)
+head(morts_ex_bw)
 }

@@ -43,10 +43,12 @@ station/location has not changed.
 \examples{
 morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",
 method="any")
+head(morts)
 
 # If station change not identified yet:
 morts_bw<-backwards(data=events,morts=morts,ID="ID",
 station="Station.Name",res.start="ResidenceStart")
+head(morts_bw)
 
 # Identify station change first:
 station.change<-stationchange(data=events,type="mort",
@@ -55,4 +57,5 @@ ID="ID",station="Station.Name")
 morts_bw<-backwards(data=events,morts=morts,ID="ID",
 station="Station.Name",res.start="ResidenceStart",
 stnchange=station.change)
+head(morts_bw)
 }

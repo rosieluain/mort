@@ -17,12 +17,13 @@ review(
   units = NULL,
   ddd = NULL,
   from.station = NULL,
-  to.station = NULL
+  to.station = NULL,
+  progress.bar = TRUE
 )
 }
 \arguments{
 \item{morts}{a dataframe with previously flagged mortalities. Format does
-not need to match \code{new.data}, but the names and formats of \code{ID}, \code{station},
+not need to match \code{new.data} exactly, but the names and formats of \code{ID}, \code{station},
 and \code{res.start} fields must match in all input dataframes.}
 
 \item{new.data}{a dataframe of new residence events (i.e., generated from
@@ -67,6 +68,9 @@ be identical to the station/location names in \code{morts} and \code{new.data}.}
 \item{to.station}{a string of the name of the column in \code{ddd} that contains
 the station/location names where drifting detections may move to. Must
 be identical to the station/location names in \code{morts} and \code{new.data}.}
+
+\item{progress.bar}{option to display progress bar as function and called
+functions are run. Default is TRUE.}
 }
 \value{
 A dataframe with one row for each tag ID from \code{morts}
@@ -84,8 +88,8 @@ alive.
 }
 \examples{
 morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",
-method="any")
+method="any",progress.bar=FALSE)
 
 undead<-review(morts=morts,new.data=new.data,
-type="mort",ID="ID",station="Station.Name")
+type="mort",ID="ID",station="Station.Name",progress.bar=FALSE)
 }

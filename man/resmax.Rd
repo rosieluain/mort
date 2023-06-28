@@ -12,13 +12,12 @@ resmax(
   residences,
   stnchange,
   drift = FALSE,
-  progressbar = TRUE
+  progress.bar = TRUE
 )
 }
 \arguments{
 \item{data}{a dataframe of residence events. Residence events must include
-tag ID, location name, start time, and duration. Residence events must also
-include end time if \code{season} is provided.}
+tag ID, location name, start time, and duration.}
 
 \item{ID}{a string of the name of the column in \code{data} that holds the tag or
 sample IDs.}
@@ -38,7 +37,7 @@ recent station or location change. Must use the same column names as \code{data}
 \item{drift}{indicates if drift residence events should be included in
 determining the maximum residence duration}
 
-\item{progressbar}{option to display progress bar as function is run. Default
+\item{progress.bar}{option to display progress bar as function is run. Default
 is TRUE.}
 }
 \value{
@@ -52,9 +51,10 @@ before a station change (i.e., the animal can be assumed to be alive)
 \examples{
 # Identify most recent station change
 station.change<-stationchange(data=events,type="mort",ID="ID",
-station="Station.Name")
+station="Station.Name",progress.bar=FALSE)
 
 longest_res_events<-resmax(data=events,ID="ID",station="Station.Name",
 res.start="ResidenceStart",residences="ResidenceLength.days",
-stnchange=station.change)
+stnchange=station.change,progress.bar=FALSE)
+head(longest_res_events)
 }

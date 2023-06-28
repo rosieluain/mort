@@ -13,13 +13,12 @@ resmaxcml(
   residences,
   units,
   stnchange,
-  progressbar = TRUE
+  progress.bar = TRUE
 )
 }
 \arguments{
 \item{data}{a dataframe of residence events. Residence events must include
-tag ID, location name, start time, and duration. Residence events must also
-include end time if \code{season} is provided.}
+tag ID, location name, start time, and duration.}
 
 \item{ID}{a string of the name of the column in \code{data} that holds the tag or
 sample IDs.}
@@ -41,7 +40,7 @@ that holds the duration of the residence events.}
 \item{stnchange}{a dataframe with the start time and location of the most
 recent station or location change. Must use the same column names as \code{data}.}
 
-\item{progressbar}{option to display progress bar as function is run. Default
+\item{progress.bar}{option to display progress bar as function is run. Default
 is TRUE.}
 }
 \value{
@@ -60,11 +59,11 @@ stations/locations.
 }
 \examples{
 # Identify most recent station change
-station.change<-stationchange(data=events,type="mort",ID="ID",
-station="Station.Name")
+station.change<-stationchange(data=events[events$ID=="A",],type="mort",
+ID="ID",station="Station.Name",progress.bar=FALSE)
 
-cumulative_events<-resmaxcml(data=events,ID="ID",station="Station.Name",
-res.start="ResidenceStart",res.end="ResidenceEnd",
+cumulative_events<-resmaxcml(data=events[events$ID=="A",],ID="ID",
+station="Station.Name",res.start="ResidenceStart",res.end="ResidenceEnd",
 residences="ResidenceLength.days",units="days",
-stnchange=station.change)
+stnchange=station.change,progress.bar=FALSE)
 }

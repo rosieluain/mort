@@ -4,8 +4,7 @@
 #' mortalities. Plotting uses ggplot2. Interactive option also uses plotly.
 #'
 #' @param data a dataframe of residence events. Residence events must include
-#' tag ID, location name, start time, and end time. Residence events must also
-#' include duration if making an interactive plot.
+#' tag ID, location name, start time, and end time.
 #' @param type the method used to generate the residence events. Options are
 #' "mort", "actel", "glatos", "vtrack", or "manual".
 #' @param ID a string of the name of the column in `data` that holds the tag or
@@ -45,7 +44,7 @@
 #' `facet.by="year"`.
 #' @param facet.by option to facet by "season" (as defined with `season.start`
 #' and `season.end`) or "year". Default is "season".
-#' @param progressbar option to display progress bar as function is run. Default
+#' @param progress.bar option to display progress bar as function is run. Default
 #' is TRUE.
 #'
 #' @return a ggplot2 plot. Additional arguments (e.g., formatting axes,
@@ -57,19 +56,21 @@
 #'
 #' @examples
 #' plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name")
+#' plot
 #'
 #' # With mortalities plotted over residences:
 #' morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",
-#' method="any")
+#' method="any",progress.bar=FALSE)
 #'
 #' plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",
 #' morts=morts)
+#' plot
 mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
                     morts=NULL,singles=TRUE,interactive=FALSE,residences=NULL,
                     units=NULL,
                     season.start=NULL,season.end=NULL,facet=FALSE,
                     facet.axis="x",facet.by="season",
-                    progressbar=TRUE){
+                    progress.bar=TRUE){
 
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package \"ggplot2\" must be installed to use this function.",
@@ -175,7 +176,7 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
     if (units=="auto"){
       units<-autofield(type=type,field="units",data=data)
     }
-    if (progressbar==TRUE){
+    if (progress.bar==TRUE){
       print("Extracting data from the period/season(s) of interest")
     }
     if (is.null(season.start)&is.null(season.end)&facet.by=="year"){
@@ -184,7 +185,7 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
     }
     data<-season(data=data,type=type,ID=ID,station=station,res.start=res.start,res.end=res.end,
                  residences=residences,units=units,season.start=season.start,
-                 season.end=season.end,overlap=FALSE,progressbar=FALSE)
+                 season.end=season.end,overlap=FALSE,progress.bar=progress.bar)
     data<-data[data[[station]]!="Break",]
     if (!is(season.start,"POSIXt")){
       try(season.start<-as.POSIXct(season.start,tz="UTC"),silent=TRUE)

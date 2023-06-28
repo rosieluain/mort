@@ -4,7 +4,7 @@
 #' alive.
 #'
 #' @param morts a dataframe with previously flagged mortalities. Format does
-#' not need to match `new.data`, but the names and formats of `ID`, `station`,
+#' not need to match `new.data` exactly, but the names and formats of `ID`, `station`,
 #' and `res.start` fields must match in all input dataframes.
 #' @param new.data a dataframe of new residence events (i.e., generated from
 #' detection data that were not included in earlier `mort` analyses).
@@ -37,6 +37,8 @@
 #' @param residences an optional character string with the name of the column
 #' in `morts` and `new.data` that holds the duration of the residence events.
 #' Only needed if drift is applied.
+#' @param progress.bar option to display progress bar as function and called
+#' functions are run. Default is TRUE.
 #'
 #' @return A dataframe with one row for each tag ID from `morts`
 #' with a station/location change that was identified
@@ -49,13 +51,14 @@
 #'
 #' @examples
 #' morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",
-#' method="any")
+#' method="any",progress.bar=FALSE)
 #'
 #' undead<-review(morts=morts,new.data=new.data,
-#' type="mort",ID="ID",station="Station.Name")
+#' type="mort",ID="ID",station="Station.Name",progress.bar=FALSE)
 review<-function(morts,new.data,old.data=NULL,type,ID,station,res.start="auto",
                  res.end=NULL,residences=NULL,units=NULL,
-                 ddd=NULL,from.station=NULL,to.station=NULL){
+                 ddd=NULL,from.station=NULL,to.station=NULL,
+                 progress.bar=TRUE){
 
   if (type %in% c("actel","vtrack")){
     new.data<-extractres(data=new.data,type=type)
@@ -199,7 +202,7 @@ review<-function(morts,new.data,old.data=NULL,type,ID,station,res.start="auto",
                 res.start=res.start,res.end=res.end,
                 ddd=ddd,from.station=from.station,to.station=to.station,
                 residences=residences,
-                units=units)
+                units=units,progress.bar=progress.bar)
     for (i in 1:nrow(morts)){
       res.temp<-data[data[[ID]]==morts[[ID]][i],]
       j<-1

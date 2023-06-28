@@ -21,13 +21,12 @@ mortsplot(
   facet = FALSE,
   facet.axis = "x",
   facet.by = "season",
-  progressbar = TRUE
+  progress.bar = TRUE
 )
 }
 \arguments{
 \item{data}{a dataframe of residence events. Residence events must include
-tag ID, location name, start time, and end time. Residence events must also
-include duration if making an interactive plot.}
+tag ID, location name, start time, and end time.}
 
 \item{type}{the method used to generate the residence events. Options are
 "mort", "actel", "glatos", "vtrack", or "manual".}
@@ -83,7 +82,7 @@ and \code{season.end} must be provided.}
 \item{facet.by}{option to facet by "season" (as defined with \code{season.start}
 and \code{season.end}) or "year". Default is "season".}
 
-\item{progressbar}{option to display progress bar as function is run. Default
+\item{progress.bar}{option to display progress bar as function is run. Default
 is TRUE.}
 }
 \value{
@@ -98,11 +97,13 @@ mortalities. Plotting uses ggplot2. Interactive option also uses plotly.
 }
 \examples{
 plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name")
+plot
 
 # With mortalities plotted over residences:
 morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",
-method="any")
+method="any",progress.bar=FALSE)
 
 plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",
 morts=morts)
+plot
 }

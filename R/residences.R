@@ -13,6 +13,8 @@
 #' @param ID a string of the name of the column in `data` that holds the tag or sample IDs.
 #' @param datetime a string of the name of the column in `data` that holds the date and time.
 #' @param station a string of the name of the column in `data` that holds the station name or receiver location.
+#' @param progress.bar option to display progress bar as residences are generated.
+#' Default is TRUE.
 #'
 #' @return A data frame with one row for each residence event, including date/time of
 #' residence start, date/time of residence end, and duration of residence event. All
@@ -23,10 +25,12 @@
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #'
 #' @examples
-#' res.events<-residences(data=detections,ID="ID",station="Station.Name",
-#' datetime="DateTimeUTC",cutoff=1,units="days")
+#' head(detections)
+#' res.events<-residences(data=detections[1:500,],ID="ID",station="Station.Name",
+#' datetime="DateTimeUTC",cutoff=1,units="days",progress.bar=FALSE)
+#' head(res.events)
 
-residences<-function(data,ID,station,datetime,cutoff,units){
+residences<-function(data,ID,station,datetime,cutoff,units,progress.bar=TRUE){
   # Create list of unique IDs
   tag<-unique(na.omit(data[[ID]]))
 
@@ -51,7 +55,9 @@ residences<-function(data,ID,station,datetime,cutoff,units){
   # Set up res
   res<-cbind(data[0,],ResidenceEnd=as.POSIXct(as.character()))
 
-  pb<-txtProgressBar(1,length(tag),style=3)
+  if (progress.bar==TRUE){
+    pb<-txtProgressBar(1,length(tag),style=3)
+  }
   for (i in 1:length(tag)){
     # Subset by ID
     res.sub<-data[data[[ID]]==tag[i],]
@@ -109,7 +115,9 @@ residences<-function(data,ID,station,datetime,cutoff,units){
         break
       }
     }
-    setTxtProgressBar(pb,i)
+    if (progress.bar==TRUE){
+      setTxtProgressBar(pb,i)
+    }
   }
   colnames(res)[colnames(res)==datetime]<-"ResidenceStart"
   attributes(res$ResidenceStart)$tzone<-attributes(data[[datetime]])$tzone

@@ -30,10 +30,12 @@
 #' @examples
 #' morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",
 #' method="any")
+#' head(morts)
 #'
 #' # If station change not identified yet:
 #' morts_bw<-backwards(data=events,morts=morts,ID="ID",
 #' station="Station.Name",res.start="ResidenceStart")
+#' head(morts_bw)
 #'
 #' # Identify station change first:
 #' station.change<-stationchange(data=events,type="mort",
@@ -42,6 +44,7 @@
 #' morts_bw<-backwards(data=events,morts=morts,ID="ID",
 #' station="Station.Name",res.start="ResidenceStart",
 #' stnchange=station.change)
+#' head(morts_bw)
 backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
   if (any(data[[station]]=="Break")){
     warning("Either a station name was 'Break' or data included seasonal
@@ -137,13 +140,19 @@ backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
 #' @export
 #'
 #' @examples
-#' drift.events<-drift(data=events,type="mort",ID="ID",
-#' station="Station.Name",ddd=ddd,from.station="From",to.station="To")
+#' # With no drift:
+#' head(events)
+#'
+#' drift.events<-drift(data=events[events$ID=="A",],type="mort",ID="ID",
+#' station="Station.Name",ddd=ddd,from.station="From",to.station="To",
+#' progress.bar=FALSE)
+#' head(drift.events)
 #'
 #' # With cutoff:
-#' drift.events<-drift(data=events,type="mort",ID="ID",
+#' drift.events<-drift(data=events[events$ID=="A",],type="mort",ID="ID",
 #' station="Station.Name",ddd=ddd,from.station="From",to.station="To",
-#' cutoff=1,cutoff.units="days")
+#' cutoff=1,cutoff.units="days",progress.bar=FALSE)
+#' head(drift.events)
 drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
                 residences="auto",units="auto",ddd,from.station,to.station,
                 cutoff=NULL,cutoff.units=NULL,progress.bar=TRUE){
@@ -301,7 +310,7 @@ drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
 #' residence events that is within the period of interest will be retained,
 #' and `residences` will be recalculated, using specified `units`.
 #' Default is `TRUE`.
-#' @param progressbar option to display progress bar as function is run. Default
+#' @param progress.bar option to display progress bar as function is run. Default
 #' is TRUE.
 #'
 #' @return a dataframe in the same format as the input data, with residence
@@ -311,16 +320,19 @@ drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
 #' @examples
 #' # Seasons in format dd-mm
 #' season.events<-season(data=events,type="mort",ID="ID",
-#' station="Station.Name",season.start="01-06",season.end="31-10")
+#' station="Station.Name",season.start="01-06",season.end="31-10",
+#' progress.bar=FALSE)
+#' head(season.events)
 #'
 #' # Seasons in format YYYY-mm-dd HH:MM:SS
 #' season.start<-c("2003-06-15","2004-06-21")
 #' season.end<-c("2003-10-15","2004-10-30")
 #' season.events<-season(data=events,type="mort",ID="ID",
-#' station="Station.Name",season.start=season.start,season.end=season.end)
+#' station="Station.Name",season.start=season.start,season.end=season.end,progress.bar=FALSE)
+#' head(season.events)
 season<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
                  residences="auto",units="auto",season.start,
-                 season.end,overlap=TRUE,progressbar=TRUE){
+                 season.end,overlap=TRUE,progress.bar=TRUE){
 
   if (type %in% c("actel","vtrack")){
     data<-extractres(data=data,type=type)
@@ -423,11 +435,11 @@ season<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
   data.season<-data[0,]
 
   for (i in 1:length(season.start)){
-    if (progressbar==TRUE){
+    if (progress.bar==TRUE){
       print(paste("season/period",i,"of",length(season.start)))
     }
     if (length(tag)>1){
-      if (progressbar==TRUE){
+      if (progress.bar==TRUE){
         pb<-txtProgressBar(1,length(tag),style=3)
       }
     }
@@ -471,7 +483,7 @@ season<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
       }
       data.season<-rbind(data.season,data.temp)
       if (length(tag)>1){
-        if (progressbar==TRUE){
+        if (progress.bar==TRUE){
           setTxtProgressBar(pb,j)
         }
       }

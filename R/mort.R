@@ -4,8 +4,7 @@
 #' derived from the dataset itself.
 #'
 #' @param data a dataframe of residence events. Residence events must include
-#' tag ID, location name, start time, and duration. Residence events must also
-#' include end time if `season` is provided.
+#' tag ID, location name, start time, end time, and duration.
 #' @param type the method used to generate the residence events. Options are
 #' "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
 #' must specify `ID`, `station`, `res.start`, `res.end`, `residences`, and `units`.
@@ -66,6 +65,8 @@
 #' residence events that is within the period of interest will be retained,
 #' and `residences` will be recalculated, using specified `units`.
 #' Default is `TRUE`
+#' @param progress.bar option to display progress bar as function and called
+#' functions are run. Default is TRUE.
 #'
 #' @return a dataframe with one row for each tag ID, including the date/time of
 #' the residence start when the potential mortality or expelled tag was identified.
@@ -78,16 +79,18 @@
 #'
 #' @examples
 #' morts_ex<-morts(data=events,type="mort",ID="ID",
-#' station="Station.Name",method="any")
+#' station="Station.Name",method="any",progress.bar=FALSE)
+#' head(morts_ex)
 #'
 #'morts_ex_bw<-morts(data=events,type="mort",ID="ID",
-#'station="Station.Name",method="any",backwards=TRUE)
+#'station="Station.Name",method="any",backwards=TRUE,progress.bar=FALSE)
+#'head(morts_ex_bw)
 morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
                method="all",units="auto",residences="auto",
                singles=TRUE,backwards=FALSE,drift="none",ddd=NULL,
                from.station=NULL, to.station=NULL,drift.cutoff=NULL,
                drift.units=NULL,season.start=NULL,season.end=NULL,
-               season.overlap=TRUE,morts.prev=NULL){
+               season.overlap=TRUE,morts.prev=NULL,progress.bar=TRUE){
 
   if (!(type %in% c("actel","glatos","manual","mort","vtrack"))){
     stop("invalid type. Please enter valid type: 'actel', 'glatos',
@@ -151,7 +154,8 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     print("Extracting data from the period/season(s) of interest")
     data<-season(data=data,type=type,ID=ID,station=station,res.start=res.start,res.end=res.end,
                  residences=residences,units=units,season.start=season.start,
-                 season.end=season.end,overlap=season.overlap)
+                 season.end=season.end,overlap=season.overlap,
+                 progress.bar=progress.bar)
   }
 
   if (any(is.na(data[[station]]))){
@@ -192,13 +196,15 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
                   res.start=res.start,res.end=res.end,residences=residences,
                   units=units,
                   ddd=ddd,from.station=from.station,to.station=to.station,
-                  cutoff.units=drift.units,cutoff=drift.cutoff)
+                  cutoff.units=drift.units,cutoff=drift.cutoff,
+                  progress.bar=progress.bar)
     }
     else {
       data.resmax<-drift(data=data,type=type,ID=ID,station=station,
                          res.start=res.start,res.end=res.end,residences=residences,
                          units=units,
-                         ddd=ddd,from.station=from.station,to.station=to.station)
+                         ddd=ddd,from.station=from.station,to.station=to.station,
+                         progress.bar=progress.bar)
     }
     drift.resmax<-TRUE
     if (method %in% c("all","cumulative")){
@@ -209,7 +215,8 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
         data<-drift(data=data,type=type,ID=ID,station=station,
                     res.start=res.start,res.end=res.end,residences=residences,
                     units=units,
-                    ddd=ddd,from.station=from.station,to.station=to.station)
+                    ddd=ddd,from.station=from.station,to.station=to.station,
+                    progress.bar=progress.bar)
       }
       else {
         data<-data.resmax
@@ -230,14 +237,16 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     data.morts<-drift(data=data,type=type,ID=ID,station=station,
                       res.start=res.start,res.end=res.end,residences=residences,
                       units=units,
-                      ddd=ddd,from.station=from.station,to.station=to.station)
+                      ddd=ddd,from.station=from.station,to.station=to.station,
+                      progress.bar=progress.bar)
     if (!is.null(drift.cutoff)){
       print("Identifying drift residence events to be removed from identifying resmax threshold")
       data.resmax<-drift(data=data,type=type,ID=ID,station=station,
                          res.start=res.start,res.end=res.end,residences=residences,
                          units=units,
                          ddd=ddd,from.station=from.station,to.station=to.station,
-                         cutoff.units=drift.units,cutoff=drift.cutoff)
+                         cutoff.units=drift.units,cutoff=drift.cutoff,
+                         progress.bar=progress.bar)
     }
     else {data.resmax<-data.morts}
     drift.resmax<-FALSE
@@ -246,7 +255,8 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
       data.full<-drift(data=data.full,type=type,ID=ID,station=station,
                        res.start=res.start,res.end=res.end,residences=residences,
                        units=units,
-                       ddd=ddd,from.station=from.station,to.station=to.station)
+                       ddd=ddd,from.station=from.station,to.station=to.station,
+                       progress.bar=progress.bar)
     }
     print("Identifying last station change")
     sc1<-stationchange(data=data.morts,type=type,ID=ID,station=station,res.start=res.start,
@@ -263,14 +273,16 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     data.morts<-drift(data=data,type=type,ID=ID,station=station,
                       res.start=res.start,res.end=res.end,residences=residences,
                       units=units,
-                      ddd=ddd,from.station=from.station,to.station=to.station)
+                      ddd=ddd,from.station=from.station,to.station=to.station,
+                      progress.bar=progress.bar)
     if (!is.null(drift.cutoff)){
       print("Applying drift to identify resmax threshold")
       data.resmax<-drift(data=data,type=type,ID=ID,station=station,
                          res.start=res.start,res.end=res.end,residences=residences,
                          units=units,
                          ddd=ddd,from.station=from.station,to.station=to.station,
-                         cutoff.units=drift.units,cutoff=drift.cutoff)
+                         cutoff.units=drift.units,cutoff=drift.cutoff,
+                         progress.bar=progress.bar)
     }
     else {
       data.resmax<-data.morts
@@ -281,7 +293,8 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
       data.full<-drift(data=data.full,type=type,ID=ID,station=station,
                        res.start=res.start,res.end=res.end,residences=residences,
                        units=units,
-                       ddd=ddd,from.station=from.station,to.station=to.station)
+                       ddd=ddd,from.station=from.station,to.station=to.station,
+                       progress.bar=progress.bar)
     }
     print("Identifying last station change")
     sc1<-stationchange(data=data.morts,type=type,ID=ID,station=station,res.start=res.start,
@@ -305,7 +318,9 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     if (method=="last"){
       # Note that not run for "all" or "any", because "last" is also captured with "any"
       print("Identifying mortalities for method='last'")
-      pb<-txtProgressBar(1,length(tag),style=3)
+      if (progress.bar==TRUE){
+        pb<-txtProgressBar(1,length(tag),style=3)
+      }
       for (i in 1:length(tag)){
         # Only run if ID not already in morts
         # If it is already in morts, it would be from infrequent function, which
@@ -321,14 +336,18 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
             morts[nrow(morts)+1,]<-data.morts[j,]
           }
         }
-        setTxtProgressBar(pb,i)
+        if (progress.bar==TRUE){
+          setTxtProgressBar(pb,i)
+        }
       }
     }
     if (method %in% c("any","all")){
       # Identify all the residences longer than max.res
       # If they are during or after the last station change, then add them to morts
       print("Identifying mortalities for method='any'")
-      pb<-txtProgressBar(1,length(tag),style=3)
+      if (progress.bar==TRUE){
+        pb<-txtProgressBar(1,length(tag),style=3)
+      }
       for (i in 1:length(tag)){
         res.temp<-data.morts[data.morts[[ID]]==tag[i],]
         j<-which(res.temp[[residences]]>max.res&
@@ -355,7 +374,9 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
             morts[nrow(morts)+1,]<-res.temp[j[k],]
           }
         }
-        setTxtProgressBar(pb,i)
+        if (progress.bar==TRUE){
+          setTxtProgressBar(pb,i)
+        }
       }
     }
   }
@@ -367,7 +388,9 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
                               res.end=res.end,residences=residences,units=units,
                               stnchange=sc1)[[residences]],na.rm=TRUE)
     print("Identifying mortalities for method='cumulative'")
-    pb<-txtProgressBar(1,nrow(sc2),style=3)
+    if (progress.bar==TRUE){
+      pb<-txtProgressBar(1,nrow(sc2),style=3)
+    }
     for (i in 1:nrow(sc2)){
       res.temp<-data.morts[data.morts[[ID]]==sc2[[ID]][i],]
       res.temp<-res.temp[order(res.temp[[res.start]]),]
@@ -417,7 +440,9 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
           }
         }
       }
-      setTxtProgressBar(pb,i)
+      if (progress.bar==TRUE){
+        setTxtProgressBar(pb,i)
+      }
     }
   }
 
@@ -426,11 +451,15 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     if (!is.null(morts.prev)){
       if (nrow(morts)>nm){
         new.morts<-unique(c(new.morts,seq((nm+1),nrow(morts),1)))
-        pb<-txtProgressBar(1,length(new.morts),style=3)
+        if (progress.bar==TRUE){
+          pb<-txtProgressBar(1,length(new.morts),style=3)
+        }
         for (i in 1:length(new.morts)){
           morts[i,]<-backwards(data=NULL,morts=morts[i,],ID=ID,station=station,
                                res.start=res.start,stnchange=sc2)
-          setTxtProgressBar(pb,i)
+          if (progress.bar==TRUE){
+            setTxtProgressBar(pb,i)
+          }
         }
       }
     }
@@ -451,8 +480,7 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
 #' on a user-defined threshold and timeframe.
 #'
 #' @param data a dataframe of residence events. Residence events must include
-#' tag ID, location name, start time, and duration. Residence events must also
-#' include end time if `season` is provided.
+#' tag ID, location name, start time, end time, and duration.
 #' @param type the method used to generate the residence events. Options are
 #' "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
 #' must specify `ID`, `station`, `res.start`, `res.end`, `residences`, and `units`.
@@ -514,6 +542,8 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
 #' @param drift.units the units of the cutoff. Options are "secs", "mins", "hours",
 #' "days", and "weeks". Recommended to be the same as used to generate
 #' residence events in `data`.
+#' @param progress.bar option to display progress bar as function and called functions
+#' are run. Default is TRUE.
 #'
 #' @details Example of `method="recent"`: if `threshold=10`, `threshold.units="mins"`,
 #' `recent.period=52` and `recent.units="weeks"` (1 year), an animal will be
@@ -541,19 +571,23 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
 #' inf_recent<-infrequent(data=events,type="mort",ID="ID",
 #' station="Station.Name",method="recent",
 #' threshold=0.5,threshold.units="hours",
-#' recent.period=52,recent.units="weeks")
+#' recent.period=52,recent.units="weeks",
+#' progress.bar=FALSE)
+#' head(inf_recent)
 #'
 #' ## User-defined example
 #' inf_defined<-infrequent(data=events,type="mort",ID="ID",
 #' station="Station.Name",method="defined",
 #' threshold=0.5,threshold.units="hours",
-#' start="2019-10-01",end="2020-06-01")
+#' start="2019-10-01",end="2020-06-01",
+#' progress.bar=FALSE)
+#' head(inf_defined)
 infrequent<-function(data,type="mort",ID,station,res.start="auto",
                      res.end="auto",residences="auto",units="auto",
                      method,threshold,threshold.units=NULL,recent.period=NULL,recent.units=NULL,
                      start=NULL,end=NULL,morts.prev=NULL,replace=FALSE,backwards=FALSE,
                      ddd=NULL,from.station=NULL,to.station=NULL,
-                     drift.cutoff=NULL,drift.units=NULL){
+                     drift.cutoff=NULL,drift.units=NULL,progress.bar=TRUE){
 
   if (type %in% c("actel","vtrack")){
     data<-extractres(data=data,type=type)
@@ -621,7 +655,8 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
       data<-drift(data=data,type=type,ID=ID,station=station,
                   res.start=res.start,res.end=res.end,residences=residences,
                   units=units,
-                  ddd=ddd,from.station=from.station,to.station=to.station)
+                  ddd=ddd,from.station=from.station,to.station=to.station,
+                  progress.bar=progress.bar)
       data.morts<-data
     }
     else {
@@ -630,12 +665,14 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
                   res.start=res.start,res.end=res.end,residences=residences,
                   units=units,
                   ddd=ddd,from.station=from.station,to.station=to.station,
-                  cutoff=drift.cutoff,cutoff.units=drift.units)
+                  cutoff=drift.cutoff,cutoff.units=drift.units,
+                  progress.bar=progress.bar)
       print("Applying drift (no cutoff)")
       data.morts<-drift(data=data,type=type,ID=ID,station=station,
                      res.start=res.start,res.end=res.end,residences=residences,
                      units=units,
-                     ddd=ddd,from.station=from.station,to.station=to.station)
+                     ddd=ddd,from.station=from.station,to.station=to.station,
+                     progress.bar=progress.bar)
     }
   }
   else {data.morts<-data}
@@ -663,7 +700,9 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
       stop("recent.units is not specified")
     }
     print("Identifying mortalities from infrequent detections")
-    pb<-txtProgressBar(1,length(tag),style=3)
+    if (progress.bar==TRUE){
+      pb<-txtProgressBar(1,length(tag),style=3)
+    }
     for (i in 1:length(tag)){
       if (is.null(morts.prev)|
           (!is.null(morts.prev)&
@@ -795,7 +834,9 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
           }
         }
       }
-      setTxtProgressBar(pb,i)
+      if (progress.bar==TRUE){
+        setTxtProgressBar(pb,i)
+      }
     }
   }
 
@@ -816,7 +857,9 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
     if (!is(end,"POSIXt")){
       stop("end is not in the format YYYY-mm-dd HH:MM:SS")
     }
-    pb<-txtProgressBar(1,length(tag),style=3)
+    if (progress.bar==TRUE){
+      pb<-txtProgressBar(1,length(tag),style=3)
+    }
     for (i in 1:length(tag)){
       if (is.null(morts.prev)|
           (!is.null(morts.prev)&
@@ -888,7 +931,9 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
           }
         }
       }
-      setTxtProgressBar(pb,i)
+      if (progress.bar==TRUE){
+        setTxtProgressBar(pb,i)
+      }
     }
   }
 

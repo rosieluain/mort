@@ -27,13 +27,13 @@ infrequent(
   from.station = NULL,
   to.station = NULL,
   drift.cutoff = NULL,
-  drift.units = NULL
+  drift.units = NULL,
+  progress.bar = TRUE
 )
 }
 \arguments{
 \item{data}{a dataframe of residence events. Residence events must include
-tag ID, location name, start time, and duration. Residence events must also
-include end time if \code{season} is provided.}
+tag ID, location name, start time, end time, and duration.}
 
 \item{type}{the method used to generate the residence events. Options are
 "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
@@ -117,6 +117,9 @@ to generate residence events in \code{data}.}
 \item{drift.units}{the units of the cutoff. Options are "secs", "mins", "hours",
 "days", and "weeks". Recommended to be the same as used to generate
 residence events in \code{data}.}
+
+\item{progress.bar}{option to display progress bar as function and called functions
+are run. Default is TRUE.}
 }
 \value{
 if \code{morts=NULL}, a dataframe with one row for each tag ID, including the date/time of
@@ -150,11 +153,15 @@ minutes between 01 October 2019 and 01 June 2020.
 inf_recent<-infrequent(data=events,type="mort",ID="ID",
 station="Station.Name",method="recent",
 threshold=0.5,threshold.units="hours",
-recent.period=52,recent.units="weeks")
+recent.period=52,recent.units="weeks",
+progress.bar=FALSE)
+head(inf_recent)
 
 ## User-defined example
 inf_defined<-infrequent(data=events,type="mort",ID="ID",
 station="Station.Name",method="defined",
 threshold=0.5,threshold.units="hours",
-start="2019-10-01",end="2020-06-01")
+start="2019-10-01",end="2020-06-01",
+progress.bar=FALSE)
+head(inf_defined)
 }

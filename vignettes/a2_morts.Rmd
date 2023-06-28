@@ -32,11 +32,11 @@ All options rely on identifying the most recent station or location change for e
 The black points in the plot below show examples of the most recent station changes. See `stationchange()` and the [Digging](https://rosieluain.github.io/mort/articles/a6_digging.html) vignette for more information on how mort identifies station changes. 
 
 ```{r stnchange_plot,echo=FALSE,fig.width=7}
-stn.change<-stationchange(data=events[events$ID %in% c("G","K"),],type="mort",ID="ID",station="Station.Name",progressbar=FALSE)
+stn.change<-stationchange(data=events[events$ID %in% c("G","K"),],type="mort",ID="ID",station="Station.Name",progress.bar=FALSE)
 plot<-mortsplot(data=events[events$ID %in% c("G","K"),],
                 type="mort",ID="ID",station="Station.Name",
                 season.start="2004-06-22",season.end="2004-07-01",
-                progressbar=FALSE)
+                progress.bar=FALSE)
 plot<-plot+
   geom_point(data=stn.change,aes(x=ResidenceStart,y=ID))+
   scale_colour_discrete(name="Station Name")+
@@ -52,10 +52,10 @@ These long residences can be explored by the user using the `resmax()` function 
 
 ```{r resmax_ex,echo=FALSE}
 stn.change<-stationchange(data=events,type="mort",ID="ID",station="Station.Name",
-                          progressbar=FALSE)
+                          progress.bar=FALSE)
 rm_example<-resmax(data=events,ID="ID",station="Station.Name",
                    res.start="ResidenceStart",residences="ResidenceLength.days",
-                   stnchange=stn.change,progressbar=FALSE)
+                   stnchange=stn.change,progress.bar=FALSE)
 rm_example<-rm_example[order(rm_example$ResidenceLength.days,decreasing=TRUE),]
 row.names(rm_example)<-NULL
 knitr::kable(head(rm_example),align="c")
@@ -126,7 +126,7 @@ cml_res<-data.frame(ID=c("C","L"),
 plot<-mortsplot(data=events[events$ID %in% c("C","L"),],
                 type="mort",ID="ID",station="Station.Name",
                 season.start="2004-03-26",season.end="2004-06-23",
-                progressbar=FALSE)
+                progress.bar=FALSE)
 plot<-plot+
   geom_point(data=cml_res,aes(x=Start,y=ID))+
   geom_point(data=cml_res,aes(x=End,y=ID))+
@@ -139,13 +139,13 @@ The threshold for cumulative residence events is identified similarly to that fo
 
 ```{r resmaxcml_ex,echo=FALSE}
 stn.change<-stationchange(data=events,type="mort",ID="ID",station="Station.Name",
-                          progressbar=FALSE)
+                          progress.bar=FALSE)
 rmc_example<-resmaxcml(data=events,ID="ID",station="Station.Name",
                    res.start="ResidenceStart",
                    res.end="ResidenceEnd",
                    residences="ResidenceLength.days",
                    units="days",
-                   stnchange=stn.change,progressbar=FALSE)
+                   stnchange=stn.change,progress.bar=FALSE)
 rmc_example<-rmc_example[order(rmc_example$ResidenceLength.days,
                                decreasing=TRUE),]
 row.names(rmc_example)<-NULL
@@ -202,7 +202,7 @@ The `infrequent()` function is used to identify potential mortalities or expelle
 plot<-mortsplot(data=events[events$ID %in% c("M","I"),],
                 type="mort",ID="ID",station="Station.Name",
                 season.start="2005-09-25",season.end="2006-09-25",
-                progressbar=FALSE)
+                progress.bar=FALSE)
 plot<-plot+
   theme(legend.position="none")
 plot
