@@ -48,8 +48,11 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{undead<-review(morts=morts,new.data=new.data,old.data=old.data,
-#' ID="TagID",station="Station.Name",res.start="ResidenceStart")}
+#' morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",
+#' method="any")
+#'
+#' undead<-review(morts=morts,new.data=new.data,
+#' type="mort",ID="ID",station="Station.Name")
 review<-function(morts,new.data,old.data=NULL,type,ID,station,res.start="auto",
                  res.end=NULL,residences=NULL,units=NULL,
                  ddd=NULL,from.station=NULL,to.station=NULL){
@@ -67,9 +70,9 @@ review<-function(morts,new.data,old.data=NULL,type,ID,station,res.start="auto",
     and units must also be specified.")
   }
 
-  # Check that ID and station are specified (not "auto") for format="mort"
+  # Check that ID and station are specified (not "auto") for type="mort"
   if (type=="mort"&(ID=="auto"|station=="auto")){
-    stop("ID and station must be specified (i.e., cannot be 'auto') for format='mort'")
+    stop("ID and station must be specified (i.e., cannot be 'auto') for type='mort'")
   }
 
   if (!is.null(ddd)){
@@ -137,10 +140,12 @@ review<-function(morts,new.data,old.data=NULL,type,ID,station,res.start="auto",
         stop("res.start is not in the format YYYY-mm-dd HH:MM:SS")
       }
     }
-    if (!is(old.data[[res.end]],"POSIXt")){
-      try(old.data[[res.end]]<-as.POSIXct(old.data[[res.end]],tz="UTC",silent=TRUE))
+    if (!is.null(res.end)){
       if (!is(old.data[[res.end]],"POSIXt")){
-        stop("res.end is not in the format YYYY-mm-dd HH:MM:SS")
+        try(old.data[[res.end]]<-as.POSIXct(old.data[[res.end]],tz="UTC",silent=TRUE))
+        if (!is(old.data[[res.end]],"POSIXt")){
+          stop("res.end is not in the format YYYY-mm-dd HH:MM:SS")
+        }
       }
     }
   }

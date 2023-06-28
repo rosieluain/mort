@@ -16,10 +16,10 @@
 #' @param residences a character string with the name of the column in `data`
 #' that holds the duration of the residence events.
 #' @param res.start a string of the name of the column in `data` that holds the
-#' start date and time. Must be specified and in POSIXt if `format="manual"`.
+#' start date and time. Must be specified and in POSIXt if `type="manual"`.
 #' @param res.end a string of the name of the column in `data` that holds the
 #' end date and time. Must be specified and in POSIXt or character in the format
-#' YYYY-mm-dd HH:MM:SS if `format="manual"`.
+#' YYYY-mm-dd HH:MM:SS if `type="manual"`.
 #' @param drift option to account for potential drifting in identifying
 #' station changes.
 #' @param ddd a dataframe of stations/locations where detected movement between
@@ -44,8 +44,7 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{stationchange(data=res.events,format="manual",ID="TagID",
-#' station="Receiver",res.start="StartUTC",residences="ResidencesLength.days")}
+#' stn.change<-stationchange(data=events,type="mort",ID="ID",station="Station.Name")
 stationchange<-function(data,type="mort",ID,station,res.start="auto",
                         res.end="auto",residences="auto",
                         singles=TRUE,drift=FALSE,ddd=NULL,units=NULL,from.station=NULL,
@@ -64,9 +63,9 @@ stationchange<-function(data,type="mort",ID,station,res.start="auto",
     stop("units must be specified if applying drift")
   }
 
-  # Check that ID and station are specified (not "auto") for format="mort"
+  # Check that ID and station are specified (not "auto") for type="mort"
   if (type=="mort"&(ID=="auto"|station=="auto")){
-    stop("ID and station must be specified (i.e., cannot be 'auto') for format='mort'")
+    stop("ID and station must be specified (i.e., cannot be 'auto') for type='mort'")
   }
 
   # Fill in auto fields
@@ -207,7 +206,7 @@ stationchange<-function(data,type="mort",ID,station,res.start="auto",
 #' @param station a string of the name of the column in `data` that holds the
 #' station name or receiver location.
 #' @param res.start a string of the name of the column in `data` that holds the
-#' start date and time. Must be specified and in POSIXt if `format="manual"`.
+#' start date and time. Must be specified and in POSIXt if `type="manual"`.
 #' @param residences a character string with the name of the column in `data`
 #' that holds the duration of the residence events.
 #' @param stnchange a dataframe with the start time and location of the most
@@ -222,8 +221,13 @@ stationchange<-function(data,type="mort",ID,station,res.start="auto",
 #' @export
 #'
 #' @examples
-#' \dontrun{resmax(data=res.events,ID="TagID",station="Receiver",
-#' res.start="StartUTC",residences="ResidencesLength.days",stnchange=station.change)}
+#' # Identify most recent station change
+#' station.change<-stationchange(data=events,type="mort",ID="ID",
+#' station="Station.Name")
+#'
+#' longest_res_events<-resmax(data=events,ID="ID",station="Station.Name",
+#' res.start="ResidenceStart",residences="ResidenceLength.days",
+#' stnchange=station.change)
 resmax<-function(data,ID,station,res.start,
                  residences,stnchange,drift=FALSE,progressbar=TRUE){
   res.max<-data[0,]
@@ -280,9 +284,9 @@ resmax<-function(data,ID,station,res.start,
 #' @param station a string of the name of the column in `data` that holds the
 #' station name or receiver location.
 #' @param res.start a string of the name of the column in `data` that holds the
-#' start date and time. Must be specified and in POSIXt if `format="manual"`.
+#' start date and time. Must be specified and in POSIXt if `type="manual"`.
 #' @param res.end a string of the name of the column in `data` that holds the
-#' end date and time. Must be specified and in POSIXt if `format="manual"`.
+#' end date and time. Must be specified and in POSIXt if `type="manual"`.
 #' @param residences a character string with the name of the column in `data`
 #' that holds the duration of the residence events.
 #' @param units units of the duration of the residence events in `data`.
@@ -298,9 +302,14 @@ resmax<-function(data,ID,station,res.start,
 #' @export
 #'
 #' @examples
-#' \dontrun{resmaxcml(data=res.events,ID="TagID",station="Receiver",
-#' res.start="StartUTC",res.end="EndUTC",residences="ResidencesLength.days",
-#' units="days",stnchange=station.change)}
+#' # Identify most recent station change
+#' station.change<-stationchange(data=events,type="mort",ID="ID",
+#' station="Station.Name")
+#'
+#' cumulative_events<-resmaxcml(data=events,ID="ID",station="Station.Name",
+#' res.start="ResidenceStart",res.end="ResidenceEnd",
+#' residences="ResidenceLength.days",units="days",
+#' stnchange=station.change)
 resmaxcml<-function(data,ID,station,res.start,res.end,
                     residences,units,stnchange,progressbar=TRUE){
   res.maxcml<-data[0,]

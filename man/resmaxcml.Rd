@@ -28,10 +28,10 @@ sample IDs.}
 station name or receiver location.}
 
 \item{res.start}{a string of the name of the column in \code{data} that holds the
-start date and time. Must be specified and in POSIXt if \code{format="manual"}.}
+start date and time. Must be specified and in POSIXt if \code{type="manual"}.}
 
 \item{res.end}{a string of the name of the column in \code{data} that holds the
-end date and time. Must be specified and in POSIXt if \code{format="manual"}.}
+end date and time. Must be specified and in POSIXt if \code{type="manual"}.}
 
 \item{residences}{a character string with the name of the column in \code{data}
 that holds the duration of the residence events.}
@@ -59,7 +59,12 @@ included, provided there are no intervening residence events at other
 stations/locations.
 }
 \examples{
-\dontrun{resmaxcml(data=res.events,ID="TagID",station="Receiver",
-res.start="StartUTC",res.end="EndUTC",residences="ResidencesLength.days",
-units="days",stnchange=station.change)}
+# Identify most recent station change
+station.change<-stationchange(data=events,type="mort",ID="ID",
+station="Station.Name")
+
+cumulative_events<-resmaxcml(data=events,ID="ID",station="Station.Name",
+res.start="ResidenceStart",res.end="ResidenceEnd",
+residences="ResidenceLength.days",units="days",
+stnchange=station.change)
 }

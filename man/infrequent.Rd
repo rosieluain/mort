@@ -35,7 +35,7 @@ infrequent(
 tag ID, location name, start time, and duration. Residence events must also
 include end time if \code{season} is provided.}
 
-\item{type}{the format used to generate the residence events. Options are
+\item{type}{the method used to generate the residence events. Options are
 "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
 must specify \code{ID}, \code{station}, \code{res.start}, \code{res.end}, \code{residences}, and \code{units}.}
 
@@ -47,11 +47,11 @@ station name or receiver location.}
 
 \item{res.start}{a string of the name of the column in \code{data} that holds the
 start date and time. Must be specified and in POSIXt or character in the format
-YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
+YYYY-mm-dd HH:MM:SS if \code{type="manual"}.}
 
 \item{res.end}{a string of the name of the column in \code{data} that holds the
 end date and time. Must be specified and in POSIXt or character in the format
-YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
+YYYY-mm-dd HH:MM:SS if \code{type="manual"}.}
 
 \item{residences}{residences a character string with the name of the column in \code{data}
 that holds the duration of the residence events.}
@@ -122,7 +122,9 @@ residence events in \code{data}.}
 if \code{morts=NULL}, a dataframe with one row for each tag ID, including the date/time of
 the residence start when the potential mortality or expelled tag was identified.
 If \code{morts} is specified, any potential mortalities will be added to existing
-\code{morts} dataframe.
+\code{morts} dataframe. If \code{morts} is specified and \code{replace=TRUE}, then any
+mortalities that are flagged by \code{infrequent()} and occurred at an earlier
+time than those in \code{morts} will be replaced to the earlier date.
 All input data fields
 (e.g., any name, location, or species information that was included with the
 input data) will be retained.
@@ -133,24 +135,26 @@ detections in passive acoustic telemetry data. Mortalities are identfied based
 on a user-defined threshold and timeframe.
 }
 \details{
-Example of \code{method="recent"}: if \code{threshold=10} and \code{recent.period=1} and
-\code{recent.units="years"}, an animal will be flagged as a potential mortality if
-it was detected for less than 10 minutes within a year, ending with the most
-recent detection.
+Example of \code{method="recent"}: if \code{threshold=10}, \code{threshold.units="mins"},
+\code{recent.period=52} and \code{recent.units="weeks"} (1 year), an animal will be
+flagged as a potential mortality if it was detected for less than 10 minutes
+within a year, ending with the most recent detection.
 
-Example of \code{method="defined"}: if \code{threshold=10} and \code{start="2019-10-01"} and \code{end="2020-06-01"}, an animal
+Example of \code{method="defined"}: if \code{threshold=10}, \code{threshold.units="mins"},
+\code{start="2019-10-01"}, and \code{end="2020-06-01"}, an animal
 will be flagged as a potential mortality if it was detected for less than 10
 minutes between 01 October 2019 and 01 June 2020.
 }
 \examples{
 ## Recent example
-\dontrun{infrequent(data=data,format="manual",ID="TagID",station="Receiver",
-res.start="ResStart",res.end="ResEnd",residences="ResidenceLength.days",
-units="days",method="recent",threshold=0.5,recent.period=1,
-recent.units="years")}
+inf_recent<-infrequent(data=events,type="mort",ID="ID",
+station="Station.Name",method="recent",
+threshold=0.5,threshold.units="hours",
+recent.period=52,recent.units="weeks")
+
 ## User-defined example
-\dontrun{infrequent(data=data,format="manual",ID="TagID",station="Receiver",
-res.start="ResStart",res.end="ResEnd",residences="ResidenceLength.days",
-units="days",method="defined",threshold=0.5,start="2019-10-01",
-end="2020-06-01")}
+inf_defined<-infrequent(data=events,type="mort",ID="ID",
+station="Station.Name",method="defined",
+threshold=0.5,threshold.units="hours",
+start="2019-10-01",end="2020-06-01")
 }

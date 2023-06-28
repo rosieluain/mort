@@ -27,7 +27,7 @@ sample IDs.}
 station name or receiver location.}
 
 \item{res.start}{a string of the name of the column in \code{data} that holds the
-start date and time. Must be specified and in POSIXt if \code{format="manual"}.}
+start date and time. Must be specified and in POSIXt if \code{type="manual"}.}
 
 \item{residences}{a character string with the name of the column in \code{data}
 that holds the duration of the residence events.}
@@ -50,6 +50,11 @@ Find the maximum duration of a single residence in the dataset that occurred
 before a station change (i.e., the animal can be assumed to be alive)
 }
 \examples{
-\dontrun{resmax(data=res.events,ID="TagID",station="Receiver",
-res.start="StartUTC",residences="ResidencesLength.days",stnchange=station.change)}
+# Identify most recent station change
+station.change<-stationchange(data=events,type="mort",ID="ID",
+station="Station.Name")
+
+longest_res_events<-resmax(data=events,ID="ID",station="Station.Name",
+res.start="ResidenceStart",residences="ResidenceLength.days",
+stnchange=station.change)
 }

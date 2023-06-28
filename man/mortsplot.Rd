@@ -40,11 +40,11 @@ station name or receiver location.}
 
 \item{res.start}{a string of the name of the column in \code{data} that holds the
 start date and time. Must be specified and in POSIXt or character in the format
-YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
+YYYY-mm-dd HH:MM:SS if \code{type="manual"}.}
 
 \item{res.end}{a string of the name of the column in \code{data} that holds the
 end date and time. Must be specified and in POSIXt or character in the format
-YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
+YYYY-mm-dd HH:MM:SS if \code{type="manual"}.}
 
 \item{morts}{a dataframe containing potential mortalities. The dataframe must
 have the same ID, station, res.start, res.end, and residences column names
@@ -97,6 +97,12 @@ Plot residence events, with the option of plotting identified
 mortalities. Plotting uses ggplot2. Interactive option also uses plotly.
 }
 \examples{
-\dontrun{plot<-mortsplot(data=data,type="mort",ID="TagID",station="Station.Name",
-interactive=TRUE,residences="auto")}
+plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name")
+
+# With mortalities plotted over residences:
+morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",
+method="any")
+
+plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",
+morts=morts)
 }

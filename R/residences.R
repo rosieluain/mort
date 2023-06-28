@@ -23,15 +23,14 @@
 #' @importFrom utils setTxtProgressBar txtProgressBar
 #'
 #' @examples
-#' \dontrun{residences(data=detections,ID="TagID",station="Receiver",
-#' datetime="DateTimeUTC",cutoff=1,units="days")}
+#' res.events<-residences(data=detections,ID="ID",station="Station.Name",
+#' datetime="DateTimeUTC",cutoff=1,units="days")
 
 residences<-function(data,ID,station,datetime,cutoff,units){
   # Create list of unique IDs
   tag<-unique(na.omit(data[[ID]]))
 
-  # Format date/times
-  # If datetime column is not already formatted as POSIXt
+  # Format date/times, if datetime column is not already formatted as POSIXt
   if (!is(data[[datetime]],"POSIXt")){
     # If data not already in POSIXt, assume that time zone is UTC
     try(data[[datetime]]<-as.POSIXct(data[[datetime]],tz="UTC"),silent=TRUE)
@@ -74,9 +73,7 @@ residences<-function(data,ID,station,datetime,cutoff,units){
           if (!(is.na(res$ResidenceEnd[k]))){
             break
           }
-          # If the same station name and within res.cutoff and the next
-          # record is not a manual record type (i.e., it is a receiver
-          # record), move to next row
+          # If the same station name and within res.cutoff, move to next row
           else if ((as.numeric(difftime(res.sub[[datetime]][j+1],res.sub[[datetime]][j],units=units))<=cutoff)&
                    (res.sub[[station]][j+1]==res.sub[[station]][j])){
             j<-j+1

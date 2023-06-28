@@ -37,6 +37,6 @@ appears and after the progress bar has reached 100\%, which may be substantial
 depending on the size of the telemetry dataset.
 }
 \examples{
-\dontrun{residences(data=detections,ID="TagID",station="Receiver",
-datetime="DateTimeUTC",cutoff=1,units="days")}
+res.events<-residences(data=detections,ID="ID",station="Station.Name",
+datetime="DateTimeUTC",cutoff=1,units="days")
 }

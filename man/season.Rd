@@ -35,11 +35,11 @@ station name or receiver location.}
 
 \item{res.start}{a string of the name of the column in \code{data} that holds the
 start date and time. Must be specified and in POSIXt or character in the format
-YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
+YYYY-mm-dd HH:MM:SS if \code{type="manual"}.}
 
 \item{res.end}{a string of the name of the column in \code{data} that holds the
 end date and time. Must be specified and in POSIXt or character in the format
-YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
+YYYY-mm-dd HH:MM:SS if \code{type="manual"}.}
 
 \item{residences}{a character string with the name of the column in \code{data}
 that holds the duration of the residence events.}
@@ -80,7 +80,13 @@ increase the threshold use to identify mortalities, which would then cause
 potential mortalities to be missed.
 }
 \examples{
-\dontrun{season(data=data,res.start="ResidenceStart",res.end="ResidenceEnd",
-residences="ResidenceDuration",units="days",season.start="01-06",
-season.end="31-10")}
+# Seasons in format dd-mm
+season.events<-season(data=events,type="mort",ID="ID",
+station="Station.Name",season.start="01-06",season.end="31-10")
+
+# Seasons in format YYYY-mm-dd HH:MM:SS
+season.start<-c("2003-06-15","2004-06-21")
+season.end<-c("2003-10-15","2004-10-30")
+season.events<-season(data=events,type="mort",ID="ID",
+station="Station.Name",season.start=season.start,season.end=season.end)
 }

@@ -41,7 +41,7 @@ knitr::kable(head(events),align="c")
 
 `ID` is defined by the user. ID could be the tag transmitter ID, the tag serial number, or a unique ID associated with the detections by the user. If the latter, `residences()` and the other functions in mort can accommodate multiple tag deployments (i.e., a tag is returned and re-deployed on another animal), because the ID is unique to the animal. 
 
-`station` is also definied by the user. It could be the receiver serial number (if the same receiver is always deployed at the same location), a unique location name, or a cluster of receivers (similar to Array in the actel package).
+`station` is also defined by the user. It could be the receiver serial number (if the same receiver is always deployed at the same location), a unique location name, or a cluster of receivers (similar to Array in the [actel](https://cran.r-project.org/web/packages/actel/index.html) package).
 
 Note that `units` specifies the units of the cutoff (in the example above, the cutoff is 1 day). These units will also be used to calculate the residence duration. 
 
@@ -57,7 +57,7 @@ attributes(data$DateTimeUTC)$tzone<-"UTC"
 mort functions support the output from other packages for acoustic telemetry data. Note that the following information will be most useful if referenced while exploring the other mort functions. 
 
 ### actel
-Residence events are called "movement events" in actel, and are generated using the `explore()` function. 
+Residence events are called "movement events" in [actel](https://cran.r-project.org/web/packages/actel/index.html), and are generated using the `explore()` function. 
 
 Actel provides residence duration in the format HH:MM:SS. mort converts the duration to a numeric vector, with units of seconds. 
 
@@ -68,12 +68,12 @@ warning("If actel date/times are in local time, they will be converted to UTC. V
 ```
 
 ### glatos
-Residence events are called "detection events" in glatos, and are generated using the `detection_events()` function. 
+Residence events are called "detection events" in [glatos](https://github.com/ocean-tracking-network/glatos), and are generated using the `detection_events()` function. 
 
 glatos uses seconds for the units of residence duration and UTC as the timezone for datetimes. 
 
 ### VTrack
-Residence events are called "residences" in VTrack, and are generated using the `RunResidenceExtraction()` function. 
+Residence events are called "residences" in [VTrack](https://github.com/RossDwyer/VTrack), and are generated using the `RunResidenceExtraction()` function. 
 
 As of VTrack version 2.10, it looks as though VTrack assigns the local time of the user's computer to datetimes. As detection data are typically downloaded in UTC, mort assumes that the datetimes output by VTrack are actually in UTC, rather than local time. Users will receive a warning when using VTrack residence events: 
 

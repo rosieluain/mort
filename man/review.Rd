@@ -83,6 +83,9 @@ flagged as a mortality made a station/location change and may therefore be
 alive.
 }
 \examples{
-\dontrun{undead<-review(morts=morts,new.data=new.data,old.data=old.data,
-ID="TagID",station="Station.Name",res.start="ResidenceStart")}
+morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",
+method="any")
+
+undead<-review(morts=morts,new.data=new.data,
+type="mort",ID="ID",station="Station.Name")
 }

@@ -14,10 +14,10 @@
 #' station name or receiver location.
 #' @param res.start a string of the name of the column in `data` that holds the
 #' start date and time. Must be specified and in POSIXt or character in the format
-#' YYYY-mm-dd HH:MM:SS if `format="manual"`.
+#' YYYY-mm-dd HH:MM:SS if `type="manual"`.
 #' @param res.end a string of the name of the column in `data` that holds the
 #' end date and time. Must be specified and in POSIXt or character in the format
-#' YYYY-mm-dd HH:MM:SS if `format="manual"`.
+#' YYYY-mm-dd HH:MM:SS if `type="manual"`.
 #' @param morts a dataframe containing potential mortalities. The dataframe must
 #' have the same ID, station, res.start, res.end, and residences column names
 #' as `data`.
@@ -56,8 +56,14 @@
 #' @importFrom rlang .data
 #'
 #' @examples
-#' \dontrun{plot<-mortsplot(data=data,type="mort",ID="TagID",station="Station.Name",
-#' interactive=TRUE,residences="auto")}
+#' plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name")
+#'
+#' # With mortalities plotted over residences:
+#' morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",
+#' method="any")
+#'
+#' plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",
+#' morts=morts)
 mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
                     morts=NULL,singles=TRUE,interactive=FALSE,residences=NULL,
                     units=NULL,
@@ -88,9 +94,9 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
     stop("For type='manual', all the following parameters must be specified:
     ID, station, res.start, res.end")
   }
-  # Check that ID and station are specified (not "auto") for format="mort"
+  # Check that ID and station are specified (not "auto") for type="mort"
   if (type=="mort"&(ID=="auto"|station=="auto")){
-    stop("ID and station must be specified (i.e., cannot be 'auto') for format='mort'")
+    stop("ID and station must be specified (i.e., cannot be 'auto') for type='mort'")
   }
   # Fill in auto fields
   if (ID=="auto"){
@@ -335,7 +341,7 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
   }
 
   if (singles==TRUE){
-    # Add a brief period to res.end so residences with 0 detections are visible
+    # Add a brief period to res.end, so residences with 0 detections are visible
     if (facet==TRUE){
       ssn$Length<-difftime(ssn$End,ssn$Start,units="days")
       if (facet.axis=="y"){
@@ -377,12 +383,12 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
     if (!is.null(data$Year)&facet.axis=="y"){
       plot<-plot+
         ggplot2::facet_grid(Year~.,scales="free",space="free_y")+
-        scale_x_datetime(date_labels = "%b %d")
+        ggplot2::scale_x_datetime(date_labels = "%b %d")
     }
     else if (!is.null(data$Year)&facet.axis=="x"){
       plot<-plot+
         ggplot2::facet_grid(.~Year,scales="free",space="free_x")+
-        scale_x_datetime(date_labels = "%b %d")
+        ggplot2::scale_x_datetime(date_labels = "%b %d")
     }
     else if (!is.null(data$Season)){
       plot<-plot+

@@ -18,10 +18,13 @@ function.
 The variables are as follows:
 
 \itemize{
-\item DateTimeUTC. The date and time of each detection, in POSIXct format. The
-data are in UTC, as they would be when downloaded from the receivers.
-\item Station.Name Name of the receiver location.
-\item ID Unique ID of the fish.
+\item ResidenceStart. The start time of the residence events, in POSIXct.
+\item Station.Name. Name of the receiver location.
+\item ID. Unique ID of the fish.
+\item ResidenceEnd. The end time of the residence events, in POSIXct.
+\item ResidenceLength.days. The duration of the residence events. The units are
+days, as indicated by the variable name (which is automatically generated
+by mort::residences())
 }
 }
 \keyword{datasets}

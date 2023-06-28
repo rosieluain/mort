@@ -2,7 +2,7 @@
 % Please edit documentation in R/options.R
 \name{drift}
 \alias{drift}
-\title{Dead drift}
+\title{Dead and drifting}
 \usage{
 drift(
   data,
@@ -37,11 +37,11 @@ station name or receiver location.}
 
 \item{res.start}{a string of the name of the column in \code{data} that holds the
 start date and time. Must be specified and in POSIXt or character in the format
-YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
+YYYY-mm-dd HH:MM:SS if \code{type="manual"}.}
 
 \item{res.end}{a string of the name of the column in \code{data} that holds the
 end date and time. Must be specified and in POSIXt or character in the format
-YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
+YYYY-mm-dd HH:MM:SS if \code{type="manual"}.}
 
 \item{residences}{a character string with the name of the column in \code{data}
 that holds the duration of the residence events.}
@@ -76,7 +76,11 @@ Identifies sequential residence events where detected movement
 between stations may be due to drifting of an expelled tag or dead animal.
 }
 \examples{
-\dontrun{drift(data=data,format="manual",ID="TagID",station="Receiver",
-res.start="ResidenceStart",res.end="ResidenceEnd",ddd=driftstations,
-from.station="FrStation",to.station="ToStation")}
+drift.events<-drift(data=events,type="mort",ID="ID",
+station="Station.Name",ddd=ddd,from.station="From",to.station="To")
+
+# With cutoff:
+drift.events<-drift(data=events,type="mort",ID="ID",
+station="Station.Name",ddd=ddd,from.station="From",to.station="To",
+cutoff=1,cutoff.units="days")
 }

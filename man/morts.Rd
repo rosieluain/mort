@@ -45,11 +45,11 @@ station name or receiver location.}
 
 \item{res.start}{a string of the name of the column in \code{data} that holds the
 start date and time. Must be specified and in POSIXt or character in the format
-YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
+YYYY-mm-dd HH:MM:SS if \code{type="manual"}.}
 
 \item{res.end}{a string of the name of the column in \code{data} that holds the
 end date and time. Must be specified and in POSIXt or character in the format
-YYYY-mm-dd HH:MM:SS if \code{format="manual"}.}
+YYYY-mm-dd HH:MM:SS if \code{type="manual"}.}
 
 \item{method}{the method to be used in flagging mortalities. Options are
 "last", "any", "cumulative", or "all"}
@@ -127,5 +127,9 @@ acoustic telemetry data. Mortalities are identified based on thresholds
 derived from the dataset itself.
 }
 \examples{
-\dontrun{mort(data=res.events,format="manual",units="days",residences="ResidenceLength")}
+morts_ex<-morts(data=events,type="mort",ID="ID",
+station="Station.Name",method="any")
+
+morts_ex_bw<-morts(data=events,type="mort",ID="ID",
+station="Station.Name",method="any",backwards=TRUE)
 }

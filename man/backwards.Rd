@@ -21,7 +21,7 @@ sample IDs.}
 station name or receiver location.}
 
 \item{res.start}{a string of the name of the column in \code{data} that holds the
-start date and time. Must be specified and in POSIXt if \code{format="manual"}.}
+start date and time. Must be specified and in POSIXt if \code{type="manual"}.}
 
 \item{stnchange}{a dataframe with the start time and location of the most
 recent station or location change. Must use the same column names and in
@@ -41,6 +41,18 @@ Shift the start time of potential mortalities earlier, if
 station/location has not changed.
 }
 \examples{
-\dontrun{backwards(data=data,morts=morts,ID="TagID",station="Receiver",
-res.start="ResidencesStart",stnchange=stn.change)}
+morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",
+method="any")
+
+# If station change not identified yet:
+morts_bw<-backwards(data=events,morts=morts,ID="ID",
+station="Station.Name",res.start="ResidenceStart")
+
+# Identify station change first:
+station.change<-stationchange(data=events,type="mort",
+ID="ID",station="Station.Name")
+
+morts_bw<-backwards(data=events,morts=morts,ID="ID",
+station="Station.Name",res.start="ResidenceStart",
+stnchange=station.change)
 }

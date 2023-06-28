@@ -12,7 +12,7 @@
 #' @param station a string of the name of the column in `data` that holds the
 #' station name or receiver location.
 #' @param res.start a string of the name of the column in `data` that holds the
-#' start date and time. Must be specified and in POSIXt if `format="manual"`.
+#' start date and time. Must be specified and in POSIXt if `type="manual"`.
 #' @param stnchange a dataframe with the start time and location of the most
 #' recent station or location change. Must use the same column names and in
 #' the same order as `data`.
@@ -28,8 +28,20 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{backwards(data=data,morts=morts,ID="TagID",station="Receiver",
-#' res.start="ResidencesStart",stnchange=stn.change)}
+#' morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",
+#' method="any")
+#'
+#' # If station change not identified yet:
+#' morts_bw<-backwards(data=events,morts=morts,ID="ID",
+#' station="Station.Name",res.start="ResidenceStart")
+#'
+#' # Identify station change first:
+#' station.change<-stationchange(data=events,type="mort",
+#' ID="ID",station="Station.Name")
+#'
+#' morts_bw<-backwards(data=events,morts=morts,ID="ID",
+#' station="Station.Name",res.start="ResidenceStart",
+#' stnchange=station.change)
 backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
   if (any(data[[station]]=="Break")){
     warning("Either a station name was 'Break' or data included seasonal
@@ -84,7 +96,7 @@ backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
   morts
 }
 
-#' Dead drift
+#' Dead and drifting
 #' @description Identifies sequential residence events where detected movement
 #' between stations may be due to drifting of an expelled tag or dead animal.
 #'
@@ -99,10 +111,10 @@ backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
 #' station name or receiver location.
 #' @param res.start a string of the name of the column in `data` that holds the
 #' start date and time. Must be specified and in POSIXt or character in the format
-#' YYYY-mm-dd HH:MM:SS if `format="manual"`.
+#' YYYY-mm-dd HH:MM:SS if `type="manual"`.
 #' @param res.end a string of the name of the column in `data` that holds the
 #' end date and time. Must be specified and in POSIXt or character in the format
-#' YYYY-mm-dd HH:MM:SS if `format="manual"`.
+#' YYYY-mm-dd HH:MM:SS if `type="manual"`.
 #' @param residences a character string with the name of the column in `data`
 #' that holds the duration of the residence events.
 #' @param units units of the duration of the residence events in `data`.
@@ -125,9 +137,13 @@ backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
 #' @export
 #'
 #' @examples
-#' \dontrun{drift(data=data,format="manual",ID="TagID",station="Receiver",
-#' res.start="ResidenceStart",res.end="ResidenceEnd",ddd=driftstations,
-#' from.station="FrStation",to.station="ToStation")}
+#' drift.events<-drift(data=events,type="mort",ID="ID",
+#' station="Station.Name",ddd=ddd,from.station="From",to.station="To")
+#'
+#' # With cutoff:
+#' drift.events<-drift(data=events,type="mort",ID="ID",
+#' station="Station.Name",ddd=ddd,from.station="From",to.station="To",
+#' cutoff=1,cutoff.units="days")
 drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
                 residences="auto",units="auto",ddd,from.station,to.station,
                 cutoff=NULL,cutoff.units=NULL,progress.bar=TRUE){
@@ -145,9 +161,9 @@ drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
     unitcheck(type=type,units=units,data=data)
   }
 
-  # Check that ID and station are specified (not "auto") for format="mort"
+  # Check that ID and station are specified (not "auto") for type="mort"
   if (type=="mort"&(ID=="auto"|station=="auto")){
-    stop("ID and station must be specified (i.e., cannot be 'auto') for format='mort'")
+    stop("ID and station must be specified (i.e., cannot be 'auto') for type='mort'")
   }
 
   # Fill in auto fields
@@ -170,7 +186,6 @@ drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
     units<-autofield(type=type,field="units",data=data)
   }
 
-  # Could make this check be a function
   if (!is(data[[res.start]],"POSIXt")){
     try(data[[res.start]]<-as.POSIXct(data[[res.start]],tz="UTC",silent=TRUE))
     if (!is(data[[res.start]],"POSIXt")){
@@ -184,7 +199,7 @@ drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
     }
   }
 
-  # Convert station to list (to hold all stations, in order)
+  # Convert station to list (to hold all stations, in chronological order)
   data[[station]]<-as.list(data[[station]])
 
   # Get list of unique tag IDs
@@ -264,10 +279,10 @@ drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
 #' station name or receiver location.
 #' @param res.start a string of the name of the column in `data` that holds the
 #' start date and time. Must be specified and in POSIXt or character in the format
-#' YYYY-mm-dd HH:MM:SS if `format="manual"`.
+#' YYYY-mm-dd HH:MM:SS if `type="manual"`.
 #' @param res.end a string of the name of the column in `data` that holds the
 #' end date and time. Must be specified and in POSIXt or character in the format
-#' YYYY-mm-dd HH:MM:SS if `format="manual"`.
+#' YYYY-mm-dd HH:MM:SS if `type="manual"`.
 #' @param residences a character string with the name of the column in `data`
 #' that holds the duration of the residence events.
 #' @param units Units of the duration of the residence events in `data`. Options are "secs",
@@ -294,9 +309,15 @@ drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
 #' @export
 #'
 #' @examples
-#' \dontrun{season(data=data,res.start="ResidenceStart",res.end="ResidenceEnd",
-#' residences="ResidenceDuration",units="days",season.start="01-06",
-#' season.end="31-10")}
+#' # Seasons in format dd-mm
+#' season.events<-season(data=events,type="mort",ID="ID",
+#' station="Station.Name",season.start="01-06",season.end="31-10")
+#'
+#' # Seasons in format YYYY-mm-dd HH:MM:SS
+#' season.start<-c("2003-06-15","2004-06-21")
+#' season.end<-c("2003-10-15","2004-10-30")
+#' season.events<-season(data=events,type="mort",ID="ID",
+#' station="Station.Name",season.start=season.start,season.end=season.end)
 season<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
                  residences="auto",units="auto",season.start,
                  season.end,overlap=TRUE,progressbar=TRUE){
@@ -314,9 +335,9 @@ season<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     unitcheck(type=type,units=units,data=data)
   }
 
-  # Check that ID and station are specified (not "auto") for format="mort"
+  # Check that ID and station are specified (not "auto") for type="mort"
   if (type=="mort"&(ID=="auto"|station=="auto")){
-    stop("ID and station must be specified (i.e., cannot be 'auto') for format='mort'")
+    stop("ID and station must be specified (i.e., cannot be 'auto') for type='mort'")
   }
 
   # Fill in auto fields

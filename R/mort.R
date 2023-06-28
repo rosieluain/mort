@@ -21,10 +21,10 @@
 #' station name or receiver location.
 #' @param res.start a string of the name of the column in `data` that holds the
 #' start date and time. Must be specified and in POSIXt or character in the format
-#' YYYY-mm-dd HH:MM:SS if `format="manual"`.
+#' YYYY-mm-dd HH:MM:SS if `type="manual"`.
 #' @param res.end a string of the name of the column in `data` that holds the
 #' end date and time. Must be specified and in POSIXt or character in the format
-#' YYYY-mm-dd HH:MM:SS if `format="manual"`.
+#' YYYY-mm-dd HH:MM:SS if `type="manual"`.
 #' @param singles specifies if single detections (length of residence event = 0)
 #' should be retained. Default is `TRUE`. Note that if single detections are
 #' removed (`singles=FALSE`), `backwards` will also not include single detections.
@@ -77,7 +77,11 @@
 #' @export
 #'
 #' @examples
-#' \dontrun{mort(data=res.events,format="manual",units="days",residences="ResidenceLength")}
+#' morts_ex<-morts(data=events,type="mort",ID="ID",
+#' station="Station.Name",method="any")
+#'
+#'morts_ex_bw<-morts(data=events,type="mort",ID="ID",
+#'station="Station.Name",method="any",backwards=TRUE)
 morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
                method="all",units="auto",residences="auto",
                singles=TRUE,backwards=FALSE,drift="none",ddd=NULL,
@@ -103,9 +107,9 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     unitcheck(type=type,units=units,data=data)
   }
 
-  # Check that ID and station are specified (not "auto") for format="mort"
+  # Check that ID and station are specified (not "auto") for type="mort"
   if (type=="mort"&(ID=="auto"|station=="auto")){
-    stop("ID and station must be specified (i.e., cannot be 'auto') for format='mort'")
+    stop("ID and station must be specified (i.e., cannot be 'auto') for type='mort'")
   }
 
   # Fill in auto fields
@@ -374,8 +378,9 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
           }
           else {break}
         }
+        # To compensate for seasonality (which introduces "Breaks")
         if (any(res.temp[[station]]=="Break")){
-          # Need two values, and determine which is lower
+          # Need two values, then determine which is lower
           # Value 1: difftime between end of most recent residence and station change (sc2)
           dt1<-difftime(res.temp[[res.end]][nrow(res.temp)],
                         sc2[[res.start]][i],
@@ -448,7 +453,7 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
 #' @param data a dataframe of residence events. Residence events must include
 #' tag ID, location name, start time, and duration. Residence events must also
 #' include end time if `season` is provided.
-#' @param type the format used to generate the residence events. Options are
+#' @param type the method used to generate the residence events. Options are
 #' "mort", "actel", "glatos", "vtrack", or "manual". If "manual", then user
 #' must specify `ID`, `station`, `res.start`, `res.end`, `residences`, and `units`.
 #' @param ID a string of the name of the column in `data` that holds the tag or
@@ -457,10 +462,10 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
 #' station name or receiver location.
 #' @param res.start a string of the name of the column in `data` that holds the
 #' start date and time. Must be specified and in POSIXt or character in the format
-#' YYYY-mm-dd HH:MM:SS if `format="manual"`.
+#' YYYY-mm-dd HH:MM:SS if `type="manual"`.
 #' @param res.end a string of the name of the column in `data` that holds the
 #' end date and time. Must be specified and in POSIXt or character in the format
-#' YYYY-mm-dd HH:MM:SS if `format="manual"`.
+#' YYYY-mm-dd HH:MM:SS if `type="manual"`.
 #' @param residences residences a character string with the name of the column in `data`
 #' that holds the duration of the residence events.
 #' @param units Units of the duration of the residence events in `data`. Options are "secs",
@@ -510,19 +515,22 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
 #' "days", and "weeks". Recommended to be the same as used to generate
 #' residence events in `data`.
 #'
-#' @details Example of `method="recent"`: if `threshold=10` and `recent.period=1` and
-#' `recent.units="years"`, an animal will be flagged as a potential mortality if
-#' it was detected for less than 10 minutes within a year, ending with the most
-#' recent detection.
+#' @details Example of `method="recent"`: if `threshold=10`, `threshold.units="mins"`,
+#' `recent.period=52` and `recent.units="weeks"` (1 year), an animal will be
+#' flagged as a potential mortality if it was detected for less than 10 minutes
+#' within a year, ending with the most recent detection.
 #'
-#' Example of `method="defined"`: if `threshold=10` and `start="2019-10-01"` and `end="2020-06-01"`, an animal
+#' Example of `method="defined"`: if `threshold=10`, `threshold.units="mins"`,
+#' `start="2019-10-01"`, and `end="2020-06-01"`, an animal
 #' will be flagged as a potential mortality if it was detected for less than 10
 #' minutes between 01 October 2019 and 01 June 2020.
 #'
 #' @return if `morts=NULL`, a dataframe with one row for each tag ID, including the date/time of
 #' the residence start when the potential mortality or expelled tag was identified.
 #' If `morts` is specified, any potential mortalities will be added to existing
-#' `morts` dataframe.
+#' `morts` dataframe. If `morts` is specified and `replace=TRUE`, then any
+#' mortalities that are flagged by `infrequent()` and occurred at an earlier
+#' time than those in `morts` will be replaced to the earlier date.
 #' All input data fields
 #' (e.g., any name, location, or species information that was included with the
 #' input data) will be retained.
@@ -530,17 +538,16 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
 #'
 #' @examples
 #' ## Recent example
-#' \dontrun{infrequent(data=data,format="manual",ID="TagID",station="Receiver",
-#' res.start="ResStart",res.end="ResEnd",residences="ResidenceLength.days",
-#' units="days",method="recent",threshold=0.5,recent.period=1,
-#' recent.units="years")}
+#' inf_recent<-infrequent(data=events,type="mort",ID="ID",
+#' station="Station.Name",method="recent",
+#' threshold=0.5,threshold.units="hours",
+#' recent.period=52,recent.units="weeks")
+#'
 #' ## User-defined example
-#' \dontrun{infrequent(data=data,format="manual",ID="TagID",station="Receiver",
-#' res.start="ResStart",res.end="ResEnd",residences="ResidenceLength.days",
-#' units="days",method="defined",threshold=0.5,start="2019-10-01",
-#' end="2020-06-01")}
-
-
+#' inf_defined<-infrequent(data=events,type="mort",ID="ID",
+#' station="Station.Name",method="defined",
+#' threshold=0.5,threshold.units="hours",
+#' start="2019-10-01",end="2020-06-01")
 infrequent<-function(data,type="mort",ID,station,res.start="auto",
                      res.end="auto",residences="auto",units="auto",
                      method,threshold,threshold.units=NULL,recent.period=NULL,recent.units=NULL,
@@ -561,9 +568,9 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
     unitcheck(type=type,units=units,data=data)
   }
 
-  # Check that ID and station are specified (not "auto") for format="mort"
+  # Check that ID and station are specified (not "auto") for type="mort"
   if (type=="mort"&(ID=="auto"|station=="auto")){
-    stop("ID and station must be specified (i.e., cannot be 'auto') for format='mort'")
+    stop("ID and station must be specified (i.e., cannot be 'auto') for type='mort'")
   }
 
   # Fill in auto fields
