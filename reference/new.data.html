@@ -90,10 +90,13 @@ function.</p>
     <div id="details">
     <h2>Details</h2>
     <p>The variables are as follows:</p>
-<ul><li><p>DateTimeUTC. The date and time of each detection, in POSIXct format. The
-data are in UTC, as they would be when downloaded from the receivers.</p></li>
-<li><p>Station.Name Name of the receiver location.</p></li>
-<li><p>ID Unique ID of the fish.</p></li>
+<ul><li><p>ResidenceStart. The start time of the residence events, in POSIXct.</p></li>
+<li><p>Station.Name. Name of the receiver location.</p></li>
+<li><p>ID. Unique ID of the fish.</p></li>
+<li><p>ResidenceEnd. The end time of the residence events, in POSIXct.</p></li>
+<li><p>ResidenceLength.days. The duration of the residence events. The units are
+days, as indicated by the variable name (which is automatically generated
+by mort::residences())</p></li>
 </ul></div>
 
   </div>

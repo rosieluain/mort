@@ -237,10 +237,11 @@ the detections by the user. If the latter, <code><a href="../reference/residence
 the other functions in mort can accommodate multiple tag deployments
 (i.e., a tag is returned and re-deployed on another animal), because the
 ID is unique to the animal.</p>
-<p><code>station</code> is also definied by the user. It could be the
+<p><code>station</code> is also defined by the user. It could be the
 receiver serial number (if the same receiver is always deployed at the
 same location), a unique location name, or a cluster of receivers
-(similar to Array in the actel package).</p>
+(similar to Array in the <a href="https://cran.r-project.org/web/packages/actel/index.html" class="external-link">actel</a>
+package).</p>
 <p>Note that <code>units</code> specifies the units of the cutoff (in
 the example above, the cutoff is 1 day). These units will also be used
 to calculate the residence duration.</p>
@@ -264,8 +265,8 @@ if referenced while exploring the other mort functions.</p>
 <div class="section level3">
 <h3 id="actel">actel<a class="anchor" aria-label="anchor" href="#actel"></a>
 </h3>
-<p>Residence events are called “movement events” in actel, and are
-generated using the <code>explore()</code> function.</p>
+<p>Residence events are called “movement events” in <a href="https://cran.r-project.org/web/packages/actel/index.html" class="external-link">actel</a>,
+and are generated using the <code>explore()</code> function.</p>
 <p>Actel provides residence duration in the format HH:MM:SS. mort
 converts the duration to a numeric vector, with units of seconds.</p>
 <p>Dates in actel are in local time and will be converted to UTC by
@@ -278,15 +279,15 @@ correct.</p>
 <div class="section level3">
 <h3 id="glatos">glatos<a class="anchor" aria-label="anchor" href="#glatos"></a>
 </h3>
-<p>Residence events are called “detection events” in glatos, and are
-generated using the <code>detection_events()</code> function.</p>
+<p>Residence events are called “detection events” in <a href="https://github.com/ocean-tracking-network/glatos" class="external-link">glatos</a>, and
+are generated using the <code>detection_events()</code> function.</p>
 <p>glatos uses seconds for the units of residence duration and UTC as
 the timezone for datetimes.</p>
 </div>
 <div class="section level3">
 <h3 id="vtrack">VTrack<a class="anchor" aria-label="anchor" href="#vtrack"></a>
 </h3>
-<p>Residence events are called “residences” in VTrack, and are generated
+<p>Residence events are called “residences” in <a href="https://github.com/RossDwyer/VTrack" class="external-link">VTrack</a>, and are generated
 using the <code>RunResidenceExtraction()</code> function.</p>
 <p>As of VTrack version 2.10, it looks as though VTrack assigns the
 local time of the user’s computer to datetimes. As detection data are
