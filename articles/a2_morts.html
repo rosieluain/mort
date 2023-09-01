@@ -79,6 +79,9 @@
     </li>
   </ul>
 </li>
+<li>
+  <a href="../news/index.html">Changelog</a>
+</li>
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
@@ -430,11 +433,11 @@ and extends back in time for the <code>recent.period</code>. If the sum
 of the duration of all residence events in this timeframe is less than
 the <code>threshold</code>, the animal is flagged as a potential
 mortality. In the following example, animals are flagged if they were
-detected for less than 60 minutes within one year (52 weeks) preceding
+detected for less than 72 hours within one year (52 weeks) preceding
 their most recent residence event.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">recent_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/infrequent.html">infrequent</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
-<span>                      method<span class="op">=</span><span class="st">"recent"</span>,threshold<span class="op">=</span><span class="fl">60</span>,threshold.units<span class="op">=</span><span class="st">"mins"</span>,</span>
+<span>                      method<span class="op">=</span><span class="st">"recent"</span>,threshold<span class="op">=</span><span class="fl">72</span>,threshold.units<span class="op">=</span><span class="st">"hours"</span>,</span>
 <span>                      recent.period<span class="op">=</span><span class="fl">52</span>,recent.units<span class="op">=</span><span class="st">"weeks"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="a2_morts_files/figure-html/rec_plot-1.png" width="672"></p>
 </div>
@@ -445,11 +448,11 @@ their most recent residence event.</p>
 infrequent residence events is specified (defined) by the user with the
 <code>start</code> and <code>end</code> arguments. In the following
 example, an animal is flagged as potential mortality if the sum of the
-duration of all residence events between 15 June and 15 October 2022 is
-less than 60 minutes.</p>
+duration of all residence events between 15 June and 15 October 2006 is
+less than 12 hours.</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">defined_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/infrequent.html">infrequent</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
-<span>                       method<span class="op">=</span><span class="st">"defined"</span>,threshold<span class="op">=</span><span class="fl">60</span>,threshold.units<span class="op">=</span><span class="st">"mins"</span>,</span>
+<span>                       method<span class="op">=</span><span class="st">"defined"</span>,threshold<span class="op">=</span><span class="fl">12</span>,threshold.units<span class="op">=</span><span class="st">"hours"</span>,</span>
 <span>                      start<span class="op">=</span><span class="st">"2006-06-15"</span>,end<span class="op">=</span><span class="st">"2006-10-15"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="a2_morts_files/figure-html/def_plot-1.png" width="672"></p>
 <p>Note that mort will assign the UTC timezone to <code>start</code> and
