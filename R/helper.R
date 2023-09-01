@@ -165,7 +165,6 @@ extractres<-function(data,type){
 }
 
 
-
 #' Compare specified to default units
 #' @description Compare specified units to package default units and issue
 #' a warning if there is no match.
@@ -204,3 +203,95 @@ unitcheck<-function(type,units,data){
   }
 }
 
+
+#' Convert units of time
+#' @description Convert a period of time into different units.
+#'
+#' @param unit1 Initial units of the period of time.
+#' @param unit2 Desired units of the period of time.
+#' @param val1 Period of time, in the units of `unit1`
+#'
+#' @return A numeric value of the period time in the desired units (`unit2`).
+#' @keywords internal
+#' @noRd
+#'
+#' @examples
+#' unitconvert("secs","mins",60)
+#' unitconvert("weeks","hours",1)
+unitconvert<-function(unit1,unit2,val1){
+  if (unit1=="secs"){
+    if (unit2=="mins"){
+      val.new<-val1/60
+    }
+    if (unit2=="hours"){
+      val.new<-val1/60/60
+    }
+    if (unit2=="days"){
+      val.new<-val1/60/60/24
+    }
+    if (unit2=="weeks"){
+      val.new<-val1/60/60/24/7
+    }
+  }
+  else if (unit1=="mins"){
+    if (unit2=="secs"){
+      val.new<-val1*60
+    }
+    if (unit2=="hours"){
+      val.new<-val1/60
+    }
+    if (unit2=="days"){
+      val.new<-val1/60/24
+    }
+    if (unit2=="weeks"){
+      val.new<-val1/60/24/7
+    }
+  }
+  else if (unit1=="hours"){
+    if (unit2=="secs"){
+      val.new<-val1*60*60
+    }
+    if (unit2=="mins"){
+      val.new<-val1*60
+    }
+    if (unit2=="days"){
+      val.new<-val1/24
+    }
+    if (unit2=="weeks"){
+      val.new<-val1/24/7
+    }
+  }
+  else if (unit1=="days"){
+    if (unit2=="secs"){
+      val.new<-val1*60*60*24
+    }
+    if (unit2=="mins"){
+      val.new<-val1*60*24
+    }
+    if (unit2=="hours"){
+      val.new<-val1*24
+    }
+    if (unit2=="weeks"){
+      val.new<-val1/7
+    }
+  }
+  else if (unit1=="weeks"){
+    if (unit2=="secs"){
+      val.new<-val1*60*60*24*7
+    }
+    if (unit2=="mins"){
+      val.new<-val1*60*24*7
+    }
+    if (unit2=="hours"){
+      val.new<-val1*24*7
+    }
+    if (unit2=="days"){
+      val.new<-val1*7
+    }
+  }
+  else{
+    stop("Units are not supported. Units must be 'secs', 'mins', 'hours', 'days', or 'weeks'.")
+  }
+
+  val.new
+}

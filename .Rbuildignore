@@ -7,3 +7,6 @@
 ^pkgdown$
 ^\.github$
 ^working$
+^cran-comments\.md$
+^doc$
+^Meta$

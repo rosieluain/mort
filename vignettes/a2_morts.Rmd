@@ -211,16 +211,16 @@ plot
 For this function, the thresholds are user-defined. The user has two options for defining the thresholds: 
 
 #### 1. recent
-For `method="recent"`, the timeframe for assessing infrequent residence events begins with the most recent residence event, and extends back in time for the `recent.period`. If the sum of the duration of all residence events in this timeframe is less than the `threshold`, the animal is flagged as a potential mortality. In the following example, animals are flagged if they were detected for less than 60 minutes within one year (52 weeks) preceding their most recent residence event. 
+For `method="recent"`, the timeframe for assessing infrequent residence events begins with the most recent residence event, and extends back in time for the `recent.period`. If the sum of the duration of all residence events in this timeframe is less than the `threshold`, the animal is flagged as a potential mortality. In the following example, animals are flagged if they were detected for less than 72 hours within one year (52 weeks) preceding their most recent residence event. 
 
 ```{r recent_ex,eval=FALSE}
 recent_ex<-infrequent(data=events,type="mort",ID="ID",station="Station.Name",
-                      method="recent",threshold=60,threshold.units="mins",
+                      method="recent",threshold=72,threshold.units="hours",
                       recent.period=52,recent.units="weeks")
 ```
 ```{r recent_ex_run,include=FALSE}
 recent_ex<-infrequent(data=events,type="mort",ID="ID",station="Station.Name",
-                      method="recent",threshold=60,threshold.units="mins",
+                      method="recent",threshold=72,threshold.units="hours",
                       recent.period=52,recent.units="weeks")
 ```
 ```{r rec_plot,echo=FALSE,fig.width=7}
@@ -231,16 +231,16 @@ plot
 ```
 
 #### 2. defined
-For `method="defined"`, the timeframe for assessing infrequent residence events is specified (defined) by the user with the `start` and `end` arguments. In the following example, an animal is flagged as potential mortality if the sum of the duration of all residence events between 15 June and 15 October 2022 is less than 60 minutes. 
+For `method="defined"`, the timeframe for assessing infrequent residence events is specified (defined) by the user with the `start` and `end` arguments. In the following example, an animal is flagged as potential mortality if the sum of the duration of all residence events between 15 June and 15 October 2006 is less than 12 hours. 
 
 ```{r defined_ex, eval=FALSE}
 defined_ex<-infrequent(data=events,type="mort",ID="ID",station="Station.Name",
-                       method="defined",threshold=60,threshold.units="mins",
+                       method="defined",threshold=12,threshold.units="hours",
                       start="2006-06-15",end="2006-10-15")
 ```
 ```{r defined_ex_run,include=FALSE}
 defined_ex<-infrequent(data=events,type="mort",ID="ID",station="Station.Name",
-                       method="defined",threshold=60,threshold.units="mins",
+                       method="defined",threshold=12,threshold.units="hours",
                       start="2006-06-15",end="2006-10-15")
 ```
 ```{r def_plot,echo=FALSE,fig.width=7}

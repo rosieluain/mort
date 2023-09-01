@@ -41,7 +41,7 @@ knitr::kable(head(events),align="c")
 
 `ID` is defined by the user. ID could be the tag transmitter ID, the tag serial number, or a unique ID associated with the detections by the user. If the latter, `residences()` and the other functions in mort can accommodate multiple tag deployments (i.e., a tag is returned and re-deployed on another animal), because the ID is unique to the animal. 
 
-`station` is also defined by the user. It could be the receiver serial number (if the same receiver is always deployed at the same location), a unique location name, or a cluster of receivers (similar to Array in the [actel](https://cran.r-project.org/web/packages/actel/index.html) package).
+`station` is also defined by the user. It could be the receiver serial number (if the same receiver is always deployed at the same location), a unique location name, or a cluster of receivers (similar to Array in the [actel](https://CRAN.R-project.org/package=actel) package).
 
 Note that `units` specifies the units of the cutoff (in the example above, the cutoff is 1 day). These units will also be used to calculate the residence duration. 
 
@@ -57,7 +57,7 @@ attributes(data$DateTimeUTC)$tzone<-"UTC"
 mort functions support the output from other packages for acoustic telemetry data. Note that the following information will be most useful if referenced while exploring the other mort functions. 
 
 ### actel
-Residence events are called "movement events" in [actel](https://cran.r-project.org/web/packages/actel/index.html), and are generated using the `explore()` function. 
+Residence events are called "movement events" in [actel](https://CRAN.R-project.org/package=actel), and are generated using the `explore()` function. 
 
 Actel provides residence duration in the format HH:MM:SS. mort converts the duration to a numeric vector, with units of seconds. 
 

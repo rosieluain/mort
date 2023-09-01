@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 library(mort)
 library(ggplot2)
 ```
-There may be situations where a tag that was expelled or from a dead animal may appear to move among stations or locations. This apparent movement could be due to the tag drifting with currents or tides. If a tag is located within range of two overlapping recievers, simultaneous or near-simultaneous detections at the two receivers may be assigned to different residence events. Left unaddressed, these residence events at different stations would be considered by mort to be station changes.
+There may be situations where a tag that was expelled or from a dead animal may appear to move among stations or locations. This apparent movement could be due to the tag drifting with currents or tides. If a tag is located within range of two overlapping receivers, simultaneous or near-simultaneous detections at the two receivers may be assigned to different residence events. Left unaddressed, these residence events at different stations would be considered by mort to be station changes.
 
 ## Specifying drift stations 
 Drift stations must be specified by the user. These can be determined by common sense (e.g., Station 5 is upstream of Station 4, so drift can occur from Station 5 to Station 4). Potential drift stations can also be determined by plotting and exploring residence events (see "Plotting" vignette). A series of long residences at one station that are followed by a series of long residences at another station may indicate drift from unmapped currents in the study area. Brief residence events with numerous station changes between two stations may indicate stations that overlap under certain environmental conditions. 

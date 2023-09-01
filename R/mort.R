@@ -570,7 +570,7 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
 #' ## Recent example
 #' inf_recent<-infrequent(data=events,type="mort",ID="ID",
 #' station="Station.Name",method="recent",
-#' threshold=0.5,threshold.units="hours",
+#' threshold=72,threshold.units="hours",
 #' recent.period=52,recent.units="weeks",
 #' progress.bar=FALSE)
 #' head(inf_recent)
@@ -578,8 +578,8 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
 #' ## User-defined example
 #' inf_defined<-infrequent(data=events,type="mort",ID="ID",
 #' station="Station.Name",method="defined",
-#' threshold=0.5,threshold.units="hours",
-#' start="2019-10-01",end="2020-06-01",
+#' threshold=12,threshold.units="hours",
+#' start="2006-06-15",end="2006-10-15",
 #' progress.bar=FALSE)
 #' head(inf_defined)
 infrequent<-function(data,type="mort",ID,station,res.start="auto",
@@ -699,6 +699,10 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
     if (is.null(recent.units)){
       stop("recent.units is not specified")
     }
+    # Convert threshold units if threshold units and residence units do not match
+    if (units!=threshold.units){
+      threshold<-unitconvert(unit1=threshold.units,unit2=units,val1=threshold)
+    }
     print("Identifying mortalities from infrequent detections")
     if (progress.bar==TRUE){
       pb<-txtProgressBar(1,length(tag),style=3)
@@ -713,28 +717,29 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
         j<-min(which(difftime(res.temp[[res.end]][nrow(res.temp)],
                           res.temp[[res.end]],
                           units=recent.units)<=recent.period))
+        res.temp<-res.temp[j:nrow(res.temp),]
         if (is.null(ddd)){
           if (nrow(res.temp)>=1&
-              length(unique(res.temp[[station]][j:nrow(res.temp)]))==1&
+              length(unique(res.temp[[station]]))==1&
               sum(res.temp[[residences]])<threshold){
             if (tag[i] %in% inf.morts[[ID]]){
-              j<-which(inf.morts[[ID]]==tag[i])
-              if (res.temp[[res.start]][1]<inf.morts[[res.start]][j]){
-                inf.morts[j,]<-res.temp[1,]
+              k<-which(inf.morts[[ID]]==tag[i])
+              if (res.temp[[res.start]][1]<inf.morts[[res.start]][k]){
+                inf.morts[k,]<-res.temp[1,]
                 if (!is.null(morts.prev)&backwards==TRUE){
-                  new.morts<-c(new.morts,j)
+                  new.morts<-c(new.morts,k)
                 }
               }
             }
             else {
-              inf.morts[nrow(inf.morts)+1,]<-res.temp[j,]
+              inf.morts[nrow(inf.morts)+1,]<-res.temp[1,]
             }
           }
         }
         else {
           if (nrow(res.temp)>0&
               sum(res.temp[[residences]])<threshold){
-            res.temp.drift<-drift(data=res.temp[j:nrow(res.temp),],
+            res.temp.drift<-drift(data=res.temp,
                                   type=type,ID=ID,station=station,
                                   res.start=res.start,res.end=res.end,
                                   residences=residences,units=units,ddd=ddd,
@@ -856,6 +861,10 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
     try(end<-as.POSIXct(end,tz="UTC",silent=TRUE))
     if (!is(end,"POSIXt")){
       stop("end is not in the format YYYY-mm-dd HH:MM:SS")
+    }
+    # Convert threshold units if threshold units and residence units do not match
+    if (units!=threshold.units){
+      threshold<-unitconvert(unit1=threshold.units,unit2=units,val1=threshold)
     }
     if (progress.bar==TRUE){
       pb<-txtProgressBar(1,length(tag),style=3)

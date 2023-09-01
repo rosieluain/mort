@@ -152,7 +152,7 @@ minutes between 01 October 2019 and 01 June 2020.
 ## Recent example
 inf_recent<-infrequent(data=events,type="mort",ID="ID",
 station="Station.Name",method="recent",
-threshold=0.5,threshold.units="hours",
+threshold=72,threshold.units="hours",
 recent.period=52,recent.units="weeks",
 progress.bar=FALSE)
 head(inf_recent)
@@ -160,8 +160,8 @@ head(inf_recent)
 ## User-defined example
 inf_defined<-infrequent(data=events,type="mort",ID="ID",
 station="Station.Name",method="defined",
-threshold=0.5,threshold.units="hours",
-start="2019-10-01",end="2020-06-01",
+threshold=12,threshold.units="hours",
+start="2006-06-15",end="2006-10-15",
 progress.bar=FALSE)
 head(inf_defined)
 }
