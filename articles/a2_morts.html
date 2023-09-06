@@ -256,7 +256,7 @@ the same station, ignoring any gaps in detection (or <code>cutoff</code>
 in <code><a href="../reference/residences.html">residences()</a></code>). The black points in the plot below
 indicate the start and end of the longest cumulative residence events,
 before a station change, for each fish.</p>
-<p><img src="a2_morts_files/figure-html/sc_cmlres_plot-1.png" width="672"></p>
+<p><img src="a2_morts_files/figure-html/sc_cmlres_plot_adjust-1.png" width="672"></p>
 <p>The threshold for cumulative residence events is identified similarly
 to that for single residence events. The cumulative residence events can
 be explored by the user using the <code><a href="../reference/resmaxcml.html">resmaxcml()</a></code> function (see
@@ -421,7 +421,7 @@ the residence event where a flagged mortality was identified:</p>
 mortalities or expelled tags that may be located just outside the usual
 range of a receiver, and are therefore detected briefly and
 intermittently when conditions allow.</p>
-<p><img src="a2_morts_files/figure-html/inf_plot-1.png" width="672"></p>
+<p><img src="a2_morts_files/figure-html/inf_plot_adjust-1.png" width="672"></p>
 <p>For this function, the thresholds are user-defined. The user has two
 options for defining the thresholds:</p>
 <div class="section level4">
@@ -522,7 +522,9 @@ the flagged mortalities are shifted earlier. The default is
 <code>backwards=TRUE</code>.</p>
 <p>In the plot below, the black points show the flagged mortalities with
 <code>backwards=FALSE</code>, and the blue points show the flagged
-mortalities with <code>backwards=TRUE</code>:</p>
+mortalities with <code>backwards=TRUE</code>. If only a blue point is
+visible for a given animal ID, then the flagged mortality is not shifted
+earlier with <code>backwards=TRUE</code>.</p>
 <p><img src="a2_morts_files/figure-html/backwards_plot-1.png" width="672"></p>
 <p>Note, when <code>method="cumulative"</code> and there is no
 seasonality, cumulative residence events will cover all consecutive

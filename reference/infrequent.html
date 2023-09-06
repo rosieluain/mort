@@ -109,7 +109,7 @@ on a user-defined threshold and timeframe.</p>
 <span>  to.station <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  drift.cutoff <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  drift.units <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  progress.bar <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  verbose <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -247,9 +247,9 @@ to generate residence events in <code>data</code>.</p></dd>
 residence events in <code>data</code>.</p></dd>
 
 
-<dt>progress.bar</dt>
-<dd><p>option to display progress bar as function and called functions
-are run. Default is TRUE.</p></dd>
+<dt>verbose</dt>
+<dd><p>option to display updates and progress bars as
+sub-functions are called and run. Default is TRUE.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -285,8 +285,7 @@ minutes between 01 October 2019 and 01 June 2020.</p>
 <span class="r-in"><span>station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"recent"</span>,</span></span>
 <span class="r-in"><span>threshold<span class="op">=</span><span class="fl">72</span>,threshold.units<span class="op">=</span><span class="st">"hours"</span>,</span></span>
 <span class="r-in"><span>recent.period<span class="op">=</span><span class="fl">52</span>,recent.units<span class="op">=</span><span class="st">"weeks"</span>,</span></span>
-<span class="r-in"><span>progress.bar<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "Identifying mortalities from infrequent detections"</span>
+<span class="r-in"><span>verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">inf_recent</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            ResidenceStart Station.Name ID        ResidenceEnd</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 51    2005-09-16 14:26:04            1  B 2005-09-16 18:05:15</span>
@@ -302,7 +301,7 @@ minutes between 01 October 2019 and 01 June 2020.</p>
 <span class="r-in"><span>station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"defined"</span>,</span></span>
 <span class="r-in"><span>threshold<span class="op">=</span><span class="fl">12</span>,threshold.units<span class="op">=</span><span class="st">"hours"</span>,</span></span>
 <span class="r-in"><span>start<span class="op">=</span><span class="st">"2006-06-15"</span>,end<span class="op">=</span><span class="st">"2006-10-15"</span>,</span></span>
-<span class="r-in"><span>progress.bar<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>verbose<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">inf_defined</span><span class="op">)</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>            ResidenceStart Station.Name ID        ResidenceEnd</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 54    2006-07-09 04:39:28            1  B 2006-07-09 04:39:28</span>
