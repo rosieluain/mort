@@ -26,7 +26,13 @@ mort uses thresholds from the dataset itself, use-defined thresholds, and severa
 
 ### Installation
 
-You can install mort from [GitHub](https://github.com/) with the line below. Note that you must have the package `devtools` installed.
+You can install mort from CRAN with the line below. 
+
+``` r
+install.packages("mort")
+```
+
+To install mort directly from GitHub, including any updates that might not be released on CRAN yet, use the line below. Note that you must have the package `devtools` installed. 
 
 ``` r
 devtools::install_github("rosieluain/mort")
@@ -40,8 +46,6 @@ Please see the package vignettes for more details, as well as guidelines and tip
 `residences` condenses detection records into residence events, with a start time, end time, and duration. Residence events are used as the input for all other mort functions. 
 
 `mortsplot` generates plots of residence events using `ggplot2`. Plots are automatically formatted to maximize visibility of the dataset, and can be further modified using `ggplot2` commands. Interactive plots can also be generated using `plotly`. 
-
-<!-- ### Should make an example plot from example dataset when ready -->
 
 #### Identifying potential mortalities or expelled tags
 
@@ -67,5 +71,5 @@ These are functions that may be called by `morts` and/or `infrequent`, depending
 `backwards` shifts the start time of a flagged mortality earlier, if the residence event that triggered the flag was not the earliest consecutive residence event at that station/location. 
 
 ### Disclaimer
-mort is brand new. Although it is has been tested extensively on a complex dataset, we expect that issues will arise as mort is applied to other datasets and systems. If you run into any issues or have any suggestions for improvements, please post an issue, and we'll see what we can do!  
+mort is brand new. Although it is has been tested extensively on a complex dataset, we expect that issues will arise as mort is applied to other datasets and systems. If you run into any issues or have any suggestions for improvements, please post an issue on [GitHub](https://github.com/rosieluain/mort/issues), and we'll see what we can do!  
 

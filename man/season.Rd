@@ -16,7 +16,7 @@ season(
   season.start,
   season.end,
   overlap = TRUE,
-  progress.bar = TRUE
+  verbose = TRUE
 )
 }
 \arguments{
@@ -64,8 +64,8 @@ residence events that is within the period of interest will be retained,
 and \code{residences} will be recalculated, using specified \code{units}.
 Default is \code{TRUE}.}
 
-\item{progress.bar}{option to display progress bar as function is run. Default
-is TRUE.}
+\item{verbose}{option to display updates and progress bars as
+functions is run. Default is TRUE.}
 }
 \value{
 a dataframe in the same format as the input data, with residence
@@ -83,13 +83,13 @@ potential mortalities to be missed.
 # Seasons in format dd-mm
 season.events<-season(data=events,type="mort",ID="ID",
 station="Station.Name",season.start="01-06",season.end="31-10",
-progress.bar=FALSE)
+verbose=FALSE)
 head(season.events)
 
 # Seasons in format YYYY-mm-dd HH:MM:SS
 season.start<-c("2003-06-15","2004-06-21")
 season.end<-c("2003-10-15","2004-10-30")
 season.events<-season(data=events,type="mort",ID="ID",
-station="Station.Name",season.start=season.start,season.end=season.end,progress.bar=FALSE)
+station="Station.Name",season.start=season.start,season.end=season.end,verbose=FALSE)
 head(season.events)
 }

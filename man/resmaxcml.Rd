@@ -13,7 +13,7 @@ resmaxcml(
   residences,
   units,
   stnchange,
-  progress.bar = TRUE
+  verbose = TRUE
 )
 }
 \arguments{
@@ -40,7 +40,7 @@ that holds the duration of the residence events.}
 \item{stnchange}{a dataframe with the start time and location of the most
 recent station or location change. Must use the same column names as \code{data}.}
 
-\item{progress.bar}{option to display progress bar as function is run. Default
+\item{verbose}{option to display progress bar as function is run. Default
 is TRUE.}
 }
 \value{
@@ -60,10 +60,10 @@ stations/locations.
 \examples{
 # Identify most recent station change
 station.change<-stationchange(data=events[events$ID=="A",],type="mort",
-ID="ID",station="Station.Name",progress.bar=FALSE)
+ID="ID",station="Station.Name",verbose=FALSE)
 
 cumulative_events<-resmaxcml(data=events[events$ID=="A",],ID="ID",
 station="Station.Name",res.start="ResidenceStart",res.end="ResidenceEnd",
 residences="ResidenceLength.days",units="days",
-stnchange=station.change,progress.bar=FALSE)
+stnchange=station.change,verbose=FALSE)
 }

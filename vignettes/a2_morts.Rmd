@@ -31,12 +31,13 @@ All options rely on identifying the most recent station or location change for e
 
 The black points in the plot below show examples of the most recent station changes. See `stationchange()` and the [Digging](https://rosieluain.github.io/mort/articles/a6_digging.html) vignette for more information on how mort identifies station changes. 
 
-```{r stnchange_plot,echo=FALSE,fig.width=7}
-stn.change<-stationchange(data=events[events$ID %in% c("G","K"),],type="mort",ID="ID",station="Station.Name",progress.bar=FALSE)
+```{r stnchange_plot_data,echo=FALSE,results=FALSE}
+stn.change<-stationchange(data=events[events$ID %in% c("G","K"),],type="mort",ID="ID",station="Station.Name")
 plot<-mortsplot(data=events[events$ID %in% c("G","K"),],
                 type="mort",ID="ID",station="Station.Name",
-                season.start="2004-06-22",season.end="2004-07-01",
-                progress.bar=FALSE)
+                season.start="2004-06-22",season.end="2004-07-01")
+```
+```{r stnchange_plot,echo=FALSE,fig.width=7}
 plot<-plot+
   geom_point(data=stn.change,aes(x=ResidenceStart,y=ID))+
   scale_colour_discrete(name="Station Name")+
@@ -50,12 +51,13 @@ After identifying the most recent station change, the longest single residence e
 
 These long residences can be explored by the user using the `resmax()` function (see the [Digging](https://rosieluain.github.io/mort/articles/a6_digging.html) vignette for more information). The output will look like this: 
 
-```{r resmax_ex,echo=FALSE}
-stn.change<-stationchange(data=events,type="mort",ID="ID",station="Station.Name",
-                          progress.bar=FALSE)
+```{r resmax_ex,echo=FALSE,results=FALSE}
+stn.change<-stationchange(data=events,type="mort",ID="ID",station="Station.Name")
 rm_example<-resmax(data=events,ID="ID",station="Station.Name",
                    res.start="ResidenceStart",residences="ResidenceLength.days",
-                   stnchange=stn.change,progress.bar=FALSE)
+                   stnchange=stn.change)
+```
+```{r resmax_table,echo=FALSE}
 rm_example<-rm_example[order(rm_example$ResidenceLength.days,decreasing=TRUE),]
 row.names(rm_example)<-NULL
 knitr::kable(head(rm_example),align="c")
@@ -117,7 +119,7 @@ manual_ex<-morts(data=data,type="manual",ID="ID",station="Station.Name",
 ### Cumulative residence events
 Cumulative residence events are the length of time between when an animal was first detected at a station and when it was last detected at the same station, ignoring any gaps in detection (or `cutoff` in `residences()`). The black points in the plot below indicate the start and end of the longest cumulative residence events, before a station change, for each fish. 
 
-```{r sc_cmlres_plot,echo=FALSE,fig.width=7}
+```{r sc_cmlres_plot,echo=FALSE,results=FALSE}
 cml_res<-data.frame(ID=c("C","L"),
                    Start=as.POSIXct(c("2004-03-26 13:39:43",
                                       "2004-04-20 15:21:35")),
@@ -125,8 +127,9 @@ cml_res<-data.frame(ID=c("C","L"),
                                     "2004-06-09 22:20:20")))
 plot<-mortsplot(data=events[events$ID %in% c("C","L"),],
                 type="mort",ID="ID",station="Station.Name",
-                season.start="2004-03-26",season.end="2004-06-23",
-                progress.bar=FALSE)
+                season.start="2004-03-26",season.end="2004-06-23")
+```
+```{r sc_cmlres_plot_adjust,echo=FALSE,fig.width=7}
 plot<-plot+
   geom_point(data=cml_res,aes(x=Start,y=ID))+
   geom_point(data=cml_res,aes(x=End,y=ID))+
@@ -137,15 +140,16 @@ plot
 
 The threshold for cumulative residence events is identified similarly to that for single residence events. The cumulative residence events can be explored by the user using the `resmaxcml()` function (see the [Digging](https://rosieluain.github.io/mort/articles/a6_digging.html) vignette for more information). The output will look like this: 
 
-```{r resmaxcml_ex,echo=FALSE}
-stn.change<-stationchange(data=events,type="mort",ID="ID",station="Station.Name",
-                          progress.bar=FALSE)
+```{r resmaxcml_ex,echo=FALSE,results=FALSE}
+stn.change<-stationchange(data=events,type="mort",ID="ID",station="Station.Name")
 rmc_example<-resmaxcml(data=events,ID="ID",station="Station.Name",
                    res.start="ResidenceStart",
                    res.end="ResidenceEnd",
                    residences="ResidenceLength.days",
                    units="days",
-                   stnchange=stn.change,progress.bar=FALSE)
+                   stnchange=stn.change)
+```
+```{r resmaxcml_ex_table,echo=FALSE}
 rmc_example<-rmc_example[order(rmc_example$ResidenceLength.days,
                                decreasing=TRUE),]
 row.names(rmc_example)<-NULL
@@ -198,11 +202,12 @@ knitr::kable(head(all_ex),align="c")
 ## `infrequent()` function
 The `infrequent()` function is used to identify potential mortalities or expelled tags that may be located just outside the usual range of a receiver, and are therefore detected briefly and intermittently when conditions allow. 
 
-```{r inf_plot,echo=FALSE,fig.width=7}
+```{r inf_plot,echo=FALSE,results=FALSE}
 plot<-mortsplot(data=events[events$ID %in% c("M","I"),],
                 type="mort",ID="ID",station="Station.Name",
-                season.start="2005-09-25",season.end="2006-09-25",
-                progress.bar=FALSE)
+                season.start="2005-09-25",season.end="2006-09-25")
+```
+```{r inf_plot_adjust,echo=FALSE,fig.width=7}
 plot<-plot+
   theme(legend.position="none")
 plot
@@ -282,7 +287,7 @@ prev_ex<-morts(data=events,type="mort",ID="ID",station="Station.Name",morts.prev
 ### Look backwards 
 For both `morts()` and `infrequent()`, there is the option to look backwards (i.e., earlier) in the dataset. If the most recent station change occurred before the flagged mortality (i.e., the animal was detected earlier than the flagged mortality, at the same station, and with no detections elsewhere), the start dates and times of the flagged mortalities are shifted earlier. The default is `backwards=FALSE`; however, it is more conservative to set `backwards=TRUE`.
 
-In the plot below, the black points show the flagged mortalities with `backwards=FALSE`, and the blue points show the flagged mortalities with `backwards=TRUE`:
+In the plot below, the black points show the flagged mortalities with `backwards=FALSE`, and the blue points show the flagged mortalities with `backwards=TRUE`. If only a blue point is visible for a given animal ID, then the flagged mortality is not shifted earlier with `backwards=TRUE`.
 ```{r backwards,include=FALSE}
 morts.all<-morts(data=events,type="mort",ID="ID",station="Station.Name",
                  method="any")

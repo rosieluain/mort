@@ -27,8 +27,15 @@ research.
 
 ### Installation
 
-You can install mort from [GitHub](https://github.com/) with the line
-below. Note that you must have the package `devtools` installed.
+You can install mort from CRAN with the line below.
+
+``` r
+install.packages("mort")
+```
+
+To install mort directly from GitHub, including any updates that might
+not be released on CRAN yet, use the line below. Note that you must have
+the package `devtools` installed.
 
 ``` r
 devtools::install_github("rosieluain/mort")
@@ -49,8 +56,6 @@ input for all other mort functions.
 are automatically formatted to maximize visibility of the dataset, and
 can be further modified using `ggplot2` commands. Interactive plots can
 also be generated using `plotly`.
-
-<!-- ### Should make an example plot from example dataset when ready -->
 
 #### Identifying potential mortalities or expelled tags
 
@@ -101,5 +106,6 @@ residence event at that station/location.
 mort is brand new. Although it is has been tested extensively on a
 complex dataset, we expect that issues will arise as mort is applied to
 other datasets and systems. If you run into any issues or have any
-suggestions for improvements, please post an issue, and we’ll see what
+suggestions for improvements, please post an issue on
+[GitHub](https://github.com/rosieluain/mort/issues), and we’ll see what
 we can do!

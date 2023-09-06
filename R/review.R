@@ -37,7 +37,7 @@
 #' @param residences an optional character string with the name of the column
 #' in `morts` and `new.data` that holds the duration of the residence events.
 #' Only needed if drift is applied.
-#' @param progress.bar option to display progress bar as function and called
+#' @param verbose option to display progress bar as function and called
 #' functions are run. Default is TRUE.
 #'
 #' @return A dataframe with one row for each tag ID from `morts`
@@ -51,14 +51,14 @@
 #'
 #' @examples
 #' morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",
-#' method="any",progress.bar=FALSE)
+#' method="any",verbose=FALSE)
 #'
 #' undead<-review(morts=morts,new.data=new.data,
-#' type="mort",ID="ID",station="Station.Name",progress.bar=FALSE)
+#' type="mort",ID="ID",station="Station.Name",verbose=FALSE)
 review<-function(morts,new.data,old.data=NULL,type,ID,station,res.start="auto",
                  res.end=NULL,residences=NULL,units=NULL,
                  ddd=NULL,from.station=NULL,to.station=NULL,
-                 progress.bar=TRUE){
+                 verbose=TRUE){
 
   if (type %in% c("actel","vtrack")){
     new.data<-extractres(data=new.data,type=type)
@@ -202,7 +202,7 @@ review<-function(morts,new.data,old.data=NULL,type,ID,station,res.start="auto",
                 res.start=res.start,res.end=res.end,
                 ddd=ddd,from.station=from.station,to.station=to.station,
                 residences=residences,
-                units=units,progress.bar=progress.bar)
+                units=units,verbose=verbose)
     for (i in 1:nrow(morts)){
       res.temp<-data[data[[ID]]==morts[[ID]][i],]
       j<-1

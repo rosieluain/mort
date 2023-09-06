@@ -18,7 +18,7 @@ drift(
   to.station,
   cutoff = NULL,
   cutoff.units = NULL,
-  progress.bar = TRUE
+  verbose = TRUE
 )
 }
 \arguments{
@@ -63,7 +63,7 @@ considered a single residence event. Default is \code{NULL}.}
 \item{cutoff.units}{the units of the cutoff. Options are "secs", "mins", "hours",
 "days", and "weeks".}
 
-\item{progress.bar}{option to display progress bar as \code{drift} is applied.
+\item{verbose}{option to display progress bar as \code{drift} is applied.
 Default is TRUE.}
 }
 \value{
@@ -81,12 +81,12 @@ head(events)
 
 drift.events<-drift(data=events[events$ID=="A",],type="mort",ID="ID",
 station="Station.Name",ddd=ddd,from.station="From",to.station="To",
-progress.bar=FALSE)
+verbose=FALSE)
 head(drift.events)
 
 # With cutoff:
 drift.events<-drift(data=events[events$ID=="A",],type="mort",ID="ID",
 station="Station.Name",ddd=ddd,from.station="From",to.station="To",
-cutoff=1,cutoff.units="days",progress.bar=FALSE)
+cutoff=1,cutoff.units="days",verbose=FALSE)
 head(drift.events)
 }

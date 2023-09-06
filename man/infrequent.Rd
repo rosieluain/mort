@@ -28,7 +28,7 @@ infrequent(
   to.station = NULL,
   drift.cutoff = NULL,
   drift.units = NULL,
-  progress.bar = TRUE
+  verbose = TRUE
 )
 }
 \arguments{
@@ -118,8 +118,8 @@ to generate residence events in \code{data}.}
 "days", and "weeks". Recommended to be the same as used to generate
 residence events in \code{data}.}
 
-\item{progress.bar}{option to display progress bar as function and called functions
-are run. Default is TRUE.}
+\item{verbose}{option to display updates and progress bars as
+sub-functions are called and run. Default is TRUE.}
 }
 \value{
 if \code{morts=NULL}, a dataframe with one row for each tag ID, including the date/time of
@@ -154,7 +154,7 @@ inf_recent<-infrequent(data=events,type="mort",ID="ID",
 station="Station.Name",method="recent",
 threshold=72,threshold.units="hours",
 recent.period=52,recent.units="weeks",
-progress.bar=FALSE)
+verbose=FALSE)
 head(inf_recent)
 
 ## User-defined example
@@ -162,6 +162,6 @@ inf_defined<-infrequent(data=events,type="mort",ID="ID",
 station="Station.Name",method="defined",
 threshold=12,threshold.units="hours",
 start="2006-06-15",end="2006-10-15",
-progress.bar=FALSE)
+verbose=FALSE)
 head(inf_defined)
 }

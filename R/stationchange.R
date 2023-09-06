@@ -33,7 +33,7 @@
 #' @param to.station a string of the name of the column in `ddd` that contains
 #' the station/location names where drifting detections may move to. Must
 #' be identical to the station/location names in `data`.
-#' @param progress.bar option to display progress bar as function is run. Default
+#' @param verbose option to display progress bar as function is run. Default
 #' is TRUE.
 #'
 #' @return a dataframe with one row for each tag ID, including the date/time of
@@ -44,12 +44,12 @@
 #' @export
 #'
 #' @examples
-#' stn.change<-stationchange(data=events,type="mort",ID="ID",station="Station.Name",progress.bar=FALSE)
+#' stn.change<-stationchange(data=events,type="mort",ID="ID",station="Station.Name",verbose=FALSE)
 #' head(stn.change)
 stationchange<-function(data,type="mort",ID,station,res.start="auto",
                         res.end="auto",residences="auto",
                         singles=TRUE,drift=FALSE,ddd=NULL,units=NULL,from.station=NULL,
-                        to.station=NULL,progress.bar=TRUE){
+                        to.station=NULL,verbose=TRUE){
 
   if (type %in% c("actel","vtrack")&is(data,"list")){
     data<-extractres(data=data,type=type)
@@ -93,7 +93,7 @@ stationchange<-function(data,type="mort",ID,station,res.start="auto",
 
   if (drift==FALSE&
       !is(data[[station]],"list")){
-    if (progress.bar==TRUE){
+    if (verbose==TRUE){
       pb<-txtProgressBar(1,length(tag),style=3)
     }
     for (i in 1:length(tag)){
@@ -134,7 +134,7 @@ stationchange<-function(data,type="mort",ID,station,res.start="auto",
       else if (nrow(res.temp)==1){
         stn.change[nrow(stn.change)+1,]<-res.temp[1,]
       }
-      if (progress.bar==TRUE){
+      if (verbose==TRUE){
         setTxtProgressBar(pb,i)
       }
     }
@@ -145,7 +145,7 @@ stationchange<-function(data,type="mort",ID,station,res.start="auto",
       data.drift<-drift(data=data,type=type,ID=ID,station=station,
                          res.start=res.start,res.end=res.end,residences=residences,
                          units=units,ddd=ddd,from.station=from.station,to.station=to.station,
-                        progress.bar=progress.bar)
+                        verbose=verbose)
     }
     else {data.drift<-data}
     pb<-txtProgressBar(1,length(tag),style=3)
@@ -214,7 +214,7 @@ stationchange<-function(data,type="mort",ID,station,res.start="auto",
 #' recent station or location change. Must use the same column names as `data`.
 #' @param drift indicates if drift residence events should be included in
 #' determining the maximum residence duration
-#' @param progress.bar option to display progress bar as function is run. Default
+#' @param verbose option to display progress bar as function is run. Default
 #' is TRUE.
 #'
 #' @return a dataframe with the residence information for the longest residence
@@ -224,17 +224,17 @@ stationchange<-function(data,type="mort",ID,station,res.start="auto",
 #' @examples
 #' # Identify most recent station change
 #' station.change<-stationchange(data=events,type="mort",ID="ID",
-#' station="Station.Name",progress.bar=FALSE)
+#' station="Station.Name",verbose=FALSE)
 #'
 #' longest_res_events<-resmax(data=events,ID="ID",station="Station.Name",
 #' res.start="ResidenceStart",residences="ResidenceLength.days",
-#' stnchange=station.change,progress.bar=FALSE)
+#' stnchange=station.change,verbose=FALSE)
 #' head(longest_res_events)
 resmax<-function(data,ID,station,res.start,
-                 residences,stnchange,drift=FALSE,progress.bar=TRUE){
+                 residences,stnchange,drift=FALSE,verbose=TRUE){
   res.max<-data[0,]
 
-  if (progress.bar==TRUE){
+  if (verbose==TRUE){
     pb<-txtProgressBar(1,nrow(stnchange),style=3)
   }
   for (i in 1:nrow(stnchange)){
@@ -261,7 +261,7 @@ resmax<-function(data,ID,station,res.start,
         }
       }
     }
-    if (progress.bar==TRUE){
+    if (verbose==TRUE){
       setTxtProgressBar(pb,i)
     }
   }
@@ -293,7 +293,7 @@ resmax<-function(data,ID,station,res.start,
 #' @param units units of the duration of the residence events in `data`.
 #' @param stnchange a dataframe with the start time and location of the most
 #' recent station or location change. Must use the same column names as `data`.
-#' @param progress.bar option to display progress bar as function is run. Default
+#' @param verbose option to display progress bar as function is run. Default
 #' is TRUE.
 #'
 #' @return a dataframe with the cumulative residence information for each
@@ -305,17 +305,17 @@ resmax<-function(data,ID,station,res.start,
 #' @examples
 #' # Identify most recent station change
 #' station.change<-stationchange(data=events[events$ID=="A",],type="mort",
-#' ID="ID",station="Station.Name",progress.bar=FALSE)
+#' ID="ID",station="Station.Name",verbose=FALSE)
 #'
 #' cumulative_events<-resmaxcml(data=events[events$ID=="A",],ID="ID",
 #' station="Station.Name",res.start="ResidenceStart",res.end="ResidenceEnd",
 #' residences="ResidenceLength.days",units="days",
-#' stnchange=station.change,progress.bar=FALSE)
+#' stnchange=station.change,verbose=FALSE)
 resmaxcml<-function(data,ID,station,res.start,res.end,
-                    residences,units,stnchange,progress.bar=TRUE){
+                    residences,units,stnchange,verbose=TRUE){
   res.maxcml<-data[0,]
 
-  if (progress.bar==TRUE){
+  if (verbose==TRUE){
     pb<-txtProgressBar(1,nrow(stnchange),style=3)
   }
   for (i in 1:nrow(stnchange)){
@@ -402,7 +402,7 @@ resmaxcml<-function(data,ID,station,res.start,res.end,
         else {break}
       }
     }
-    if (progress.bar==TRUE){
+    if (verbose==TRUE){
       setTxtProgressBar(pb,i)
     }
   }

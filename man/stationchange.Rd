@@ -18,7 +18,7 @@ stationchange(
   units = NULL,
   from.station = NULL,
   to.station = NULL,
-  progress.bar = TRUE
+  verbose = TRUE
 )
 }
 \arguments{
@@ -66,7 +66,7 @@ be identical to the station/location names in \code{data}.}
 the station/location names where drifting detections may move to. Must
 be identical to the station/location names in \code{data}.}
 
-\item{progress.bar}{option to display progress bar as function is run. Default
+\item{verbose}{option to display progress bar as function is run. Default
 is TRUE.}
 }
 \value{
@@ -81,6 +81,6 @@ Identify the most recent station or location change from passive
 acoustic telemetry data.
 }
 \examples{
-stn.change<-stationchange(data=events,type="mort",ID="ID",station="Station.Name",progress.bar=FALSE)
+stn.change<-stationchange(data=events,type="mort",ID="ID",station="Station.Name",verbose=FALSE)
 head(stn.change)
 }

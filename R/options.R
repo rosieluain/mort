@@ -131,7 +131,7 @@ backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
 #' considered a single residence event. Default is `NULL`.
 #' @param cutoff.units the units of the cutoff. Options are "secs", "mins", "hours",
 #' "days", and "weeks".
-#' @param progress.bar option to display progress bar as `drift` is applied.
+#' @param verbose option to display progress bar as `drift` is applied.
 #' Default is TRUE.
 #'
 #' @return A data frame with one row for each residence event. Format is the
@@ -145,17 +145,17 @@ backwards<-function(data,morts,ID,station,res.start,stnchange=NULL){
 #'
 #' drift.events<-drift(data=events[events$ID=="A",],type="mort",ID="ID",
 #' station="Station.Name",ddd=ddd,from.station="From",to.station="To",
-#' progress.bar=FALSE)
+#' verbose=FALSE)
 #' head(drift.events)
 #'
 #' # With cutoff:
 #' drift.events<-drift(data=events[events$ID=="A",],type="mort",ID="ID",
 #' station="Station.Name",ddd=ddd,from.station="From",to.station="To",
-#' cutoff=1,cutoff.units="days",progress.bar=FALSE)
+#' cutoff=1,cutoff.units="days",verbose=FALSE)
 #' head(drift.events)
 drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
                 residences="auto",units="auto",ddd,from.station,to.station,
-                cutoff=NULL,cutoff.units=NULL,progress.bar=TRUE){
+                cutoff=NULL,cutoff.units=NULL,verbose=TRUE){
 
   if (type %in% c("actel","vtrack")){
     data<-extractres(data=data,type=type)
@@ -216,7 +216,7 @@ drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
 
   res.drift<-data[0,]
 
-  if (progress.bar==TRUE){
+  if (verbose==TRUE){
     pb<-txtProgressBar(1,length(tag),style=3)
   }
   for (i in 1:length(tag)){
@@ -257,7 +257,7 @@ drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
       }
     }
     res.drift[(nrow(res.drift)+1):(nrow(res.drift)+nrow(res.temp)),]<-res.temp[,]
-    if (progress.bar==TRUE){
+    if (verbose==TRUE){
       setTxtProgressBar(pb,i)
     }
   }
@@ -310,8 +310,8 @@ drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
 #' residence events that is within the period of interest will be retained,
 #' and `residences` will be recalculated, using specified `units`.
 #' Default is `TRUE`.
-#' @param progress.bar option to display progress bar as function is run. Default
-#' is TRUE.
+#' @param verbose option to display updates and progress bars as
+#' functions is run. Default is TRUE.
 #'
 #' @return a dataframe in the same format as the input data, with residence
 #' events limited to the period(s) of interest.
@@ -321,18 +321,18 @@ drift<-function(data,type,ID,station,res.start="auto",res.end="auto",
 #' # Seasons in format dd-mm
 #' season.events<-season(data=events,type="mort",ID="ID",
 #' station="Station.Name",season.start="01-06",season.end="31-10",
-#' progress.bar=FALSE)
+#' verbose=FALSE)
 #' head(season.events)
 #'
 #' # Seasons in format YYYY-mm-dd HH:MM:SS
 #' season.start<-c("2003-06-15","2004-06-21")
 #' season.end<-c("2003-10-15","2004-10-30")
 #' season.events<-season(data=events,type="mort",ID="ID",
-#' station="Station.Name",season.start=season.start,season.end=season.end,progress.bar=FALSE)
+#' station="Station.Name",season.start=season.start,season.end=season.end,verbose=FALSE)
 #' head(season.events)
 season<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
                  residences="auto",units="auto",season.start,
-                 season.end,overlap=TRUE,progress.bar=TRUE){
+                 season.end,overlap=TRUE,verbose=TRUE){
 
   if (type %in% c("actel","vtrack")){
     data<-extractres(data=data,type=type)
@@ -435,11 +435,11 @@ season<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
   data.season<-data[0,]
 
   for (i in 1:length(season.start)){
-    if (progress.bar==TRUE){
+    if (verbose==TRUE){
       print(paste("season/period",i,"of",length(season.start)))
     }
     if (length(tag)>1){
-      if (progress.bar==TRUE){
+      if (verbose==TRUE){
         pb<-txtProgressBar(1,length(tag),style=3)
       }
     }
@@ -483,7 +483,7 @@ season<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
       }
       data.season<-rbind(data.season,data.temp)
       if (length(tag)>1){
-        if (progress.bar==TRUE){
+        if (verbose==TRUE){
           setTxtProgressBar(pb,j)
         }
       }

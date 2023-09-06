@@ -1,5 +1,5 @@
 test_that("residences work", {
   expect_equal(residences(data=detections[1:6564,],ID="ID",station="Station.Name",
                           datetime="DateTimeUTC",cutoff=1,units="days",
-                          progress.bar=FALSE), events[1:3,])
+                          verbose=FALSE), events[1:3,])
 })

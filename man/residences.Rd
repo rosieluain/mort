@@ -4,7 +4,7 @@
 \alias{residences}
 \title{Generate residence events}
 \usage{
-residences(data, ID, station, datetime, cutoff, units, progress.bar = TRUE)
+residences(data, ID, station, datetime, cutoff, units, verbose = TRUE)
 }
 \arguments{
 \item{data}{a data frame of detection data.}
@@ -21,7 +21,7 @@ be considered a single residence event.}
 \item{units}{the units of the cutoff. These will also be the units used to calculate the duration of the residence events.
 Options are "secs", "mins", "hours", "days", and "weeks".}
 
-\item{progress.bar}{option to display progress bar as residences are generated.
+\item{verbose}{option to display progress bar as residences are generated.
 Default is TRUE.}
 }
 \value{
@@ -42,6 +42,6 @@ depending on the size of the telemetry dataset.
 \examples{
 head(detections)
 res.events<-residences(data=detections[1:500,],ID="ID",station="Station.Name",
-datetime="DateTimeUTC",cutoff=1,units="days",progress.bar=FALSE)
+datetime="DateTimeUTC",cutoff=1,units="days",verbose=FALSE)
 head(res.events)
 }

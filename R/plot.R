@@ -44,8 +44,8 @@
 #' `facet.by="year"`.
 #' @param facet.by option to facet by "season" (as defined with `season.start`
 #' and `season.end`) or "year". Default is "season".
-#' @param progress.bar option to display progress bar as function is run. Default
-#' is TRUE.
+#' @param verbose option to display updates and progress bar as function is run.
+#' Default is TRUE.
 #'
 #' @return a ggplot2 plot. Additional arguments (e.g., formatting axes,
 #' legend, aes, manual colour scales) can be added as for any ggplot2 plot.
@@ -60,7 +60,7 @@
 #'
 #' # With mortalities plotted over residences:
 #' morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",
-#' method="any",progress.bar=FALSE)
+#' method="any",verbose=FALSE)
 #'
 #' plot<-mortsplot(data=events,type="mort",ID="ID",station="Station.Name",
 #' morts=morts)
@@ -70,7 +70,7 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
                     units=NULL,
                     season.start=NULL,season.end=NULL,facet=FALSE,
                     facet.axis="x",facet.by="season",
-                    progress.bar=TRUE){
+                    verbose=TRUE){
 
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package \"ggplot2\" must be installed to use this function.",
@@ -176,7 +176,7 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
     if (units=="auto"){
       units<-autofield(type=type,field="units",data=data)
     }
-    if (progress.bar==TRUE){
+    if (verbose==TRUE){
       print("Extracting data from the period/season(s) of interest")
     }
     if (is.null(season.start)&is.null(season.end)&facet.by=="year"){
@@ -185,7 +185,7 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
     }
     data<-season(data=data,type=type,ID=ID,station=station,res.start=res.start,res.end=res.end,
                  residences=residences,units=units,season.start=season.start,
-                 season.end=season.end,overlap=FALSE,progress.bar=progress.bar)
+                 season.end=season.end,overlap=FALSE,verbose=verbose)
     data<-data[data[[station]]!="Break",]
     if (!is(season.start,"POSIXt")){
       try(season.start<-as.POSIXct(season.start,tz="UTC"),silent=TRUE)
@@ -214,7 +214,9 @@ mortsplot<-function(data,type,ID,station,res.start="auto",res.end="auto",
     ssn<-data.frame(Start=season.start,End=season.end)
     ssn<-ssn[order(ssn$Start),]
     if (!is.null(morts)){
-      print("Extracting morts from the period/season(s) of interest")
+      if (verbose==TRUE){
+        print("Extracting morts from the period/season(s) of interest")
+      }
       morts.ssn<-season(data=morts,ID=ID,station=station,res.start=res.start,
                         res.end=res.end,
                    residences=residences,units=units,season.start=season.start,

@@ -12,7 +12,7 @@ resmax(
   residences,
   stnchange,
   drift = FALSE,
-  progress.bar = TRUE
+  verbose = TRUE
 )
 }
 \arguments{
@@ -37,7 +37,7 @@ recent station or location change. Must use the same column names as \code{data}
 \item{drift}{indicates if drift residence events should be included in
 determining the maximum residence duration}
 
-\item{progress.bar}{option to display progress bar as function is run. Default
+\item{verbose}{option to display progress bar as function is run. Default
 is TRUE.}
 }
 \value{
@@ -51,10 +51,10 @@ before a station change (i.e., the animal can be assumed to be alive)
 \examples{
 # Identify most recent station change
 station.change<-stationchange(data=events,type="mort",ID="ID",
-station="Station.Name",progress.bar=FALSE)
+station="Station.Name",verbose=FALSE)
 
 longest_res_events<-resmax(data=events,ID="ID",station="Station.Name",
 res.start="ResidenceStart",residences="ResidenceLength.days",
-stnchange=station.change,progress.bar=FALSE)
+stnchange=station.change,verbose=FALSE)
 head(longest_res_events)
 }

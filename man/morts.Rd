@@ -26,7 +26,7 @@ morts(
   season.end = NULL,
   season.overlap = TRUE,
   morts.prev = NULL,
-  progress.bar = TRUE
+  verbose = TRUE
 )
 }
 \arguments{
@@ -112,8 +112,8 @@ Default is \code{TRUE}}
 \item{morts.prev}{a dataframe containing potential mortalities. The dataframe must
 have the same columns and in the same order as \code{data}.}
 
-\item{progress.bar}{option to display progress bar as function and called
-functions are run. Default is TRUE.}
+\item{verbose}{option to display updates and progress bars as
+sub-functions are called and run. Default is TRUE.}
 
 \item{season}{a dataframe with start and end dates of the season(s) of interest}
 }
@@ -131,10 +131,10 @@ derived from the dataset itself.
 }
 \examples{
 morts_ex<-morts(data=events,type="mort",ID="ID",
-station="Station.Name",method="any",progress.bar=FALSE)
+station="Station.Name",method="any",verbose=FALSE)
 head(morts_ex)
 
 morts_ex_bw<-morts(data=events,type="mort",ID="ID",
-station="Station.Name",method="any",backwards=TRUE,progress.bar=FALSE)
+station="Station.Name",method="any",backwards=TRUE,verbose=FALSE)
 head(morts_ex_bw)
 }

@@ -18,7 +18,7 @@ review(
   ddd = NULL,
   from.station = NULL,
   to.station = NULL,
-  progress.bar = TRUE
+  verbose = TRUE
 )
 }
 \arguments{
@@ -69,7 +69,7 @@ be identical to the station/location names in \code{morts} and \code{new.data}.}
 the station/location names where drifting detections may move to. Must
 be identical to the station/location names in \code{morts} and \code{new.data}.}
 
-\item{progress.bar}{option to display progress bar as function and called
+\item{verbose}{option to display progress bar as function and called
 functions are run. Default is TRUE.}
 }
 \value{
@@ -88,8 +88,8 @@ alive.
 }
 \examples{
 morts<-morts(data=events,type="mort",ID="ID",station="Station.Name",
-method="any",progress.bar=FALSE)
+method="any",verbose=FALSE)
 
 undead<-review(morts=morts,new.data=new.data,
-type="mort",ID="ID",station="Station.Name",progress.bar=FALSE)
+type="mort",ID="ID",station="Station.Name",verbose=FALSE)
 }
