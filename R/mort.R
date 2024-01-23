@@ -148,6 +148,11 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     }
   }
 
+  # Check that all records have a station assigned
+  if (nrow(data[is.na(data[[station]]),])>0){
+    stop("Station must be specified for all records.")
+  }
+
   data.full<-data
   if (!is.null(season.start)|
       !is.null(season.end)){
@@ -680,6 +685,11 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
     }
   }
 
+  # Check that all records have a station assigned
+  if (nrow(data[is.na(data[[station]]),])>0){
+    stop("Station must be specified for all records.")
+  }
+
   if (any(data[[station]]=="Break")){
     warning("Either a station name was 'Break' or data included seasonal
             breaks. Breaks were removed.")
@@ -764,7 +774,23 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
                           res.temp[[res.end]],
                           units=recent.units)<=recent.period))
         res.temp<-res.temp[j:nrow(res.temp),]
-        if (is.null(ddd)){
+        if (nrow(res.temp)>0&length(unique(res.temp$Station.Name))==1){
+          if (sum(res.temp[[residences]])<threshold){
+            if (tag[i] %in% inf.morts[[ID]]){
+              k<-which(inf.morts[[ID]]==tag[i])
+              if (res.temp[[res.start]][1]<inf.morts[[res.start]][k]){
+                inf.morts[k,]<-res.temp[1,]
+                if (!is.null(morts.prev)&backwards==TRUE){
+                  new.morts<-c(new.morts,k)
+                }
+              }
+            }
+            else {
+              inf.morts[nrow(inf.morts)+1,]<-res.temp[1,]
+            }
+          }
+        }
+        else if (is.null(ddd)){
           if (nrow(res.temp)>=1&
               length(unique(res.temp[[station]]))==1&
               sum(res.temp[[residences]])<threshold){

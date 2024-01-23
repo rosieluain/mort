@@ -4,6 +4,9 @@
 # mort <img src="man/figures/logo.png" align="right" height="139" />
 
 <!-- badges: start -->
+
+[![Codecov test
+coverage](https://codecov.io/gh/rosieluain/mort/branch/main/graph/badge.svg)](https://app.codecov.io/gh/rosieluain/mort?branch=main)
 <!-- badges: end -->
 
 The goal of mort is to provide a framework to identify potential

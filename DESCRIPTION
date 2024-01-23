@@ -21,6 +21,7 @@ Imports:
     methods,
     rlang
 Suggests: 
+    covr,
     ggplot2,
     knitr,
     plotly,
