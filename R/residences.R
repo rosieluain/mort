@@ -31,6 +31,12 @@
 #' head(res.events)
 
 residences<-function(data,ID,station,datetime,cutoff,units,verbose=TRUE){
+  # Check for missing station names
+  if (nrow(data[is.na(data[[station]])|
+                data[[station]]=="",])>0){
+    stop("Station must be specified for all records.")
+  }
+
   # Create list of unique IDs
   tag<-unique(na.omit(data[[ID]]))
 

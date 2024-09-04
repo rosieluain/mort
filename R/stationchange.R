@@ -142,13 +142,19 @@ stationchange<-function(data,type="mort",ID,station,res.start="auto",
 
   else {
     if (drift==TRUE){
+      if (verbose==TRUE){
+        print("Applying drift to identify station changes")
+      }
       data.drift<-drift(data=data,type=type,ID=ID,station=station,
                          res.start=res.start,res.end=res.end,residences=residences,
                          units=units,ddd=ddd,from.station=from.station,to.station=to.station,
                         verbose=verbose)
     }
     else {data.drift<-data}
-    pb<-txtProgressBar(1,length(tag),style=3)
+    if (verbose==TRUE){
+      print("Identifying station changes")
+      pb<-txtProgressBar(1,length(tag),style=3)
+    }
     for (i in 1:length(tag)){
       res.temp<-data.drift[data.drift[[ID]]==tag[i],]
       # Order by time
@@ -189,7 +195,9 @@ stationchange<-function(data,type="mort",ID,station,res.start="auto",
       else if (nrow(res.temp)==1){
         stn.change[nrow(stn.change)+1,]<-res.temp[1,]
       }
-      setTxtProgressBar(pb,i)
+      if (verbose==TRUE){
+        setTxtProgressBar(pb,i)
+      }
     }
   }
 

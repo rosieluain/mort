@@ -72,5 +72,5 @@ These are functions that may be called by `morts` and/or `infrequent`, depending
 `backwards` shifts the start time of a flagged mortality earlier, if the residence event that triggered the flag was not the earliest consecutive residence event at that station/location. 
 
 ### Disclaimer
-mort is brand new. Although it is has been tested extensively on a complex dataset, we expect that issues will arise as mort is applied to other datasets and systems. If you run into any issues or have any suggestions for improvements, please post an issue on [GitHub](https://github.com/rosieluain/mort/issues), and we'll see what we can do!  
+mort is pretty new. Although it is has been tested extensively on a complex dataset, we expect that issues will arise as mort is applied to other datasets and systems. If you run into any issues or have any suggestions for improvements, please post an issue on [GitHub](https://github.com/rosieluain/mort/issues), and we'll see what we can do!  
 

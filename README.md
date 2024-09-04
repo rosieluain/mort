@@ -106,7 +106,7 @@ residence event at that station/location.
 
 ### Disclaimer
 
-mort is brand new. Although it is has been tested extensively on a
+mort is pretty new. Although it is has been tested extensively on a
 complex dataset, we expect that issues will arise as mort is applied to
 other datasets and systems. If you run into any issues or have any
 suggestions for improvements, please post an issue on

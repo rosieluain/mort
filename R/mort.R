@@ -149,7 +149,8 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
   }
 
   # Check that all records have a station assigned
-  if (nrow(data[is.na(data[[station]]),])>0){
+  if (nrow(data[is.na(data[[station]])|
+                      data[[station]]=="",])>0){
     stop("Station must be specified for all records.")
   }
 
@@ -165,10 +166,6 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
                  verbose=verbose)
   }
 
-  if (any(is.na(data[[station]]))){
-    stop("one or more station names is NA")
-  }
-
   # Get list of unique tag IDs
   tag<-unique(data[[ID]])
 
@@ -182,13 +179,18 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
   else {morts<-data[0,]}
 
   if (drift=="none"){
-    data.morts<-data
-    data.resmax<-data
-    drift.resmax<-FALSE
+    if (method!="cumulative"){
+      data.morts<-data
+      data.resmax<-data
+      drift.resmax<-FALSE
+    }
+    if (method %in% c("all","cumulative")){
+      data.cml<-data
+    }
     if (verbose==TRUE){
       print("Identifying last station change")
     }
-    sc1<-stationchange(data=data.morts,type=type,ID=ID,station=station,res.start=res.start,
+    sc1<-stationchange(data=data,type=type,ID=ID,station=station,res.start=res.start,
                        residences=residences,singles=singles)
     if(!is.null(season.start)){
       if (verbose==TRUE){
@@ -200,48 +202,56 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     else {sc2<-sc1}
   }
   else if (drift=="threshold"){
-    data.morts<-data
-    if (verbose==TRUE){
-      print("Applying drift")
+    if (method!="cumulative"){
+      data.morts<-data
+      if (verbose==TRUE){
+        print("Applying drift")
+      }
+      if (!is.null(drift.cutoff)){
+        data.resmax<-drift(data=data,type=type,ID=ID,station=station,
+                           res.start=res.start,res.end=res.end,residences=residences,
+                           units=units,
+                           ddd=ddd,from.station=from.station,to.station=to.station,
+                           cutoff.units=drift.units,cutoff=drift.cutoff,
+                           verbose=verbose)
+      }
+      else {
+        data.resmax<-drift(data=data,type=type,ID=ID,station=station,
+                           res.start=res.start,res.end=res.end,residences=residences,
+                           units=units,
+                           ddd=ddd,from.station=from.station,to.station=to.station,
+                           verbose=verbose)
+      }
+      drift.resmax<-TRUE
     }
-    if (!is.null(drift.cutoff)){
-      data.resmax<-drift(data=data,type=type,ID=ID,station=station,
-                  res.start=res.start,res.end=res.end,residences=residences,
-                  units=units,
-                  ddd=ddd,from.station=from.station,to.station=to.station,
-                  cutoff.units=drift.units,cutoff=drift.cutoff,
-                  verbose=verbose)
-    }
-    else {
-      data.resmax<-drift(data=data,type=type,ID=ID,station=station,
-                         res.start=res.start,res.end=res.end,residences=residences,
-                         units=units,
-                         ddd=ddd,from.station=from.station,to.station=to.station,
-                         verbose=verbose)
-    }
-    drift.resmax<-TRUE
     if (method %in% c("all","cumulative")){
-      if(!is.null(drift.cutoff)){
+      if(!is.null(drift.cutoff)|method=="cumulative"){
         # This just gets used for resmaxcml, so there should not be a cutoff
         # when identifying the drift residence events
         if (verbose==TRUE){
           print("Applying drift to identify cumulative threshold")
         }
-        data<-drift(data=data,type=type,ID=ID,station=station,
+        data.cml<-drift(data=data,type=type,ID=ID,station=station,
                     res.start=res.start,res.end=res.end,residences=residences,
                     units=units,
                     ddd=ddd,from.station=from.station,to.station=to.station,
                     verbose=verbose)
       }
       else {
-        data<-data.resmax
+        data.cml<-data.resmax
       }
+      sc1<-stationchange(data=data.cml,type=type,ID=ID,station=station,res.start=res.start,
+                         residences=residences,singles=singles)
     }
-    if (verbose==TRUE){
-      print("Identifying last station change")
+    if (method %in% c("last","any")){
+      if (verbose==TRUE){
+        print("Identifying last station change for identifying thresholds")
+      }
+      sc1<-stationchange(data=data,type=type,ID=ID,station=station,res.start=res.start,
+                         residences=residences,singles=singles,drift=TRUE,
+                         ddd=ddd,units=units,from.station=from.station,to.station=to.station,
+                         verbose=verbose)
     }
-    sc1<-stationchange(data=data.morts,type=type,ID=ID,station=station,res.start=res.start,
-                       residences=residences,singles=singles)
     if(!is.null(season.start)){
       if (verbose==TRUE){
         print("Identifying last station change in full dataset")
@@ -249,45 +259,48 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
       sc2<-stationchange(data=data.full,type=type,ID=ID,station=station,res.start=res.start,
                          residences=residences,singles=singles)
     }
-    else {sc2<-sc1}
+    else {
+      if (verbose==TRUE){
+        print("Identifying last station change for identifying mortalities")
+      }
+      sc2<-stationchange(data=data,type=type,ID=ID,station=station,res.start=res.start,
+                         residences=residences,singles=singles)
+    }
   }
   else if (drift=="morts"){
-    if (verbose==TRUE){
-      print("Applying drift")
-    }
-    data.morts<-drift(data=data,type=type,ID=ID,station=station,
-                      res.start=res.start,res.end=res.end,residences=residences,
-                      units=units,
-                      ddd=ddd,from.station=from.station,to.station=to.station,
-                      verbose=verbose)
-    if (!is.null(drift.cutoff)){
+    if (method!="cumulative"){
       if (verbose==TRUE){
-        print("Identifying drift residence events to be removed from identifying resmax threshold")
+        print("Applying drift")
       }
-      data.resmax<-drift(data=data,type=type,ID=ID,station=station,
+      data.morts<-drift(data=data,type=type,ID=ID,station=station,
+                        res.start=res.start,res.end=res.end,residences=residences,
+                        units=units,
+                        ddd=ddd,from.station=from.station,to.station=to.station,
+                        cutoff.units=drift.units,cutoff=drift.cutoff,
+                        verbose=verbose)
+      data.resmax<-data.morts
+      drift.resmax<-FALSE
+      if (!is.null(season.start)){
+        if (verbose==TRUE){
+          print("Applying drift to full dataset")
+        }
+        data.full<-drift(data=data.full,type=type,ID=ID,station=station,
                          res.start=res.start,res.end=res.end,residences=residences,
                          units=units,
                          ddd=ddd,from.station=from.station,to.station=to.station,
-                         cutoff.units=drift.units,cutoff=drift.cutoff,
                          verbose=verbose)
-    }
-    else {data.resmax<-data.morts}
-    drift.resmax<-FALSE
-    if (!is.null(season.start)){
-      if (verbose==TRUE){
-        print("Applying drift to full dataset")
       }
-      data.full<-drift(data=data.full,type=type,ID=ID,station=station,
-                       res.start=res.start,res.end=res.end,residences=residences,
-                       units=units,
-                       ddd=ddd,from.station=from.station,to.station=to.station,
-                       verbose=verbose)
+    }
+    if (method %in% c("all","cumulative")){
+      data.cml<-data
     }
     if (verbose==TRUE){
       print("Identifying last station change")
     }
-    sc1<-stationchange(data=data.morts,type=type,ID=ID,station=station,res.start=res.start,
-                       residences=residences,singles=singles)
+    sc1<-stationchange(data=data,type=type,ID=ID,station=station,res.start=res.start,
+                       residences=residences,singles=singles,drift=TRUE,
+                       ddd=ddd,units=units,from.station=from.station,to.station=to.station,
+                       verbose=verbose)
     if(!is.null(season.start)){
       if (verbose==TRUE){
         print("Identifying last station change in full dataset")
@@ -298,29 +311,47 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     else {sc2<-sc1}
   }
   else if (drift=="both"){
-    if (verbose==TRUE){
-      print("Applying drift")
-    }
-    data.morts<-drift(data=data,type=type,ID=ID,station=station,
-                      res.start=res.start,res.end=res.end,residences=residences,
-                      units=units,
-                      ddd=ddd,from.station=from.station,to.station=to.station,
-                      verbose=verbose)
-    if (!is.null(drift.cutoff)){
+    if (method!="cumulative"){
       if (verbose==TRUE){
-        print("Applying drift to identify resmax threshold")
+        print("Applying drift")
       }
-      data.resmax<-drift(data=data,type=type,ID=ID,station=station,
-                         res.start=res.start,res.end=res.end,residences=residences,
-                         units=units,
-                         ddd=ddd,from.station=from.station,to.station=to.station,
-                         cutoff.units=drift.units,cutoff=drift.cutoff,
+      data.morts<-drift(data=data,type=type,ID=ID,station=station,
+                        res.start=res.start,res.end=res.end,residences=residences,
+                        units=units,
+                        ddd=ddd,from.station=from.station,to.station=to.station,
+                        cutoff.units=drift.units,cutoff=drift.cutoff,
+                        verbose=verbose)
+      data.resmax<-data.morts
+      drift.resmax<-TRUE
+    }
+    if (method %in% c("all","cumulative")){
+      if(!is.null(drift.cutoff)){
+        # This just gets used for resmaxcml, so there should not be a cutoff
+        # when identifying the drift residence events
+        if (verbose==TRUE){
+          print("Applying drift to identify cumulative threshold")
+        }
+        data.cml<-drift(data=data,type=type,ID=ID,station=station,
+                    res.start=res.start,res.end=res.end,residences=residences,
+                    units=units,
+                    ddd=ddd,from.station=from.station,to.station=to.station,
+                    verbose=verbose)
+      }
+      if (verbose==TRUE){
+        print("Identifying last station change")
+      }
+      sc1<-stationchange(data=data.cml,type=type,ID=ID,station=station,res.start=res.start,
+                         residences=residences,singles=singles)
+    }
+    if (method %in% c("last","any")){
+      if (verbose==TRUE){
+        print("Identifying last station change for identifying thresholds")
+      }
+      sc1<-stationchange(data=data,type=type,ID=ID,station=station,res.start=res.start,
+                         residences=residences,singles=singles,drift=TRUE,
+                         ddd=ddd,units=units,from.station=from.station,to.station=to.station,
                          verbose=verbose)
     }
-    else {
-      data.resmax<-data.morts
-    }
-    drift.resmax<-TRUE
     if (!is.null(season.start)){
       if (verbose==TRUE){
         print("Applying drift to full dataset")
@@ -330,13 +361,6 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
                        units=units,
                        ddd=ddd,from.station=from.station,to.station=to.station,
                        verbose=verbose)
-    }
-    if (verbose==TRUE){
-      print("Identifying last station change")
-    }
-    sc1<-stationchange(data=data.morts,type=type,ID=ID,station=station,res.start=res.start,
-                       residences=residences,singles=singles)
-    if(!is.null(season.start)){
       if (verbose==TRUE){
         print("Identifying last station change in full dataset")
       }
@@ -427,7 +451,7 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
     if (verbose==TRUE){
       print("Identifying the resmaxcml threshold")
     }
-    max.rescml<-max(resmaxcml(data=data,ID=ID,station=station,res.start=res.start,
+    max.rescml<-max(resmaxcml(data=data.cml,ID=ID,station=station,res.start=res.start,
                               res.end=res.end,residences=residences,units=units,
                               stnchange=sc1)[[residences]],na.rm=TRUE)
     if (verbose==TRUE){
@@ -435,7 +459,7 @@ morts<-function(data,type="mort",ID,station,res.start="auto",res.end="auto",
       pb<-txtProgressBar(1,nrow(sc2),style=3)
     }
     for (i in 1:nrow(sc2)){
-      res.temp<-data.morts[data.morts[[ID]]==sc2[[ID]][i],]
+      res.temp<-data[data[[ID]]==sc2[[ID]][i],]
       res.temp<-res.temp[order(res.temp[[res.start]]),]
       if (nrow(res.temp)>0){
         repeat {

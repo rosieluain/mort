@@ -46,7 +46,7 @@ Two input dataframes are mandatory for `review()`:
 
 The new residence events in `new.data` must be generated using the same method as the original dataset, or must be manipulated to match the format of the original dataset. The format of `new.data` must also match the format of `morts`. 
 
-The other four required arguments, `type`, `ID`, `station`, and `res.start`, are specified in the same way as for `morts()` and `infrequent()`. See the [Identifyig potential mortalities](https://rosieluain.github.io/mort/articles/a2_morts.html) vignette for more information about these arguments. 
+The other four required arguments, `type`, `ID`, `station`, and `res.start`, are specified in the same way as for `morts()` and `infrequent()`. See the [Identifying potential mortalities](https://rosieluain.github.io/mort/articles/a2_morts.html) vignette for more information about these arguments. 
 
 ```{r rev_ex,results=FALSE}
 review_example<-review(morts=morts,new.data=new.data,type="mort",
