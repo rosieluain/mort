@@ -25,28 +25,7 @@
     <loc>/articles/a7_review.html</loc>
   </url>
   <url>
-    <loc>/articles/data-prep.html</loc>
-  </url>
-  <url>
-    <loc>/articles/digging.html</loc>
-  </url>
-  <url>
-    <loc>/articles/drift.html</loc>
-  </url>
-  <url>
     <loc>/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>/articles/morts.html</loc>
-  </url>
-  <url>
-    <loc>/articles/plots.html</loc>
-  </url>
-  <url>
-    <loc>/articles/review.html</loc>
-  </url>
-  <url>
-    <loc>/articles/season.html</loc>
   </url>
   <url>
     <loc>/authors.html</loc>
@@ -58,10 +37,22 @@
     <loc>/LICENSE.html</loc>
   </url>
   <url>
+    <loc>/news/index.html</loc>
+  </url>
+  <url>
     <loc>/reference/backwards.html</loc>
   </url>
   <url>
+    <loc>/reference/ddd.html</loc>
+  </url>
+  <url>
+    <loc>/reference/detections.html</loc>
+  </url>
+  <url>
     <loc>/reference/drift.html</loc>
+  </url>
+  <url>
+    <loc>/reference/events.html</loc>
   </url>
   <url>
     <loc>/reference/index.html</loc>
@@ -74,6 +65,9 @@
   </url>
   <url>
     <loc>/reference/mortsplot.html</loc>
+  </url>
+  <url>
+    <loc>/reference/new.data.html</loc>
   </url>
   <url>
     <loc>/reference/residences.html</loc>
@@ -89,6 +83,9 @@
   </url>
   <url>
     <loc>/reference/season.html</loc>
+  </url>
+  <url>
+    <loc>/reference/seasons.html</loc>
   </url>
   <url>
     <loc>/reference/stationchange.html</loc>
