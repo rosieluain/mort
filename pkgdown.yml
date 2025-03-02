@@ -1,5 +1,5 @@
 pandoc: 3.1.11
-pkgdown: 2.1.0
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   a1_data-prep: a1_data-prep.html
@@ -9,4 +9,4 @@ articles:
   a5_plots: a5_plots.html
   a6_digging: a6_digging.html
   a7_review: a7_review.html
-last_built: 2024-09-04T21:21Z
+last_built: 2025-03-02T17:43Z
