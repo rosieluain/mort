@@ -98,7 +98,7 @@
       <h1 data-toc-skip>Dead and drifting</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/rosieluain/mort/blob/0.0.2/vignettes/a3_drift.Rmd" class="external-link"><code>vignettes/a3_drift.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rosieluain/mort/blob/main/vignettes/a3_drift.Rmd" class="external-link"><code>vignettes/a3_drift.Rmd</code></a></small>
       <div class="hidden name"><code>a3_drift.Rmd</code></div>
 
     </div>
@@ -211,9 +211,9 @@ detected by both receivers.</p>
 </tbody>
 </table>
 <p>Residence events before applying drift:
-<img src="a3_drift_files/figure-html/before_drift-1.png" width="672"></p>
+<img src="a3_drift_files/figure-html/before_drift-1.png" class="r-plt" alt="" width="672"></p>
 <p>Residence events, including drift residence events:
-<img src="a3_drift_files/figure-html/after_drift-1.png" width="672"></p>
+<img src="a3_drift_files/figure-html/after_drift-1.png" class="r-plt" alt="" width="672"></p>
 <p>Note that, when using the <code><a href="../reference/mortsplot.html">mortsplot()</a></code> function, the
 legend entry for the station name of a drift residence event begins with
 “Drift”, followed by an alphabetical list of all station names involved
@@ -266,12 +266,12 @@ exceed the threshold. See below for an example of identifying
 mortalities with and without applying drift.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">no_drift</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="a3_drift_files/figure-html/no_drift_plot-1.png" width="672"></p>
+<p><img src="a3_drift_files/figure-html/no_drift_plot-1.png" class="r-plt" alt="" width="672"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">drift_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"all"</span>,</span>
 <span>                drift<span class="op">=</span><span class="st">"morts"</span>,ddd<span class="op">=</span><span class="va">ddd</span>,from.station<span class="op">=</span><span class="st">"From"</span>,to.station<span class="op">=</span><span class="st">"To"</span>,</span>
 <span>                drift.cutoff<span class="op">=</span><span class="fl">1</span>,drift.units<span class="op">=</span><span class="st">"days"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="a3_drift_files/figure-html/drift_ex_morts_plot-1.png" width="672"></p>
+<p><img src="a3_drift_files/figure-html/drift_ex_morts_plot-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="drift-function">
@@ -304,7 +304,7 @@ for the other functions.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>

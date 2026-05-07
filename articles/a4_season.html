@@ -98,7 +98,7 @@
       <h1 data-toc-skip>Seasonality</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/rosieluain/mort/blob/0.0.2/vignettes/a4_season.Rmd" class="external-link"><code>vignettes/a4_season.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rosieluain/mort/blob/main/vignettes/a4_season.Rmd" class="external-link"><code>vignettes/a4_season.Rmd</code></a></small>
       <div class="hidden name"><code>a4_season.Rmd</code></div>
 
     </div>
@@ -110,7 +110,7 @@ in the plot below, there is reduced movement during the ice-covered
 season (before the dashed line), with associated long residence events.
 In summer (after the dashed line), when movement activity increases,
 residence events may also increase in number and frequency.</p>
-<p><img src="a4_season_files/figure-html/moveplot-1.png" width="672"></p>
+<p><img src="a4_season_files/figure-html/moveplot-1.png" class="r-plt" alt="" width="672"></p>
 <p>If this is the case, the long residence events will likely increase
 thresholds for <code><a href="../reference/morts.html">morts()</a></code>. Animals that do not move during the
 summer months, and are likely mortalities, may then not exceed the
@@ -141,9 +141,9 @@ times, or as character strings in the format YYYY-mm-dd HH:MM:SS.</p>
 <p>Here is how mortalities would be identified, using
 <code>method="all"</code> and no seasonality. The black points indicate
 the time of a potential mortality.</p>
-<p><img src="a4_season_files/figure-html/all_ex-1.png" width="672"></p>
+<p><img src="a4_season_files/figure-html/all_ex-1.png" class="r-plt" alt="" width="672"></p>
 <p>And here is when seasonality is included:</p>
-<p><img src="a4_season_files/figure-html/season_ex-1.png" width="672"></p>
+<p><img src="a4_season_files/figure-html/season_ex-1.png" class="r-plt" alt="" width="672"></p>
 <p>Note that animal I is not flagged as a potential mortality when
 seasonality is applied. However, animal I would likely be flagged if the
 <code><a href="../reference/infrequent.html">infrequent()</a></code> function was used in addition to
@@ -167,10 +167,10 @@ the examples above. To truncate the residence events, use
 <span>                 season.overlap<span class="op">=</span><span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <p>Here is an example of residence events with overlap
 (<code>overlap=TRUE</code>):
-<img src="a4_season_files/figure-html/overlap_plot-1.png" width="672"></p>
+<img src="a4_season_files/figure-html/overlap_plot-1.png" class="r-plt" alt="" width="672"></p>
 <p>Here is an example of residence events without overlap
 (<code>overlap=FALSE</code>):
-<img src="a4_season_files/figure-html/no_overlap_plot-1.png" width="672"></p>
+<img src="a4_season_files/figure-html/no_overlap_plot-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="season-function">
@@ -202,7 +202,7 @@ functions.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>

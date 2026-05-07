@@ -98,7 +98,7 @@
       <h1 data-toc-skip>Identifying potential mortalities</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/rosieluain/mort/blob/0.0.2/vignettes/a2_morts.Rmd" class="external-link"><code>vignettes/a2_morts.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/rosieluain/mort/blob/main/vignettes/a2_morts.Rmd" class="external-link"><code>vignettes/a2_morts.Rmd</code></a></small>
       <div class="hidden name"><code>a2_morts.Rmd</code></div>
 
     </div>
@@ -131,7 +131,7 @@ animal was alive before this point.</p>
 station changes. See <code><a href="../reference/stationchange.html">stationchange()</a></code> and the <a href="https://rosieluain.github.io/mort/articles/a6_digging.html" class="external-link">Digging</a>
 vignette for more information on how mort identifies station
 changes.</p>
-<p><img src="a2_morts_files/figure-html/stnchange_plot-1.png" width="672"></p>
+<p><img src="a2_morts_files/figure-html/stnchange_plot-1.png" class="r-plt" alt="" width="672"></p>
 <div class="section level3">
 <h3 id="duration-of-residence-events">Duration of residence events<a class="anchor" aria-label="anchor" href="#duration-of-residence-events"></a>
 </h3>
@@ -215,7 +215,7 @@ flagged as potential mortalities.</p>
 <p>The black points in the plot below indicate the beginning of
 residence events that were longer than the threshold, and were therefore
 flagged in <code>last_ex</code> as run above.</p>
-<p><img src="a2_morts_files/figure-html/last_ex_plot-1.png" width="672"></p>
+<p><img src="a2_morts_files/figure-html/last_ex_plot-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level4">
 <h4 id="any">2. any<a class="anchor" aria-label="anchor" href="#any"></a>
@@ -224,7 +224,7 @@ flagged in <code>last_ex</code> as run above.</p>
 the most recent station change for each animal.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">any_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"any"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="a2_morts_files/figure-html/morts_any_plot-1.png" width="672"></p>
+<p><img src="a2_morts_files/figure-html/morts_any_plot-1.png" class="r-plt" alt="" width="672"></p>
 <p>Note in the examples above that ID and station were specified for
 <code>type="mort"</code>. For other supported input types, there is no
 default for ID and station, but they can both be specified as “auto” and
@@ -248,7 +248,7 @@ the same station, ignoring any gaps in detection (or <code>cutoff</code>
 in <code><a href="../reference/residences.html">residences()</a></code>). The black points in the plot below
 indicate the start and end of the longest cumulative residence events,
 before a station change, for each fish.</p>
-<p><img src="a2_morts_files/figure-html/sc_cmlres_plot_adjust-1.png" width="672"></p>
+<p><img src="a2_morts_files/figure-html/sc_cmlres_plot_adjust-1.png" class="r-plt" alt="" width="672"></p>
 <p>The threshold for cumulative residence events is identified similarly
 to that for single residence events. The cumulative residence events can
 be explored by the user using the <code><a href="../reference/resmaxcml.html">resmaxcml()</a></code> function (see
@@ -323,7 +323,7 @@ occurred after the last station change to flag potential
 mortalities.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">cumulative_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"cumulative"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="a2_morts_files/figure-html/clm_ex_plot-1.png" width="672"></p>
+<p><img src="a2_morts_files/figure-html/clm_ex_plot-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level3">
 <h3 id="notes-on-selecting-a-method">Notes on selecting a method<a class="anchor" aria-label="anchor" href="#notes-on-selecting-a-method"></a>
@@ -342,7 +342,7 @@ on their own would not be long enough to be identified by
 <code>method="all"</code> is the most conservative method.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">all_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/morts.html">morts</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,method<span class="op">=</span><span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="a2_morts_files/figure-html/all_ex_plot-1.png" width="672"></p>
+<p><img src="a2_morts_files/figure-html/all_ex_plot-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level3">
 <h3 id="output">Output<a class="anchor" aria-label="anchor" href="#output"></a>
@@ -413,7 +413,7 @@ the residence event where a flagged mortality was identified:</p>
 mortalities or expelled tags that may be located just outside the usual
 range of a receiver, and are therefore detected briefly and
 intermittently when conditions allow.</p>
-<p><img src="a2_morts_files/figure-html/inf_plot_adjust-1.png" width="672"></p>
+<p><img src="a2_morts_files/figure-html/inf_plot_adjust-1.png" class="r-plt" alt="" width="672"></p>
 <p>For this function, the thresholds are user-defined. The user has two
 options for defining the thresholds:</p>
 <div class="section level4">
@@ -431,7 +431,7 @@ their most recent residence event.</p>
 <code class="sourceCode R"><span><span class="va">recent_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/infrequent.html">infrequent</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
 <span>                      method<span class="op">=</span><span class="st">"recent"</span>,threshold<span class="op">=</span><span class="fl">72</span>,threshold.units<span class="op">=</span><span class="st">"hours"</span>,</span>
 <span>                      recent.period<span class="op">=</span><span class="fl">52</span>,recent.units<span class="op">=</span><span class="st">"weeks"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="a2_morts_files/figure-html/rec_plot-1.png" width="672"></p>
+<p><img src="a2_morts_files/figure-html/rec_plot-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level4">
 <h4 id="defined">2. defined<a class="anchor" aria-label="anchor" href="#defined"></a>
@@ -446,7 +446,7 @@ less than 12 hours.</p>
 <code class="sourceCode R"><span><span class="va">defined_ex</span><span class="op">&lt;-</span><span class="fu"><a href="../reference/infrequent.html">infrequent</a></span><span class="op">(</span>data<span class="op">=</span><span class="va">events</span>,type<span class="op">=</span><span class="st">"mort"</span>,ID<span class="op">=</span><span class="st">"ID"</span>,station<span class="op">=</span><span class="st">"Station.Name"</span>,</span>
 <span>                       method<span class="op">=</span><span class="st">"defined"</span>,threshold<span class="op">=</span><span class="fl">12</span>,threshold.units<span class="op">=</span><span class="st">"hours"</span>,</span>
 <span>                      start<span class="op">=</span><span class="st">"2006-06-15"</span>,end<span class="op">=</span><span class="st">"2006-10-15"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="a2_morts_files/figure-html/def_plot-1.png" width="672"></p>
+<p><img src="a2_morts_files/figure-html/def_plot-1.png" class="r-plt" alt="" width="672"></p>
 <p>Note that mort will assign the UTC timezone to <code>start</code> and
 <code>end</code>. If you want to define the period of interest using
 local times, it is recommended to convert local datetimes to POSIXt and
@@ -517,7 +517,7 @@ the flagged mortalities are shifted earlier. The default is
 mortalities with <code>backwards=TRUE</code>. If only a blue point is
 visible for a given animal ID, then the flagged mortality is not shifted
 earlier with <code>backwards=TRUE</code>.</p>
-<p><img src="a2_morts_files/figure-html/backwards_plot-1.png" width="672"></p>
+<p><img src="a2_morts_files/figure-html/backwards_plot-1.png" class="r-plt" alt="" width="672"></p>
 <p>Note, when <code>method="cumulative"</code> and there is no
 seasonality, cumulative residence events will cover all consecutive
 detections at a given station, and <code>backwards</code> is
@@ -561,7 +561,7 @@ as <code>start</code> and <code>end</code> arguments.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
       </footer>
