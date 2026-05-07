@@ -797,6 +797,7 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
         j<-min(which(difftime(res.temp[[res.end]][nrow(res.temp)],
                           res.temp[[res.end]],
                           units=recent.units)<=recent.period))
+        res.temp.full<-res.temp
         res.temp<-res.temp[j:nrow(res.temp),]
         if (nrow(res.temp)>0&length(unique(res.temp$Station.Name))==1){
           if (sum(res.temp[[residences]])<threshold){
@@ -852,14 +853,14 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
               if (k==1){
                 if (backwards==TRUE&j>1){
                   # Run drift on whole dataset
-                  res.temp.drift.full<-drift(data=res.temp,type=type,ID=ID,station=station,
+                  res.temp.drift.full<-drift(data=res.temp.full,type=type,ID=ID,station=station,
                                              res.start=res.start,res.end=res.end,
                                              residences=residences,units=units,ddd=ddd,
                                              from.station=from.station,to.station=to.station,
                                              verbose=FALSE)
                   # Run backwards on dataset, starting with j
                   morts.temp<-backwards(data=res.temp.drift.full,
-                                        morts=res.temp[j,],
+                                        morts=res.temp.full[j,],
                                         ID=ID,station=station,res.start=res.start)
                   if (tag[i] %in% inf.morts[[ID]]){
                     m<-which(inf.morts[[ID]]==tag[i])
@@ -893,7 +894,7 @@ infrequent<-function(data,type="mort",ID,station,res.start="auto",
             else if (nrow(res.temp.drift)==1){
               if (backwards==TRUE&j>1){
                 # Run drift on whole dataset
-                res.temp<-drift(data=res.temp,type=type,ID=ID,station=station,
+                res.temp<-drift(data=res.temp.full,type=type,ID=ID,station=station,
                                 res.start=res.start,res.end=res.end,
                                 residences=residences,units=units,ddd=ddd,
                                 from.station=from.station,to.station=to.station,

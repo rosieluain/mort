@@ -36,6 +36,10 @@ residences<-function(data,ID,station,datetime,cutoff,units,verbose=TRUE){
                 data[[station]]=="",])>0){
     stop("Station must be specified for all records.")
   }
+  # Check for missing detection times
+  if (nrow(data[[is.na(data[[datetime]]),]])>0){
+    stop("Datetime must be specified for all records.")
+  }
 
   # Create list of unique IDs
   tag<-unique(na.omit(data[[ID]]))
