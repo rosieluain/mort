@@ -37,7 +37,7 @@ residences<-function(data,ID,station,datetime,cutoff,units,verbose=TRUE){
     stop("Station must be specified for all records.")
   }
   # Check for missing detection times
-  if (nrow(data[[is.na(data[[datetime]]),]])>0){
+  if (nrow(data[is.na(data[[datetime]]),])>0){
     stop("Datetime must be specified for all records.")
   }
 
